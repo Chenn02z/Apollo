@@ -1,3 +1,14 @@
 .DS_Store
 .agent-trace/
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.uv-cache/
+.venv/
+*.egg-info/
+dist/
+build/

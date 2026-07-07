@@ -1,0 +1,22 @@
+[project]
+name = "topic-to-script-package"
+version = "0.1.0"
+description = "Local topic-to-script-package CLI for the clip production workspace."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+topic-to-script-package = "topic_to_script_package.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
