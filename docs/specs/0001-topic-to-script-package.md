@@ -1,22 +1,25 @@
-# Spec: Topic To Script Package Scaffold
+# Spec: Topic To Script Package
 
 ## Status
 
-Verified
+Accepted
+
+Recommended target: Accepted after `spec-griller` confirms architecture seam
+compliance.
 
 ## Goal
 
-Implement the first local CLI scaffold that accepts topic-only intake and
+Implement the first local CLI pipeline step that accepts topic-only intake and
 emits one canonical `script package` JSON document for a single 60-90 second
-technical education clip using deterministic placeholder drafting.
+technical education clip.
 
 ## Scenario
 
-The creator runs a local CLI command with one required `topic` value, such as
-a technical concept to explain. On success, the command emits exactly one JSON
-script-package document to stdout containing a deterministic placeholder
-teaching angle, target duration, contiguous placeholder voiceover script, and
-ordered untimed visual beats for downstream contract validation.
+The creator runs a local CLI command with one required `topic` value, such as a
+technical concept to explain. On success, the command emits exactly one JSON
+script-package document to stdout containing the selected teaching angle,
+target duration, contiguous voiceover script, and ordered untimed visual beats
+for the later timeline assembly milestone.
 
 ## Architecture Reference
 
@@ -27,16 +30,12 @@ Touched approved seams:
 - Topic intake contract: `topic` is the only required input.
 - Research input seam: no seed links, source URLs, source packages, or live
   retrieval are introduced.
-- Drafting provider seam: preserve the artifact contract so milestone `0002`
-  can replace deterministic placeholder generation with hosted drafting
-  without redesigning the output shape.
 - Timeline assembly seam: output must be structured enough for later timed
   timeline work while remaining untimed and non-render-specific.
 
 Deferred architecture honored:
 
 - Seed-link grounding remains deferred.
-- Hosted drafting remains deferred to milestone `0002`.
 - Narration, subtitle timing, rendering, thumbnailing, export packaging,
   publishing, and feedback ingestion remain out of scope.
 
@@ -44,11 +43,9 @@ Deferred architecture honored:
 
 - Local CLI entrypoint for topic-to-script-package generation.
 - Validation for missing or empty `topic`.
-- Deterministic placeholder selection of exactly one concrete technical
-  education clip angle.
-- Deterministic generation of one contiguous placeholder voiceover script
-  draft for a 60-90 second clip.
-- Deterministic generation of an ordered untimed visual-beat list.
+- Selection of exactly one concrete technical education clip angle.
+- Generation of one contiguous voiceover script draft for a 60-90 second clip.
+- Generation of an ordered untimed visual-beat list.
 - Canonical JSON script-package output.
 - Clear failure behavior that does not emit a valid-looking script package.
 
@@ -56,7 +53,6 @@ Deferred architecture honored:
 
 - Seed links, source URLs, external research packages, or live source
   retrieval.
-- Hosted LLM or provider-backed drafting.
 - Multiple candidate angles, multi-clip plans, or long-form planning.
 - Narration audio.
 - Subtitle segmentation or timing.
@@ -72,9 +68,6 @@ Deferred architecture honored:
   flag or any other file-write behavior.
 - Research input seam: keep generation topic-only. Do not add source-fetching
   abstractions or URL parameters in this milestone.
-- Drafting provider seam: do not introduce provider integration here, but keep
-  the output contract stable so milestone `0002` can swap in hosted drafting
-  without changing the CLI success or artifact shape.
 - Timeline assembly seam: produce a stable untimed handoff artifact. Visual
   beats must reference spans of the script and preserve order, but must not
   contain timestamps, durations, renderer templates, asset IDs, subtitle
@@ -147,9 +140,6 @@ Each `visual_beats` item must include exactly `id`, `sequence`, `goal`,
 `script_span`, and `visual_intent`. Each `script_span` must include exactly
 `start_char` and `end_char`.
 
-The content may be deterministic placeholder drafting, but it must still be
-topic-specific enough to satisfy the non-empty field and span-coverage rules.
-
 Angle-selection contract:
 
 - A usable selected angle must express exactly one concrete viewer takeaway for
@@ -203,18 +193,16 @@ Failure contract:
   JSON script-package document to stdout and exits `0`.
 - The artifact targets one 60-90 second technical education clip.
 - The artifact includes `schema_version`, original `topic`, exactly one
-  `selected_clip_angle`, one `target_duration_seconds` value in `[60, 90]`,
-  one contiguous `voiceover_script`, and ordered `visual_beats`.
+  `selected_clip_angle`, one `target_duration_seconds` value in `[60, 90]`, one
+  contiguous `voiceover_script`, and ordered `visual_beats`.
 - `selected_clip_angle.title`, `selected_clip_angle.teaching_goal`,
   `voiceover_script`, and each visual beat `goal` and `visual_intent` are
   non-empty after trimming whitespace.
 - `visual_beats` contains at least one item.
-- Each visual beat includes stable `id`, `sequence`, `goal`, `script_span`,
-  and `visual_intent`.
+- Each visual beat includes stable `id`, `sequence`, `goal`, `script_span`, and
+  `visual_intent`.
 - Visual beats collectively cover the full script in sequence and remain
   untimed.
-- The selected angle, voiceover script, and visual beats are deterministic
-  scaffold content rather than hosted model output.
 - The flow does not require source URLs, seed links, external source packages,
   or live retrieval.
 - Topics are accepted only when one usable selected angle can be chosen from
@@ -223,8 +211,8 @@ Failure contract:
   output to stdout.
 - Empty topic and generation failure paths fail clearly and emit no stdout
   output.
-- The output contract is the exact shape that milestone `0002` must preserve
-  when hosted drafting replaces deterministic placeholder generation.
+- The output can be consumed by milestone `0002` without a human rewrite before
+  timed timeline assembly begins.
 
 ## Verification
 
@@ -253,7 +241,6 @@ Failure contract:
 
 None blocking.
 
-The implemented scaffold may use deterministic placeholder drafting internally,
-but it must preserve `topic` as the only required production input and keep
-the success artifact identical in shape to the hosted-drafting milestone that
-follows.
+Implementation may choose the exact local CLI command name according to
+existing project conventions, but it must preserve `topic` as the only required
+production input.
