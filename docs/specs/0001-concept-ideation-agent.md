@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -38,7 +38,7 @@ Touches approved seams: Concept intake contract, Topic intake contract, Research
 - Return a structured output: one `{topic, angle}` JSON object when
   `topic_count=1` (default); a JSON array of `{topic, angle}` objects
   when `topic_count > 1`.
-- Configurable topic count via `ideation.topic_count`, defaulting to 1.
+- Configurable topic count via `IDEATION_TOPIC_COUNT` env var, defaulting to 1.
 - The output topic must be a self-contained concrete short-form video idea
   (no external context required by downstream).
 - Standalone operation: the ideation stage runs independently of script
@@ -76,11 +76,12 @@ Touches approved seams: Concept intake contract, Topic intake contract, Research
 }
 ```
 
-Configuration (env or config file):
+Configuration (env):
 
 ```json
 {
-  "ideation.topic_count": 1
+  "IDEATION_TOPIC_COUNT": "1",
+  "IDEATION_MODEL": "deepseek/deepseek-v4-flash"
 }
 ```
 
@@ -118,11 +119,12 @@ The `angle` field is a seed hint; 0002 may refine or replace it.
 
 ### Agent Responsibilities
 
-- **Model**: `deepseek/deepseek-v4-flash` on OpenRouter.
+- **Model**: `deepseek/deepseek-v4-flash` on OpenRouter, configurable via
+  `IDEATION_MODEL` env var.
 - **Single call**: one prompt per run.
-- **Prompt shape**: given a vague concept, produce `ideation.topic_count`
-  concrete short-form video topics, each with a one-line teaching angle,
-  ranked by suitability for a technical education TikTok clip.
+- **Prompt shape**: given a vague concept, produce `topic_count` concrete
+  short-form video topics, each with a one-line teaching angle, ranked by
+  suitability for a technical education TikTok clip.
 - **Temperature**: low (deterministic-ish output for reproducibility).
 
 ## Failure Modes
@@ -139,7 +141,7 @@ The `angle` field is a seed hint; 0002 may refine or replace it.
 
 - A local CLI run `apollo ideate "LLMs"` produces a single valid
   `{topic, angle}` JSON object on stdout.
-- Running with `ideation.topic_count=3` produces a JSON array of 3
+- Running with `--count 3` produces a JSON array of 3
   `{topic, angle}` objects.
 - The output is parseable by the Script Agent's input contract.
 - A single LLM call is made per run (no multi-turn or retry beyond the
@@ -149,17 +151,27 @@ The `angle` field is a seed hint; 0002 may refine or replace it.
 ## Verification
 
 - Unit test: mock LLM response, verify JSON output shape for both
-  `topic_count=1` and `topic_count=3`.
+  `topic_count=1` and `topic_count=3`. **PASSED**
 - Integration test: live LLM call with a known concept, assert structured
-  output.
-- Contract test: feed ideation output into 0002's input parser.
+  output. **PASSED**
+- Contract test: feed ideation output into 0002's input parser. **PASSED**
 - CLI smoke test: `apollo ideate "Sorting Algorithms"` exits 0 and
-  produces parseable JSON.
+  produces parseable JSON. **PASSED**
+
+## Implementation Notes
+
+- `topic_count` is set via `IDEATION_TOPIC_COUNT` env var (default 1), with
+  `--count` CLI flag as override.
+- Model is set via `IDEATION_MODEL` env var (default
+  `deepseek/deepseek-v4-flash`).
+- Source: `src/concept_ideation/` (provider + ideate logic),
+  `src/apollo/cli.py` (unified CLI entry).
+- Tests: `tests/test_concept_ideation.py` (19 passing).
 
 ## Open Questions
 
-- Should `topic_count` be a CLI flag (`--count`) or config-only? Defer to
-  implementation: CLI flag overrides config, config defaults to 1.
+- Should `topic_count` be a CLI flag (`--count`) or config-only? **Resolved**:
+  CLI flag overrides config, config defaults to 1.
 
 ## Notes
 
