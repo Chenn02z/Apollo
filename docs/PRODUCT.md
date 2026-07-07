@@ -76,12 +76,15 @@ For the short-form MVP, success means:
 
 ## Roadmap Backbone
 
-1. Prove topic-only intake and generate a production-ready script package.
-2. Assemble a timed narrated draft with subtitles from the generated plan.
-3. Replace placeholder visuals with asset-driven motion graphics and generate a
+1. Prove topic-only intake and scaffold the script-package contract with
+   deterministic placeholder drafting.
+2. Replace placeholder generation with hosted LLM-backed angle, voiceover, and
+   visual-beat drafting.
+3. Assemble a timed narrated draft with subtitles from the generated plan.
+4. Replace placeholder visuals with asset-driven motion graphics and generate a
    thumbnail.
-4. Export a complete TikTok-ready clip package locally with no direct posting.
-5. Expand only after the MVP loop is stable: grounded source seeding,
+5. Export a complete TikTok-ready clip package locally with no direct posting.
+6. Expand only after the MVP loop is stable: grounded source seeding,
    publishing adapters, feedback loops, and broader content families.
 
 ## Non-Goals For Now

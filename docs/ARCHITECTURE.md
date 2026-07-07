@@ -11,8 +11,8 @@ The current product shape should stay close to the MVP production loop:
 
 1. `topic intake`: accepts the topic-only CLI input and resolves a run
    contract.
-2. `research and script generation`: turns the topic into a short-form teaching
-   angle, script, and supporting content plan.
+2. `research and script drafting`: turns the topic into a short-form teaching
+   angle, script package, and supporting content plan.
 3. `storyboard and timeline assembly`: converts the script into timed visual
    beats, subtitle segments, and render instructions.
 4. `asset-driven renderer`: composes reusable motion-graphics assets and
@@ -41,6 +41,13 @@ module tree or framework.
     script or timeline stages.
   - **Current path**: the MVP operates without seeded links or external source
     packages.
+
+- **Drafting provider seam**
+  - **What**: a provider boundary around hosted script-package drafting.
+  - **Why**: preserves flexibility in hosted drafting choice without changing
+    the public CLI or script-package artifact contract.
+  - **Current path**: milestone `0002` begins with OpenRouter-backed drafting
+    while preserving provider-neutral downstream handoffs.
 
 - **Timeline assembly seam**
   - **What**: a structured intermediate representation between script output

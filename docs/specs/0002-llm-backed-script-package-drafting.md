@@ -1,22 +1,25 @@
-# Spec: Topic To Script Package Scaffold
+# Spec: LLM-Backed Script Package Drafting
 
 ## Status
 
-Verified
+Accepted
 
 ## Goal
 
-Implement the first local CLI scaffold that accepts topic-only intake and
-emits one canonical `script package` JSON document for a single 60-90 second
-technical education clip using deterministic placeholder drafting.
+Replace deterministic placeholder script-package generation with hosted
+LLM-backed drafting while preserving the existing `script package` JSON
+contract for downstream timeline assembly.
 
 ## Scenario
 
-The creator runs a local CLI command with one required `topic` value, such as
-a technical concept to explain. On success, the command emits exactly one JSON
-script-package document to stdout containing a deterministic placeholder
-teaching angle, target duration, contiguous placeholder voiceover script, and
-ordered untimed visual beats for downstream contract validation.
+The creator runs the existing local CLI with one required `topic` value and a
+configured `OPENROUTER_API_KEY`. On success, the command emits exactly one
+canonical script-package JSON document to stdout containing one selected clip
+angle, one target duration, one contiguous voiceover script, and one ordered
+untimed visual-beat list for a single 60-90 second technical education clip.
+The output is materially topic-specific and is not deterministic placeholder
+filler. If hosted drafting fails or returns unusable output, the command emits
+no artifact.
 
 ## Architecture Reference
 
@@ -24,67 +27,72 @@ This spec follows `docs/ARCHITECTURE.md`.
 
 Touched approved seams:
 
-- Topic intake contract: `topic` is the only required input.
+- Topic intake contract: `topic` remains the only required production input.
 - Research input seam: no seed links, source URLs, source packages, or live
-  retrieval are introduced.
-- Drafting provider seam: preserve the artifact contract so milestone `0002`
-  can replace deterministic placeholder generation with hosted drafting
-  without redesigning the output shape.
-- Timeline assembly seam: output must be structured enough for later timed
-  timeline work while remaining untimed and non-render-specific.
+  retrieval are introduced in this milestone.
+- Drafting provider seam: first implementation uses OpenRouter, but provider
+  invocation is isolated so the public CLI and artifact contract remain
+  provider-neutral.
+- Timeline assembly seam: output keeps the same untimed script-package shape
+  already expected by downstream narrated timeline work.
 
 Deferred architecture honored:
 
-- Seed-link grounding remains deferred.
-- Hosted drafting remains deferred to milestone `0002`.
-- Narration, subtitle timing, rendering, thumbnailing, export packaging,
-  publishing, and feedback ingestion remain out of scope.
+- Seed-link grounding remains deferred to milestone `0100`.
+- Narration, subtitle timing, timeline IR, rendering, thumbnailing, export
+  packaging, publishing, and feedback ingestion remain out of scope.
 
 ## In Scope
 
-- Local CLI entrypoint for topic-to-script-package generation.
+- Hosted LLM-backed selection of exactly one concrete technical education clip
+  angle.
+- Hosted LLM-backed generation of one contiguous voiceover script draft for a
+  60-90 second clip.
+- Hosted LLM-backed generation of an ordered untimed visual-beat list.
+- Integration with OpenRouter for the first implementation pass.
+- Lightweight provider seam that isolates hosted drafting from the public CLI
+  and artifact contract.
 - Validation for missing or empty `topic`.
-- Deterministic placeholder selection of exactly one concrete technical
-  education clip angle.
-- Deterministic generation of one contiguous placeholder voiceover script
-  draft for a 60-90 second clip.
-- Deterministic generation of an ordered untimed visual-beat list.
-- Canonical JSON script-package output.
+- Validation for missing `OPENROUTER_API_KEY`.
+- Validation that model output satisfies the exact v1 script-package contract
+  before emission.
 - Clear failure behavior that does not emit a valid-looking script package.
 
 ## Out Of Scope
 
-- Seed links, source URLs, external research packages, or live source
-  retrieval.
-- Hosted LLM or provider-backed drafting.
+- Seed links, source URLs, external research packages, or live retrieval.
+- Citations, grounding metadata, or source provenance fields.
 - Multiple candidate angles, multi-clip plans, or long-form planning.
 - Narration audio.
 - Subtitle segmentation or timing.
 - Timeline IR with timestamps.
 - Rendered video, motion graphics, thumbnail assets, export bundles, or
   publishing output.
-- Human editing workflows inside the pipeline.
+- Changes to the public script-package schema.
 
 ## Architecture Seams
 
-- Topic intake contract: implement a narrow run input with `topic` as the only
-  required production input. This milestone does not include an output-path
-  flag or any other file-write behavior.
-- Research input seam: keep generation topic-only. Do not add source-fetching
-  abstractions or URL parameters in this milestone.
-- Drafting provider seam: do not introduce provider integration here, but keep
-  the output contract stable so milestone `0002` can swap in hosted drafting
-  without changing the CLI success or artifact shape.
-- Timeline assembly seam: produce a stable untimed handoff artifact. Visual
-  beats must reference spans of the script and preserve order, but must not
-  contain timestamps, durations, renderer templates, asset IDs, subtitle
-  timing, or narration metadata.
+- Topic intake contract: preserve `topic` as the only required production
+  input. No additional interactive prompts or required source inputs may be
+  introduced.
+- Research input seam: keep drafting topic-only. Do not add retrieval or
+  source-material abstractions in this milestone.
+- Drafting provider seam: isolate OpenRouter-specific request and response
+  handling behind a minimal drafting-provider boundary so provider choice can
+  change later without altering CLI input, stdout behavior, or artifact
+  fields.
+- Timeline assembly seam: emit the same stable untimed handoff artifact used by
+  downstream milestones. Visual beats must reference spans of the script and
+  preserve order, but must not contain timestamps, durations, renderer
+  templates, asset IDs, subtitle timing, or narration metadata.
 
 ## Contracts
 
 Input contract:
 
-- Required: `topic`, a non-empty string after trimming whitespace.
+- Required production input: `topic`, a non-empty string after trimming
+  whitespace.
+- Required runtime configuration: `OPENROUTER_API_KEY` in the environment.
 - No other required production input is allowed.
 
 Output contract:
@@ -147,9 +155,6 @@ Each `visual_beats` item must include exactly `id`, `sequence`, `goal`,
 `script_span`, and `visual_intent`. Each `script_span` must include exactly
 `start_char` and `end_char`.
 
-The content may be deterministic placeholder drafting, but it must still be
-topic-specific enough to satisfy the non-empty field and span-coverage rules.
-
 Angle-selection contract:
 
 - A usable selected angle must express exactly one concrete viewer takeaway for
@@ -158,6 +163,15 @@ Angle-selection contract:
 - If satisfying the topic would require choosing arbitrarily among multiple
   materially different lessons or surveying a whole field or toolchain, the
   flow must fail rather than guess.
+
+Content-quality contract:
+
+- The output must be materially topic-specific and internally consistent across
+  `selected_clip_angle`, `voiceover_script`, and `visual_beats`.
+- Deterministic placeholder fallback is forbidden once this milestone owns real
+  drafting.
+- Schema-valid but obviously generic filler that does not resolve a concrete
+  clip angle is considered unusable output and must fail closed.
 
 Visual beat contract:
 
@@ -180,27 +194,37 @@ Failure contract:
 - On failure, the command exits non-zero.
 - On failure, diagnostics are emitted only to stderr.
 - On failure, stdout is empty.
-- Empty topic, unusably broad topic, missing angle, or generation failure must
-  follow this failure I/O contract.
+- Missing `OPENROUTER_API_KEY`, provider timeout, provider rate-limit,
+  provider network failure, retry exhaustion, empty topic, unresolved broad
+  topic, unusable angle, malformed model output, or schema validation failure
+  must all follow this failure I/O contract.
 
 ## Failure Modes
 
 - Missing or whitespace-only topic.
 - Topic is too broad for one 60-90 second technical education clip and no
   single concrete angle can be selected without more input.
+- Missing `OPENROUTER_API_KEY`.
+- OpenRouter timeout, rate-limit, authentication, or network failure.
+- Retry exhaustion after repeated provider failures or unusable outputs.
+- Model output cannot be parsed into the required JSON shape.
+- Model output omits required fields, adds forbidden fields, or breaks
+  script-span reconstruction.
 - Generation cannot produce a usable selected angle.
 - Generation cannot produce a non-empty contiguous script.
 - Generation cannot produce at least one visual beat with non-empty `goal` and
   `visual_intent`.
 - Visual beats do not cover the full non-empty script in order.
-- Output serialization fails.
+- Any attempted fallback emits deterministic placeholder content instead of
+  failing closed.
 - Any attempted output includes timed timeline, subtitle, narration, render,
-  thumbnail, export, or publishing fields.
+  thumbnail, export, publishing, seed-link, or source-retrieval fields.
 
 ## Acceptance Criteria
 
-- A local CLI run with only `topic` as required input emits exactly one UTF-8
-  JSON script-package document to stdout and exits `0`.
+- A local CLI run with only `topic` as required production input, plus a
+  configured `OPENROUTER_API_KEY`, emits exactly one UTF-8 JSON script-package
+  document to stdout and exits `0`.
 - The artifact targets one 60-90 second technical education clip.
 - The artifact includes `schema_version`, original `topic`, exactly one
   `selected_clip_angle`, one `target_duration_seconds` value in `[60, 90]`,
@@ -213,47 +237,44 @@ Failure contract:
   and `visual_intent`.
 - Visual beats collectively cover the full script in sequence and remain
   untimed.
-- The selected angle, voiceover script, and visual beats are deterministic
-  scaffold content rather than hosted model output.
+- The output is materially topic-specific and not deterministic placeholder
+  filler.
 - The flow does not require source URLs, seed links, external source packages,
   or live retrieval.
 - Topics are accepted only when one usable selected angle can be chosen from
   topic-only intake.
 - If a clear angle cannot be selected, the command fails clearly and emits no
   output to stdout.
-- Empty topic and generation failure paths fail clearly and emit no stdout
-  output.
-- The output contract is the exact shape that milestone `0002` must preserve
-  when hosted drafting replaces deterministic placeholder generation.
+- Empty topic, missing `OPENROUTER_API_KEY`, provider failure, malformed model
+  output, schema validation failure, and retry exhaustion all fail clearly and
+  emit no stdout output.
+- The output contract remains compatible with downstream narrated timeline work
+  after the milestone renumbering.
 
 ## Verification
 
-- Unit tests for topic validation.
-- Contract/schema test for a successful script-package artifact.
+- Unit tests for topic validation and missing `OPENROUTER_API_KEY`.
+- Provider seam tests that translate timeout, rate-limit, authentication, and
+  network failures into the shared failure I/O contract.
+- Contract/schema test for a successful provider-backed script-package
+  artifact.
 - Test that visual beat spans are ordered, non-overlapping, and cover the full
   script.
 - Test that concatenating visual-beat script slices in `sequence` order
   reproduces the full `voiceover_script` exactly.
-- CLI smoke test verifies that a narrowly scoped topic such as `binary search`
-  succeeds, exits `0`, emits exactly one UTF-8 script-package JSON document to
-  stdout, and emits no non-JSON content to stdout.
-- Success-path tests verify non-empty `selected_clip_angle.title`,
-  `selected_clip_angle.teaching_goal`, `voiceover_script`, and each visual beat
-  `goal` and `visual_intent`, plus at least one visual beat.
-- Negative-path tests for empty topic, too-broad unresolved topic, no usable
-  angle, and generation failure.
-- Negative-path test verifies that a survey-sized topic such as `computer
-  science` fails non-zero, emits diagnostics only to stderr, emits nothing to
-  stdout.
-- Review output fields to confirm no timed timeline, narration audio, subtitle
-  timing, render, thumbnail, export, publishing, seed-link, or source-retrieval
-  scope leaked into the artifact.
+- Tests for malformed model output, schema-invalid model output, unusable
+  selected angle, and retry exhaustion.
+- Smoke test verifies that a narrowly scoped topic succeeds, exits `0`, emits
+  exactly one UTF-8 script-package JSON document to stdout, and emits no
+  non-JSON content to stdout when hosted drafting is available.
+- Negative-path tests verify that empty topic, overly broad unresolved topic,
+  missing `OPENROUTER_API_KEY`, provider failure, malformed model output, and
+  retry exhaustion all fail non-zero, emit diagnostics only to stderr, and
+  emit nothing to stdout.
+- Manual artifact review confirms the selected angle is single-clip sized and
+  the voiceover plus visual beats are materially topic-specific rather than
+  generic filler.
 
 ## Open Questions
 
 None blocking.
-
-The implemented scaffold may use deterministic placeholder drafting internally,
-but it must preserve `topic` as the only required production input and keep
-the success artifact identical in shape to the hosted-drafting milestone that
-follows.
