@@ -9,17 +9,19 @@ platform.
 
 The current product shape should stay close to the MVP production loop:
 
-1. `topic intake`: accepts the topic-only CLI input and resolves a run
-   contract.
-2. `research and script generation`: turns the topic into a short-form teaching
-   angle, script, and supporting content plan.
-3. `storyboard and timeline assembly`: converts the script into timed visual
+1. `concept ideation`: accepts a vague `concept` and produces ranked concrete
+   video topics via the Concept Ideation Agent (0001).
+2. `topic intake`: accepts a single `{topic, angle}` JSON object (from
+   ideation via the pipe adapter or direct CLI input) and resolves a run contract.
+3. `research and script generation`: turns the topic into a short-form teaching
+   angle, script, and supporting content plan via the Script Agent (0002).
+4. `storyboard and timeline assembly`: converts the script into timed visual
    beats, subtitle segments, and render instructions.
-4. `asset-driven renderer`: composes reusable motion-graphics assets and
+5. `asset-driven renderer`: composes reusable motion-graphics assets and
    deterministic layouts into video scenes.
-5. `narration and subtitle generation`: produces voiceover audio and subtitle
+6. `narration and subtitle generation`: produces voiceover audio and subtitle
    data aligned to the timeline.
-6. `export packaging`: emits the final video, thumbnail, and any delivery
+7. `export packaging`: emits the final video, thumbnail, and any delivery
    metadata needed for manual upload.
 
 This is an aspirational component map for the MVP, not a commitment to a large
@@ -27,20 +29,33 @@ module tree or framework.
 
 ## Approved Seams
 
+- **Concept intake contract**
+  - **What**: a boundary that accepts a vague `concept` string and produces
+    one or more concrete video topics (configurable via `ideation.topic_count`,
+    defaulting to 1) before the topic intake stage.
+  - **Why**: allows concept-driven ideation to exist as an optional upstream
+    stage without coupling it to topic intake or script generation.
+  - **Current path**: the MVP supports concept as an alternative starting
+    point; topic-only direct input remains the primary intake. The pipe adapter
+    feeds exactly one topic (top-ranked) from ideation into script generation.
+
 - **Topic intake contract**
-  - **What**: a narrow run-input boundary that requires `topic` and can grow
-    later without breaking the caller shape.
+  - **What**: a narrow run-input boundary that consumes a `{topic, angle}` JSON
+    object and can grow later without breaking the caller shape.
   - **Why**: preserves the topic-only MVP while leaving room for optional seed
-    links later.
-  - **Current path**: MVP intake should treat topic as the only required field.
+    links later. The `angle` field is an optional seed hint from ideation that
+    the script agent may refine or replace.
+  - **Current path**: MVP intake accepts a single `{topic, angle}` object from
+    ideation output (via the pipe adapter) or direct CLI input.
 
 - **Research input seam**
   - **What**: a source-material hook between topic intake and script
     generation.
-  - **Why**: future source seeding can slot in without rewriting downstream
-    script or timeline stages.
+  - **Why**: future source seeding (seed-link grounding) can slot in without
+    rewriting downstream script or timeline stages.
   - **Current path**: the MVP operates without seeded links or external source
-    packages.
+    packages. The Script Agent (0002) performs lightweight internal knowledge
+    synthesis as part of its single LLM call.
 
 - **Timeline assembly seam**
   - **What**: a structured intermediate representation between script output

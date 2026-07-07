@@ -28,6 +28,10 @@ produces one exported short-form clip package containing:
 - thumbnail
 - final export suitable for TikTok delivery
 
+The pipeline may accept a `concept` as an alternative starting point, using
+the Concept Ideation Agent (0001) to produce concrete topics that feed the
+downstream stages.
+
 The MVP explicitly excludes:
 
 - direct posting to TikTok, YouTube, or other platforms
@@ -76,12 +80,13 @@ For the short-form MVP, success means:
 
 ## Roadmap Backbone
 
-1. Prove topic-only intake and generate a production-ready script package.
-2. Assemble a timed narrated draft with subtitles from the generated plan.
-3. Replace placeholder visuals with asset-driven motion graphics and generate a
+1. Prove concept ideation: accept a vague concept and produce ranked concrete video topics (0001).
+2. Prove script generation: accept a concrete topic and produce a production-ready script package (0002).
+3. Assemble a timed narrated draft with subtitles from the generated plan.
+4. Replace placeholder visuals with asset-driven motion graphics and generate a
    thumbnail.
-4. Export a complete TikTok-ready clip package locally with no direct posting.
-5. Expand only after the MVP loop is stable: grounded source seeding,
+5. Export a complete TikTok-ready clip package locally with no direct posting.
+6. Expand only after the MVP loop is stable: grounded source seeding,
    publishing adapters, feedback loops, and broader content families.
 
 ## Non-Goals For Now

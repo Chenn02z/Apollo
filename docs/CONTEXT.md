@@ -13,14 +13,57 @@ implementation details out.
 - `TikTok-ready clip package`: the exported output bundle containing the final
   video, subtitles in their chosen delivery form, and a thumbnail, ready for
   manual upload.
+- `concept`: a vague creator-supplied idea (e.g. "LLMs") that the Concept
+  Ideation Agent expands into ranked concrete video topics.
+- `Concept Ideation Agent`: the agentic stage (0001) that accepts a `concept`
+  and outputs one or more concrete video topics with one-line teaching
+  angles. Topic count is configurable via `ideation.topic_count`, defaulting
+  to 1. Model: `deepseek/deepseek-v4-flash`.
+- `Script Agent`: the agentic stage (0002) that accepts a concrete topic
+  (with optional angle seed from 0001) and outputs a `script package`
+  containing a refined angle, narration draft, visual beats, and duration
+  estimate. Content is targeted at software developers preparing for
+  technical interviews. Model: `deepseek/deepseek-v4-pro`.
 - `topic-only intake`: the MVP input contract where `topic` is the only
-  required production input.
+  required production input. The pipeline may also accept a `concept` as an
+  alternative starting point via the Concept Ideation Agent.
 - `script package`: the canonical intermediate artifact for one clip produced
   after topic-only intake and script planning, containing the untimed
   one-clip script and visual-beat plan consumed by later timeline assembly;
   distinct from the final `TikTok-ready clip package`.
 - `seed-link grounding`: optional future input of supporting source links or
   materials to steer research and scripting.
+
+- `angle`: a one-line teaching approach attached to a concrete video topic.
+  Produced as a seed hint by the Concept Ideation Agent and refined into the
+  authoritative teaching angle by the Script Agent. The input `angle` is a
+  seed the script agent may override; the output `angle` is authoritative.
+- `angle seed`: the `angle` field as provided by the Concept Ideation Agent
+  (0001). A hint, not a hard constraint — the Script Agent (0002) may refine
+  or replace it.
+- `pipe adapter`: the CLI-level adapter that connects the Concept Ideation
+  Agent to the Script Agent. When ideation produces multiple topics, it
+  selects only the first (top-ranked) topic before feeding 0002. This keeps
+  the per-topic contract identical regardless of ideation output count.
+- `visual beats`: timed scene descriptions in the script package, each with
+  a `timestamp` (M:SS from clip start) and `description`. Consumed by
+  timeline assembly as the rendering instruction source.
+- `narration draft`: untimed speakable prose in the script package, sized
+  for 60–90 seconds at ~150 words/minute. Must be plain prose with no
+  markdown, bullet lists, or parentheticals.
+- `ideation.topic_count`: config key controlling how many concrete topics
+  the Concept Ideation Agent produces. Defaults to 1. Values greater than 1
+  produce a JSON array output; the pipe adapter feeds only the first topic
+  to 0002.
+- `script.*` config namespace: configuration keys for the Script Agent,
+  including `script.model` (defaults to `deepseek/deepseek-v4-pro`),
+  `script.temperature`, and `script.max_duration_s`/`script.min_duration_s`.
+- `ideation model`: `deepseek/deepseek-v4-flash` on OpenRouter — the fast,
+  low-cost model used by the Concept Ideation Agent for single-call topic
+  generation.
+- `script model`: `deepseek/deepseek-v4-pro` on OpenRouter — the
+  reasoning-capable model used by the Script Agent for interview-prep
+  script generation.
 - `local pipeline`: the first product surface, operated through a CLI on the
   creator's machine.
 - `asset-driven rendering`: deterministic scene composition from reusable
@@ -28,9 +71,9 @@ implementation details out.
   video.
 - `cheap polish`: the quality bar for output that is cost-conscious but not
   obvious AI slop.
-- `MVP boundary`: one local pipeline from topic input to one exported
-  TikTok-ready clip package, with no direct posting and no required human
-  editing pass.
+- `MVP boundary`: one local pipeline from concept or topic input to one
+  exported TikTok-ready clip package, with no direct posting and no required
+  human editing pass.
 - `approved seam`: a lightweight interface, contract, or config boundary kept
   open for clearly deferred work.
 - `future publishing adapter`: the approved seam for post-MVP direct upload
