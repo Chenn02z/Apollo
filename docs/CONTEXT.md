@@ -15,6 +15,10 @@ implementation details out.
   manual upload.
 - `topic-only intake`: the MVP input contract where `topic` is the only
   required production input.
+- `script package`: the canonical intermediate artifact for one clip produced
+  after topic-only intake and script planning, containing the untimed
+  one-clip script and visual-beat plan consumed by later timeline assembly;
+  distinct from the final `TikTok-ready clip package`.
 - `seed-link grounding`: optional future input of supporting source links or
   materials to steer research and scripting.
 - `local pipeline`: the first product surface, operated through a CLI on the
