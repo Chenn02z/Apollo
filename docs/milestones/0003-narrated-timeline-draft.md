@@ -12,9 +12,10 @@ shared timing plan needed before render.
 
 ## MVP Deliverable
 
-One local run can accept the authoritative 0002 script package and emit a
-single `narrated timeline draft` artifact for one clip, ready to hand to 0004
-for visual rendering.
+A local CLI command accepts the authoritative 0002 script package and emits a
+single `narrated timeline draft` JSON artifact for one clip, ready to hand to
+0004 for visual rendering. No manual timeline rewriting — the CLI output is
+the canonical artifact.
 
 ## Developer Workflow
 
@@ -78,6 +79,35 @@ Requirements -> spec authoring -> development loop.
 
 Narration provider choice, rendered visuals, final subtitle delivery format,
 thumbnail generation, and final packaging.
+
+## Non-Blocking Spec Constraints
+
+These design questions must be settled during spec authoring, before
+implementation begins. They are not blocking milestone acceptance but are
+required constraints for the spec to produce a testable contract:
+
+- **Segment narration reconstruction** — how the spec reconstructs narration
+  from input segments.
+- **Visual beat alignment** — how visual beats map to timeline segments and
+  whether alignment is segment-level or beat-level.
+- **`subtitle_text` relationship** — whether each segment carries its own
+  `subtitle_text` or derives it from narration.
+- **Contiguous timing** — how `start_s` / `end_s` guarantee contiguous,
+  gap-free coverage across segments.
+- **LLM output scope** — whether the LLM returns only `timeline_segments` or
+  also produces narration text, beat metadata, or other fields.
+
+### Flaky-Test Mitigation
+
+The spec must enforce these constraints to keep the test suite deterministic:
+
+- **Unit and CLI tests mock the LLM provider boundary.** No test may call a
+  live LLM endpoint for core path assertions.
+- **Validation must be deterministic.** All acceptance checks use fixed inputs
+  and expected outputs — no model-dependent assertions.
+- **Live LLM tests are skipped by default.** Any integration test that calls a
+  real provider must be gated behind an opt-in marker (e.g. `pytest -m live`)
+  and excluded from the default test run.
 
 ## Open Questions
 
