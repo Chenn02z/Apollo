@@ -25,4 +25,4 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/apollo", "src/concept_ideation", "src/script_agent"]
+packages = ["src/apollo", "src/concept_ideation", "src/script_agent", "src/timeline_agent"]

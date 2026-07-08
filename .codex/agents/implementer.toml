@@ -1,6 +1,7 @@
 name = "implementer"
 description = "Workspace-write implementation agent for accepted specs and tightly scoped code or doc changes."
-model = "gpt-5.5"
+model_provider="openrouter"
+model = "deepseek/deepseek-v4-pro"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 

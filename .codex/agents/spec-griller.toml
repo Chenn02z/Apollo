@@ -1,6 +1,7 @@
 name = "spec-griller"
 description = "Pressure-tests specs and milestones for ambiguity, missing failure modes, weak contracts, and scope creep."
-model = "gpt-5.4"
+model_provider="openrouter"
+model = "qwen/qwen3.7-plus"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 
