@@ -15,12 +15,15 @@ The current product shape should stay close to the MVP production loop:
    ideation via the pipe adapter or direct CLI input) and resolves a run contract.
 3. `research and script generation`: turns the topic into a short-form teaching
    angle, script, and supporting content plan via the Script Agent (0002).
-4. `storyboard and timeline assembly`: converts the script into timed visual
-   beats, subtitle segments, and render instructions.
-5. `asset-driven renderer`: composes reusable motion-graphics assets and
-   deterministic layouts into video scenes.
-6. `narration and subtitle generation`: produces voiceover audio and subtitle
-   data aligned to the timeline.
+4. `storyboard and narrated timeline drafting`: converts the authoritative
+   script package into the canonical pre-render `narrated timeline draft`
+   with authoritative timing and subtitle-ready text consumed by downstream
+   narration, subtitle realization, and 0004.
+5. `narration and subtitle generation`: produces voiceover audio and subtitle
+   artifacts from that shared timeline.
+6. `asset-driven renderer`: composes reusable motion-graphics assets and
+   deterministic layouts into video scenes against the narrated timeline
+   draft.
 7. `export packaging`: emits the final video, thumbnail, and any delivery
    metadata needed for manual upload.
 
@@ -60,9 +63,13 @@ module tree or framework.
 - **Timeline assembly seam**
   - **What**: a structured intermediate representation between script output
     and rendering.
-  - **Why**: keeps narration, subtitles, thumbnails, and scene composition
+  - **Why**: keeps narration, subtitle realization, and scene composition
     aligned through one timeline contract.
-  - **Current path**: one local clip pipeline targeting 60-90 second exports.
+  - **Current path**: 0003 emits the canonical `narrated timeline draft`
+    before narration/subtitle realization and 0004 visual rendering. Its
+    `timeline_segments.start_s` and `end_s` fields use numeric seconds, with
+    fractional precision allowed, and downstream stages must treat that timing
+    as authoritative rather than silently drifting.
 
 - **Renderer asset seam**
   - **What**: a boundary between timeline instructions and reusable visual
@@ -75,16 +82,18 @@ module tree or framework.
 - **Narration provider seam**
   - **What**: a provider boundary for voice generation.
   - **Why**: preserves flexibility between local and low-cost hosted narration
-    approaches without affecting export packaging.
-  - **Current path**: the MVP should favor local or low-variable-cost narration
-    where practical.
+    approaches without affecting the pre-render timeline contract.
+  - **Current path**: narration is generated from the narrated timeline draft;
+    exact provider choice remains deferred.
 
 - **Subtitle output seam**
   - **What**: a boundary that allows subtitles to be rendered into the video or
     shipped alongside it from the same timing source.
   - **Why**: preserves platform-specific delivery options later without
     changing timing generation.
-  - **Current path**: subtitles are part of the MVP clip package.
+  - **Current path**: subtitle timing is derived from the narrated timeline
+    draft before final render/export decisions; 0003 does not emit final
+    subtitle artifacts.
 
 - **Publishing adapter seam**
   - **What**: a post-export handoff boundary for future platform integrations.

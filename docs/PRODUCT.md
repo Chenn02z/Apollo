@@ -82,9 +82,10 @@ For the short-form MVP, success means:
 
 1. Prove concept ideation: accept a vague concept and produce ranked concrete video topics (0001).
 2. Prove script generation: accept a concrete topic and produce a production-ready script package (0002).
-3. Assemble a timed narrated draft with subtitles from the generated plan.
-4. Replace placeholder visuals with asset-driven motion graphics and generate a
-   thumbnail.
+3. Assemble a timed narrated draft with subtitle-ready timing and text from
+   the generated plan.
+4. Replace placeholder visuals with asset-driven motion graphics from the
+   narrated timeline draft.
 5. Export a complete TikTok-ready clip package locally with no direct posting.
 6. Expand only after the MVP loop is stable: grounded source seeding,
    publishing adapters, feedback loops, and broader content families.

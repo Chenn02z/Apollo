@@ -2,17 +2,19 @@
 
 ## Status
 
-Draft
+Accepted
 
 ## Goal
 
-Convert the script package into a timed clip draft with aligned narration and
-subtitle timing.
+Convert the authoritative 0002 script package into a narrated timeline draft
+that preserves the script's narration and target audience while adding the
+shared timing plan needed before render.
 
 ## MVP Deliverable
 
-The pipeline can generate a timed draft for one clip that includes narration
-audio and subtitle data aligned to a shared timeline.
+One local run can accept the authoritative 0002 script package and emit a
+single `narrated timeline draft` artifact for one clip, ready to hand to 0004
+for visual rendering.
 
 ## Developer Workflow
 
@@ -20,12 +22,23 @@ Requirements -> spec authoring -> development loop.
 
 ## In Scope
 
-- Timeline assembly contract.
-- Narration provider integration for one clip.
-- Subtitle timing generation from the same clip timeline.
+- Authoritative 0002 script-package input contract:
+  `topic`, `angle`, `narration`, `visual_beats`, `duration_estimate_s`,
+  `target_audience`.
+- Narrated timeline draft output contract for one clip.
+- Timeline drafting that preserves the input narration draft and target
+  audience.
+- Shared timing plan with subtitle-ready text for later narration, subtitle
+  realization, and rendering.
+- Structured handoff into 0004.
+- Timeline drafting with `deepseek/deepseek-v4-pro` on OpenRouter.
 
 ## Out Of Scope
 
+- Re-authoring the script package narration.
+- Retargeting the audience defined by 0002.
+- Exact narration provider selection or narration-audio generation.
+- Final subtitle-file generation.
 - Final motion-graphics polish.
 - Thumbnail generation.
 - Direct platform upload.
@@ -38,24 +51,34 @@ Requirements -> spec authoring -> development loop.
 
 ## Specs
 
-- `docs/specs/...`
+- `docs/specs/0003-narrated-timeline-draft.md`
 
 ## Acceptance Criteria
 
-- One script package can be turned into a timed narration and subtitle draft.
-- Narration and subtitle timing come from the same underlying clip plan.
-- The result is ready for renderer consumption without manual timeline editing.
+- One authoritative 0002 script package can be turned into one narrated
+  timeline draft.
+- The draft preserves the input `narration` and `target_audience` unchanged.
+- Timeline timing is shared across narration planning, subtitle planning, and
+  render consumption.
+- `timeline_segments.start_s` and `end_s` use numeric seconds, with
+  fractional precision allowed.
+- The output is the canonical pre-render artifact handed to 0004.
+- The draft is the authoritative timing source for downstream narration,
+  subtitle realization, and 0004 rendering.
+- The drafting stage uses `deepseek/deepseek-v4-pro` on OpenRouter.
 
 ## Verification
 
-- Future local command to generate the narrated timeline draft.
-- Artifact review for timing alignment.
+- Future local command to generate a narrated timeline draft from a 0002
+  script package.
+- Artifact review to confirm narration preservation, target-audience
+  continuity, timeline alignment, and numeric-second timing fields.
 
 ## Deferred
 
-Reusable motion-graphics rendering, thumbnail generation, and final packaging.
+Narration provider choice, rendered visuals, final subtitle delivery format,
+thumbnail generation, and final packaging.
 
 ## Open Questions
 
-- How should narration quality versus runtime be traded off on the first
-  machine?
+- No blocking open questions for milestone acceptance.

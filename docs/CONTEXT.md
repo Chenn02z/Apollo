@@ -22,15 +22,22 @@ implementation details out.
 - `Script Agent`: the agentic stage (0002) that accepts a concrete topic
   (with optional angle seed from 0001) and outputs a `script package`
   containing a refined angle, narration draft, visual beats, and duration
-  estimate. Content is targeted at software developers preparing for
+  estimate, plus the target audience. Content is targeted at software developers preparing for
   technical interviews. Model: `deepseek/deepseek-v4-pro`.
 - `topic-only intake`: the MVP input contract where `topic` is the only
   required production input. The pipeline may also accept a `concept` as an
   alternative starting point via the Concept Ideation Agent.
 - `script package`: the canonical intermediate artifact for one clip produced
-  after topic-only intake and script planning, containing the untimed
-  one-clip script and visual-beat plan consumed by later timeline assembly;
-  distinct from the final `TikTok-ready clip package`.
+  after topic-only intake and script planning, containing the authoritative
+  one-clip topic, angle, narration draft, visual-beat plan, duration estimate,
+  and target audience consumed by later timeline assembly; distinct from the
+  final `TikTok-ready clip package`.
+- `narrated timeline draft`: the canonical post-0002, pre-render artifact for
+  one clip. Produced by 0003 from the authoritative `script package`, it
+  preserves the input narration draft and target audience while adding the
+  authoritative timing plan and subtitle-ready text later stages consume
+  before final render. Downstream narration, subtitle realization, and 0004
+  rendering must conform to this timing or fail as a contract error.
 - `seed-link grounding`: optional future input of supporting source links or
   materials to steer research and scripting.
 
@@ -51,6 +58,9 @@ implementation details out.
 - `narration draft`: untimed speakable prose in the script package, sized
   for 60–90 seconds at ~150 words/minute. Must be plain prose with no
   markdown, bullet lists, or parentheticals.
+- `target audience`: the intended viewer profile attached authoritatively to
+  the 0002 `script package` and preserved unchanged through the 0003
+  `narrated timeline draft`.
 - `ideation.topic_count`: config key controlling how many concrete topics
   the Concept Ideation Agent produces. Defaults to 1. Values greater than 1
   produce a JSON array output; the pipe adapter feeds only the first topic
@@ -58,6 +68,11 @@ implementation details out.
 - `script.*` config namespace: configuration keys for the Script Agent,
   including `script.model` (defaults to `deepseek/deepseek-v4-pro`),
   `script.temperature`, and `script.max_duration_s`/`script.min_duration_s`.
+- `timeline.*` config namespace: configuration keys for narrated timeline
+  drafting, including `timeline.model` (defaults to
+  `deepseek/deepseek-v4-pro`) and `timeline.temperature`.
+- `timeline segment timing`: `timeline_segments.start_s` and `end_s` are
+  numeric seconds from clip start, with fractional precision allowed.
 - `ideation model`: `deepseek/deepseek-v4-flash` on OpenRouter — the fast,
   low-cost model used by the Concept Ideation Agent for single-call topic
   generation.
