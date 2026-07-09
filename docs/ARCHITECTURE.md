@@ -73,6 +73,8 @@ module tree or framework.
     produces narration text and timing; the CLI deterministically copies each
     `visual_beats[i].description` into the corresponding segment's
     `visual_instruction` field — 0003 does not paraphrase or regenerate it.
+    0004 consumes this output read-only; `start_s`, `end_s`, and
+    `visual_instruction` are the authoritative fields downstream.
 
 - **Renderer asset seam**
   - **What**: a boundary between timeline instructions and reusable visual
@@ -80,9 +82,10 @@ module tree or framework.
   - **Why**: supports cheap polish and deterministic output without coupling
     the pipeline to one-off scene logic.
   - **Current path**: visuals should favor reusable motion-graphics assets over
-    frame-by-frame AI video generation. 0004 maps each segment's
-    `visual_instruction` to an asset and template combination; this field is
-    the segment-level key for the asset lookup.
+    frame-by-frame AI video generation. The 0004 spec settles deterministic
+    template mapping from `visual_instruction` to the template vocabulary with
+    `fallback_text_card` for unmatched text, and no LLM in the render path.
+    `visual_instruction` is the segment-level key for the asset lookup.
 
 - **Narration provider seam**
   - **What**: a provider boundary for voice generation.
@@ -96,9 +99,10 @@ module tree or framework.
     shipped alongside it from the same timing source.
   - **Why**: preserves platform-specific delivery options later without
     changing timing generation.
-  - **Current path**: subtitle timing is derived from the narrated timeline
-    draft before final render/export decisions; 0003 does not emit final
-    subtitle artifacts.
+  - **Current path**: the 0004 spec selects subtitle burn-in for the visual
+    draft, where `subtitle_text` is rendered directly into MP4 frames.
+    Standalone subtitle-file delivery remains deferred to 0005. 0003 does
+    not emit final subtitle artifacts.
 
 - **Publishing adapter seam**
   - **What**: a post-export handoff boundary for future platform integrations.

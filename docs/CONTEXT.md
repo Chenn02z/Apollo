@@ -61,6 +61,27 @@ implementation details out.
   `visual_beats[i].description` by the 0003 CLI; not produced or paraphrased
   by the LLM. Consumed by 0004 as the segment-level key for asset and
   template mapping.
+- `visual draft`: canonical 0004 output artifact for one clip: rendered MP4
+  plus render manifest, produced from the narrated timeline draft by the
+  asset-driven renderer once implemented; distinct from TikTok-ready clip
+  package because 0004 omits thumbnail generation, final export packaging,
+  and standalone subtitle-file delivery for 0005.
+- `asset-driven renderer`: 0004 pipeline stage specified to compose one
+  scene per timeline segment by mapping its visual instruction to the
+  template vocabulary and emitting the visual draft; no LLM in render path.
+- `template vocabulary`: closed set of deterministic render templates
+  recognized by the asset-driven renderer; full enumeration lives in
+  docs/specs/0004-asset-driven-visual-render.md; fallback_text_card handles
+  unmatched visual instruction text.
+- `template mapping`: deterministic keyword/regex operation assigning each
+  visual instruction to exactly one template; CLI behavior, not LLM
+  behavior.
+- `render manifest`: per-render `.render.json` emitted beside MP4 recording
+  source timeline, optional narration source, output path, duration,
+  resolution, codec, and per-segment template/params/warnings.
+- `subtitle burn-in`: 0004 delivery form for subtitle output seam where
+  subtitle_text is rendered into MP4 frames; standalone subtitle-file export
+  deferred to 0005.
 - `narration draft`: untimed speakable prose in the script package, sized
   for 60–90 seconds at ~150 words/minute. Must be plain prose with no
   markdown, bullet lists, or parentheticals.
@@ -137,8 +158,11 @@ implementation details out.
 
 - The exact local command set for running the future pipeline is not defined
   yet.
-- The concrete narration stack, subtitle toolchain, and render toolchain are
-  intentionally unsettled at bootstrap time.
+- Render contract and toolchain direction are settled in 0004 spec but not
+  yet implemented.
+- The narration stack remains unsettled.
+- Standalone subtitle-file delivery beyond burn-in remains unsettled
+  (deferred to 0005).
 - The under-10-minute runtime target is a product goal, not yet a verified
   benchmark.
 - The trace retention policy for this repo remains unsettled.
@@ -146,5 +170,3 @@ implementation details out.
 ## Open Questions
 
 - Which local-first narration approach best meets the MVP cost and quality bar?
-- Which render stack best supports deterministic motion-graphics output on the
-  initial machine without adding proprietary dependencies?
