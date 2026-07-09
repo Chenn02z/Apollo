@@ -1,0 +1,33 @@
+{
+    "topic": "DeepSeek-V2: China's Open Source Model Challenging GPT-4",
+    "angle": "DeepSeek-V2 demonstrates how Mixture-of-Experts (MoE) architecture enables near-GPT-4 performance with open-source accessibility, using sparse activation to reduce computational cost while maintaining high accuracy.",
+    "narration": "You've heard of GPT-4, but what if I told you there's an open-source model that rivals it? DeepSeek-V2 uses a Mixture-of-Experts architecture to achieve this. Imagine a team of specialists instead of one generalist. Each expert handles different types of data, and a gating network decides which experts to activate per token. With 236 billion total parameters, it only uses 21 billion per forward pass. That's like having a huge library but only pulling the books you need. This sparse activation reduces compute by 90% compared to dense models. In practice, you'd implement a gating network that selects the top two experts per token, similar to a mixture of linear layers. Developers can fine-tune the model for specific tasks using standard frameworks. For interviews, remember: MoE means sparse activation, expert specialization, and cost efficiency. DeepSeek-V2 proves open-source can compete with closed giants.",
+    "visual_beats": [
+        {
+            "timestamp": "0:00",
+            "description": "Title slide: 'DeepSeek-V2: Open Source Challenger to GPT-4' with logo"
+        },
+        {
+            "timestamp": "0:10",
+            "description": "Diagram of MoE architecture: multiple expert blocks connected to a router/gating network, arrows showing token routing"
+        },
+        {
+            "timestamp": "0:25",
+            "description": "Comparison chart: Total parameters 236B vs active parameters 21B, with a 90% reduction label"
+        },
+        {
+            "timestamp": "0:40",
+            "description": "Pseudocode snippet: 'def moe_gate(x): scores = router(x); top_k = topk(scores, k=2); return weighted_sum(expert_outputs)'"
+        },
+        {
+            "timestamp": "0:55",
+            "description": "Key takeaways list: 'MoE = Sparse Activation, Expert Specialization, Cost Efficiency'"
+        },
+        {
+            "timestamp": "1:10",
+            "description": "End screen with 'Subscribe for more AI interview prep'"
+        }
+    ],
+    "duration_estimate_s": 70,
+    "target_audience": "Software developers preparing for technical interviews"
+}

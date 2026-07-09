@@ -1,0 +1,29 @@
+{
+    "topic": "Cache Miss vs Cache Hit",
+    "angle": "Cache hit vs cache miss: the fundamental performance trade-off where a hit means instant data retrieval from fast local memory, while a miss forces a costly fetch from slower primary storage, directly impacting application speed.",
+    "narration": "Think of cache as your desk drawer for frequently used items. A cache hit is when you find what you need right there, instant access. A cache miss means you have to walk to the file cabinet across the room, much slower. In computing, a cache is a small, fast memory that stores copies of frequently accessed data. When the CPU requests data, it first checks the cache. If the data is there, that's a cache hit, and the operation completes in nanoseconds. If not, that's a cache miss, and the system must fetch the data from main memory or even disk, taking microseconds or milliseconds. This multiplies latency by orders of magnitude. Consider this code pattern: a dictionary cache. On a hit, we return immediately. On a miss, we compute or fetch the value, store it, then return. Developers optimize by increasing cache size, improving locality, or using smarter eviction policies. For interviews, remember: cache hits are fast, cache misses are expensive. Locality matters. The goal is to maximize the hit rate.",
+    "visual_beats": [
+        {
+            "timestamp": "0:00",
+            "description": "Title screen: 'Cache Hit vs Cache Miss' with a split graphic showing a lightning bolt on the left (hit) and a snail on the right (miss)."
+        },
+        {
+            "timestamp": "0:05",
+            "description": "Animation of a desk drawer: hand pulls out a paper instantly (hit) vs. person walks to a filing cabinet, opens drawer, retrieves paper (miss)."
+        },
+        {
+            "timestamp": "0:20",
+            "description": "Code snippet displayed: Python dictionary cache example. On left: 'if key in cache: return cache[key]' (hit). On right: 'data = fetch_from_db(key); cache[key] = data; return data' (miss)."
+        },
+        {
+            "timestamp": "0:40",
+            "description": "Bar chart comparing latency: cache hit ~10 ns, main memory ~100 ns, disk ~10 ms, showing the huge gap."
+        },
+        {
+            "timestamp": "0:55",
+            "description": "Key takeaways slide: '1. Cache hits are fast, misses are expensive. 2. Locality of reference improves hit rate. 3. Understand cache hierarchy for interviews.'"
+        }
+    ],
+    "duration_estimate_s": 75,
+    "target_audience": "Software developers preparing for technical interviews"
+}

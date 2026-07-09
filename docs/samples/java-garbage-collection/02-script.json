@@ -1,0 +1,33 @@
+{
+    "topic": "Stop-the-World: Why Java Pauses",
+    "angle": "Garbage Collection pauses in Java are a necessary evil; understanding their root cause and tuning G1GC can minimize application latency.",
+    "narration": "Imagine you're building a sandcastle, and every few minutes, a giant hand sweeps away the unused sand to make room for new towers. That's Java's garbage collector. When memory fills up, the JVM must stop the world to clean up. This pause is called a stop-the-world event. During this time, all application threads are frozen. Why? Because the collector needs a consistent snapshot of object references to safely reclaim memory. For example, in a typical heap, objects are connected like a web. The collector traces from root references, marking live objects, then sweeps away the dead ones. But while it marks, no new objects can be created or modified. That's the pause. With G1GC, you can reduce these pauses by setting pause time goals, like using -XX:MaxGCPauseMillis=200. G1 divides the heap into regions and collects incrementally, aiming to meet your target. For interviews, remember: stop-the-world pauses are caused by the need for a consistent heap snapshot. G1GC trades throughput for lower latency by collecting in small increments. Tune MaxGCPauseMillis to balance your application's needs.",
+    "visual_beats": [
+        {
+            "timestamp": "0:00",
+            "description": "Animated sandcastle being built, then a giant hand sweeps away unused sand."
+        },
+        {
+            "timestamp": "0:10",
+            "description": "Diagram of JVM threads frozen, with a red 'STOP' sign overlay."
+        },
+        {
+            "timestamp": "0:20",
+            "description": "Web of objects with roots, live objects in green, dead in gray; collector traces paths."
+        },
+        {
+            "timestamp": "0:35",
+            "description": "Code snippet: -XX:MaxGCPauseMillis=200, with G1 heap regions shown as colored squares."
+        },
+        {
+            "timestamp": "0:50",
+            "description": "Graph comparing pause times: default vs. tuned G1GC, with lower spikes."
+        },
+        {
+            "timestamp": "1:05",
+            "description": "Text overlay: 'Key Takeaway: Stop-the-world = consistent snapshot. G1GC = incremental collection. Tune MaxGCPauseMillis.'"
+        }
+    ],
+    "duration_estimate_s": 75,
+    "target_audience": "Software developers preparing for technical interviews, with basic Java knowledge."
+}

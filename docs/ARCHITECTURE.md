@@ -69,7 +69,10 @@ module tree or framework.
     before narration/subtitle realization and 0004 visual rendering. Its
     `timeline_segments.start_s` and `end_s` fields use numeric seconds, with
     fractional precision allowed, and downstream stages must treat that timing
-    as authoritative rather than silently drifting.
+    as authoritative rather than silently drifting. The LLM (0003 model)
+    produces narration text and timing; the CLI deterministically copies each
+    `visual_beats[i].description` into the corresponding segment's
+    `visual_instruction` field — 0003 does not paraphrase or regenerate it.
 
 - **Renderer asset seam**
   - **What**: a boundary between timeline instructions and reusable visual
@@ -77,7 +80,9 @@ module tree or framework.
   - **Why**: supports cheap polish and deterministic output without coupling
     the pipeline to one-off scene logic.
   - **Current path**: visuals should favor reusable motion-graphics assets over
-    frame-by-frame AI video generation.
+    frame-by-frame AI video generation. 0004 maps each segment's
+    `visual_instruction` to an asset and template combination; this field is
+    the segment-level key for the asset lookup.
 
 - **Narration provider seam**
   - **What**: a provider boundary for voice generation.

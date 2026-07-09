@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Verified
 
 ## Goal
 
@@ -39,6 +39,8 @@ Where `script-package.json` contains:
 }
 ```
 
+The narration text and timeline segments in this example are abbreviated for readability; real fixtures must use the full narration text and include all segments needed to satisfy validation.
+
 The timeline drafter calls `deepseek/deepseek-v4-pro` once and emits:
 
 ```json
@@ -58,11 +60,46 @@ The timeline drafter calls `deepseek/deepseek-v4-pro` once and emits:
   "target_audience": "software developers preparing for technical interviews",
   "timeline_segments": [
     {
-      "start_s": 0,
-      "end_s": 5,
-      "narration_text": "Ever wondered how LLMs process an entire sentence at once...",
+      "start_s": 0.0,
+      "end_s": 7.0,
+      "narration_text": "Ever wondered how LLMs process an entire sentence at once",
       "visual_instruction": "Title card: topic + hook question",
-      "subtitle_text": "Ever wondered how LLMs process an entire sentence at once..."
+      "subtitle_text": "Ever wondered how LLMs process an entire sentence at once"
+    },
+    {
+      "start_s": 7.0,
+      "end_s": 18.0,
+      "narration_text": "instead of reading one word at a time like older models?",
+      "visual_instruction": "Split screen: sequential vs parallel processing",
+      "subtitle_text": "instead of reading one word at a time like older models?"
+    },
+    {
+      "start_s": 18.0,
+      "end_s": 30.0,
+      "narration_text": "The secret is self-attention, which works a lot like a key-value lookup.",
+      "visual_instruction": "Diagram: query slides across key-value pairs",
+      "subtitle_text": "The secret is self-attention, which works a lot like a key-value lookup."
+    },
+    {
+      "start_s": 30.0,
+      "end_s": 50.0,
+      "narration_text": "Here's how you'd implement a simplified version in just a few lines of Python.",
+      "visual_instruction": "Code snippet: simplified attention in Python",
+      "subtitle_text": "Here's how you'd implement a simplified version in just a few lines of Python."
+    },
+    {
+      "start_s": 50.0,
+      "end_s": 70.0,
+      "narration_text": "GPT uses this exact mechanism to understand your prompts holistically.",
+      "visual_instruction": "Real-world: how GPT uses this in practice",
+      "subtitle_text": "GPT uses this exact mechanism to understand your prompts holistically."
+    },
+    {
+      "start_s": 70.0,
+      "end_s": 81.0,
+      "narration_text": "Let's recap the three key takeaways.",
+      "visual_instruction": "Recap: three key takeaways",
+      "subtitle_text": "Let's recap the three key takeaways."
     }
   ]
 }
@@ -163,15 +200,27 @@ consumes.
 
 ### Output Constraints
 
-- `narration` must exactly match the input narration draft.
-- `target_audience` must exactly match the input target audience.
-- `timeline_segments` must be ordered, non-overlapping, and cover the clip
-  from `0.0` to the final segment end.
-- Each segment must include narration, visual, and subtitle text tied to one
-  shared timing range.
-- `start_s` and `end_s` are numeric seconds; fractional precision is allowed.
-- The final segment end must land within `1.0` second of
-  `duration_estimate_s`.
+- **LLM output scope**: the model returns only `timeline_segments`. The CLI
+  copies through the passthrough fields — `topic`, `angle`, `narration`,
+  `visual_beats`, `duration_estimate_s`, `target_audience` — from the input
+  script package unchanged.
+- **One segment per visual beat**: there must be exactly one
+  `timeline_segment` per `visual_beats` entry, in the same order.
+  `visual_instruction` must equal the corresponding `visual_beats[].description`.
+  `visual_instruction` for segment `i` is deterministically copied from
+  `visual_beats[i].description`, not generated or paraphrased by the LLM.
+- **Contiguous timing**: the first segment's `start_s` is `0.0`. Every
+  segment's `start_s` must equal the prior segment's `end_s`. The final
+  segment's `end_s` must land within `1.0` second of `duration_estimate_s`.
+- **Narration preservation**: `narration_text` values are segment-aligned
+  slices of the input `narration`. When the `narration_text` values are
+  concatenated in segment order and whitespace-normalized, the result must
+  equal the input `narration` after whitespace normalization.
+- **Whitespace normalization** means trimming leading and trailing whitespace and collapsing internal whitespace sequences (including newlines, tabs, and multiple spaces) to a single space. Both the concatenated `narration_text` values and the input `narration` are normalized before comparison.
+- **Subtitle mirroring**: `subtitle_text` must equal `narration_text` for
+  each segment.
+  `subtitle_text` mirrors `narration_text` in this phase; future
+  divergence is deferred to subtitle realization/output work.
 - Downstream narration generation, subtitle realization, and 0004 rendering
   must treat this draft as the authoritative timing source. If a downstream
   stage cannot conform to the emitted timing, it is a contract error rather
@@ -186,14 +235,19 @@ consumes.
 - **Single call**: one prompt per run.
 - **Prompt shape**: consume the authoritative script package and return a
   narrated timeline draft that preserves the script's narration and target
-  audience while aligning narration slices, visual instructions, and
-  subtitle-ready text on one timeline.
+  audience while providing only segment timing, narration slices, and
+  subtitle-ready text. `visual_instruction` is **not** requested from or
+  returned by the LLM; the CLI injects it after the call (see Output
+  Constraints).
 
 ### Handoff to 0004
 
-0004 consumes the narrated timeline draft as its canonical pre-render input.
-0003 does not hand 0004 narration audio, rendered scenes, or a final subtitle
-file. 0003 hands downstream stages subtitle-ready timing and text, not final
+0004 consumes the canonical narrated timeline draft JSON (with
+`timeline_segments`, authoritative timing, `visual_instruction`,
+`narration_text`/`subtitle_text`, and the duration-estimate/context fields)
+as its sole pre-render input. 0003 does **not** hand off: narration audio or
+TTS artifacts, rendered scenes or video frames, final subtitle files, an
+asset library, or template selection. 0003 hands downstream stages timing and text, not final
 subtitle artifacts.
 
 ## Failure Modes
@@ -206,8 +260,13 @@ subtitle artifacts.
 | LLM call fails (network, rate limit, auth) | Retry once, then surface error with exit code |
 | LLM returns unparseable or incomplete timeline output | Surface parse/contract error, exit nonzero |
 | Output changes `narration` or `target_audience` | Treat as contract violation, exit nonzero |
-| Timeline segments overlap or leave large gaps | Treat as contract violation, exit nonzero |
+| Timeline segments overlap or leave gaps | Treat as contract violation, exit nonzero |
 | Downstream narration or subtitle stage cannot realize the emitted timing | Treat as downstream contract error, exit nonzero |
+| Segment count does not equal `visual_beats` length | Validation error, exit nonzero |
+| `visual_instruction` does not match corresponding `visual_beats[].description` (validated after CLI injection) | Validation error, exit nonzero |
+| First `start_s` is not `0.0` or any segment `start_s` does not equal prior `end_s` | Contiguity error, exit nonzero |
+| Concatenated `narration_text` values (whitespace-normalized) do not equal input `narration` (whitespace-normalized) | Narration-preservation error, exit nonzero |
+| Any `subtitle_text` does not equal its segment's `narration_text` | Subtitle-mirroring error, exit nonzero |
 | Model not available | Fail fast with model name in error message |
 
 ## Acceptance Criteria
@@ -216,8 +275,15 @@ subtitle artifacts.
   all required fields.
 - The output `narration` exactly matches the input `narration`.
 - The output `target_audience` exactly matches the input `target_audience`.
-- The output includes ordered `timeline_segments` with shared timing for
-  narration text, visual instruction, and subtitle text.
+- Passthrough fields `topic`, `angle`, `visual_beats`, and
+  `duration_estimate_s` are copied from the input unchanged.
+- There is exactly one `timeline_segment` per `visual_beats` entry, in the
+  same order.
+- The first `start_s` is `0.0`; every segment `start_s` equals the prior
+  segment `end_s`; the final `end_s` satisfies `|final_end_s - duration_estimate_s| <= 1.0`.
+- Concatenated `narration_text` values (whitespace-normalized) equal the
+  input `narration` (whitespace-normalized).
+- `subtitle_text` equals `narration_text` for every segment.
 - `timeline_segments.start_s` and `end_s` are numeric seconds, with fractional
   values allowed.
 - The drafting stage uses `deepseek/deepseek-v4-pro` on OpenRouter.
@@ -230,11 +296,18 @@ subtitle artifacts.
   of `narration` and `target_audience`.
 - Contract test: invalid or incomplete script-package input fails with a
   structured error.
-- Contract test: mutated narration or target audience in model output fails
-  validation.
+- Contract test: mutated passthrough fields (`topic`, `angle`, `narration`,
+  `visual_beats`, `duration_estimate_s`, `target_audience`) in the output
+  fail validation.
 - Timeline validation test: output segments are ordered, non-overlapping, and
-  cover the expected clip duration, with the final `end_s` within `1.0`
-  second of `duration_estimate_s`.
+  cover the expected clip duration, with `|final_end_s - duration_estimate_s| <= 1.0`.
+- One-segment-per-beat test: segment count equals `visual_beats` length and
+  (post-CLI injection) `visual_instruction` matches `visual_beats[].description`.
+- Contiguity test: first `start_s` is `0.0`, each `start_s` equals prior
+  `end_s`.
+- Narration-preservation test: whitespace-normalized concatenation of
+  `narration_text` equals whitespace-normalized input `narration`.
+- Subtitle-mirroring test: `subtitle_text` equals `narration_text` per segment.
 - Config test: default `timeline.model` resolves to
   `deepseek/deepseek-v4-pro`, and `timeline.temperature` can be supplied
   through the `timeline.*` namespace.

@@ -35,7 +35,8 @@ implementation details out.
 - `narrated timeline draft`: the canonical post-0002, pre-render artifact for
   one clip. Produced by 0003 from the authoritative `script package`, it
   preserves the input narration draft and target audience while adding the
-  authoritative timing plan and subtitle-ready text later stages consume
+  authoritative timing plan, per-segment `visual instruction` deterministically
+  copied from visual beats, and subtitle-ready text later stages consume
   before final render. Downstream narration, subtitle realization, and 0004
   rendering must conform to this timing or fail as a contract error.
 - `seed-link grounding`: optional future input of supporting source links or
@@ -55,6 +56,11 @@ implementation details out.
 - `visual beats`: timed scene descriptions in the script package, each with
   a `timestamp` (M:SS from clip start) and `description`. Consumed by
   timeline assembly as the rendering instruction source.
+- `visual instruction`: the per-segment rendering directive in the narrated
+  timeline draft. Deterministically copied from the corresponding
+  `visual_beats[i].description` by the 0003 CLI; not produced or paraphrased
+  by the LLM. Consumed by 0004 as the segment-level key for asset and
+  template mapping.
 - `narration draft`: untimed speakable prose in the script package, sized
   for 60–90 seconds at ~150 words/minute. Must be plain prose with no
   markdown, bullet lists, or parentheticals.
