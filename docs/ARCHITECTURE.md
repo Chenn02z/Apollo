@@ -15,17 +15,16 @@ The current product shape should stay close to the MVP production loop:
    ideation via the pipe adapter or direct CLI input) and resolves a run contract.
 3. `research and script generation`: turns the topic into a short-form teaching
    angle, script, and supporting content plan via the Script Agent (0002).
-4. `storyboard and narrated timeline drafting`: converts the authoritative
-   script package into the canonical pre-render `narrated timeline draft`
-   with authoritative timing and subtitle-ready text consumed by downstream
-   narration, subtitle realization, and 0004.
-5. `narration and subtitle generation`: produces voiceover audio and subtitle
-   artifacts from that shared timeline.
-6. `asset-driven renderer`: composes reusable motion-graphics assets and
-   deterministic layouts into video scenes against the narrated timeline
-   draft.
-7. `export packaging`: emits the final video, thumbnail, and any delivery
-   metadata needed for manual upload.
+4. `storyboard and timeline drafting`: converts the authoritative script
+   package into the canonical pre-render `narrated timeline draft` with
+   authoritative ordering, visual instructions, and slide-text-ready fields
+   consumed by 0004.
+5. `slide text derivation`: derives slide text from timeline segment fields for
+   use by the renderer.
+6. `asset-driven renderer`: renders deterministic HTML/CSS templates into
+   1080x1920 PNG slideshow images against the narrated timeline draft.
+7. `export packaging`: emits the slideshow image set, manifest, and optional
+   caption metadata for manual TikTok upload.
 
 This is an aspirational component map for the MVP, not a commitment to a large
 module tree or framework.
@@ -63,46 +62,47 @@ module tree or framework.
 - **Timeline assembly seam**
   - **What**: a structured intermediate representation between script output
     and rendering.
-  - **Why**: keeps narration, subtitle realization, and scene composition
-    aligned through one timeline contract.
+  - **Why**: keeps script, slide text, and scene composition aligned through
+    one timeline contract.
   - **Current path**: 0003 emits the canonical `narrated timeline draft`
-    before narration/subtitle realization and 0004 visual rendering. Its
+    before 0004 visual rendering. Its
     `timeline_segments.start_s` and `end_s` fields use numeric seconds, with
     fractional precision allowed, and downstream stages must treat that timing
     as authoritative rather than silently drifting. The LLM (0003 model)
-    produces narration text and timing; the CLI deterministically copies each
+    produces segment text and timing; the CLI deterministically copies each
     `visual_beats[i].description` into the corresponding segment's
     `visual_instruction` field — 0003 does not paraphrase or regenerate it.
     0004 consumes this output read-only; `start_s`, `end_s`, and
     `visual_instruction` are the authoritative fields downstream.
 
 - **Renderer asset seam**
-  - **What**: a boundary between timeline instructions and reusable visual
-    assets/templates.
+  - **What**: a boundary between timeline instructions and reusable HTML/CSS
+    templates.
   - **Why**: supports cheap polish and deterministic output without coupling
     the pipeline to one-off scene logic.
-  - **Current path**: visuals should favor reusable motion-graphics assets over
-    frame-by-frame AI video generation. The 0004 spec settles deterministic
-    template mapping from `visual_instruction` to the template vocabulary with
-    `fallback_text_card` for unmatched text, and no LLM in the render path.
-    `visual_instruction` is the segment-level key for the asset lookup.
+  - **Current path**: 0004 renders deterministic HTML/CSS templates to 1080x1920
+    PNG slideshow images via a headless browser. Template mapping from
+    `visual_instruction` to the template vocabulary uses `fallback_text_card`
+    for unmatched text, with no LLM in the render path. `visual_instruction` is
+    the segment-level key for the asset lookup. Inputs contain 3-10 segments;
+    the renderer emits exactly one PNG and one manifest entry per segment,
+    assigning the first `intro`, every middle `content`, and the last `ending`,
+    with no duplicated intro or ending slides.
 
 - **Narration provider seam**
-  - **What**: a provider boundary for voice generation.
-  - **Why**: preserves flexibility between local and low-cost hosted narration
-    approaches without affecting the pre-render timeline contract.
-  - **Current path**: narration is generated from the narrated timeline draft;
-    exact provider choice remains deferred.
+  - **What**: a deferred provider boundary for possible future voice generation.
+  - **Why**: keeps optional audio experiments out of the slideshow-image MVP.
+  - **Current path**: no audio output in the MVP. 0004 does not accept or
+    generate narration audio.
 
 - **Subtitle output seam**
-  - **What**: a boundary that allows subtitles to be rendered into the video or
-    shipped alongside it from the same timing source.
+  - **What**: a boundary for how subtitle text reaches the final output.
   - **Why**: preserves platform-specific delivery options later without
     changing timing generation.
-  - **Current path**: the 0004 spec selects subtitle burn-in for the visual
-    draft, where `subtitle_text` is rendered directly into MP4 frames.
-    Standalone subtitle-file delivery remains deferred to 0005. 0003 does
-    not emit final subtitle artifacts.
+  - **Current path**: 0004 derives slide text from `subtitle_text` (preferred)
+    or `visual_instruction` (fallback) without requiring a new 0003 field.
+    No subtitle burn-in, no subtitle file output. Caption metadata and upload
+    notes deferred to 0005.
 
 - **Publishing adapter seam**
   - **What**: a post-export handoff boundary for future platform integrations.

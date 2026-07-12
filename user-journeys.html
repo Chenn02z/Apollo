@@ -493,7 +493,7 @@
             <ul>
               <li>Pipeline entry: a topic or concept enters through the Concept Ideation Agent (<code>docs/specs/0001</code>) to produce a concrete topic and angle.</li>
               <li><code>apollo ideate</code> is the MVP intake; <code>apollo script -</code> and <code>apollo timeline -</code> are shipped or scoped stages where supported by repo docs.</li>
-              <li>Rendering (<code>docs/milestones/0004</code>) and export (<code>docs/milestones/0005</code>) are planned milestones, not working end-to-end CLI commands unless the repo proves otherwise.</li>
+              <li>Rendering (<code>docs/milestones/0004-asset-driven-visual-render.md</code>) and export (<code>docs/milestones/0005-mvp-export-package.md</code>) are planned milestones, not working end-to-end CLI commands unless the repo proves otherwise.</li>
               <li>Validation at each shipped stage: ideation checks {topic, angle}; script checks narration/audience/duration; timeline checks segment timing and visual copy survival.</li>
             </ul>
             <table class="io-table">
@@ -680,13 +680,13 @@
           </article>
           <article class="capability">
             <span class="stage">Rendering <code style="font-size:0.7rem">planned / 0004</code></span>
-            <h3>Compose and assemble clips</h3>
-            <p>Planned milestone <code>docs/milestones/0004</code>. Render timeline segments into a cohesive clip with transitions, overlays, and visual instructions applied.</p>
+            <h3>Rasterize slideshow images</h3>
+            <p>Planned milestone <code>docs/milestones/0004-asset-driven-visual-render.md</code>. Render 3-10 timeline segments into ordered 1080x1920 PNG slideshow images via deterministic HTML/CSS templates: exactly one image and manifest entry per segment, with first <code>intro</code>, middle <code>content</code>, and last <code>ending</code> roles and no duplicated intro or ending slides.</p>
           </article>
           <article class="capability">
             <span class="stage">Export <code style="font-size:0.7rem">planned / 0005</code></span>
-            <h3>Deliver TikTok-ready package</h3>
-            <p>Planned milestone <code>docs/milestones/0005</code>. Export the assembled clip in TikTok-compatible format with the correct resolution, duration, and encoding.</p>
+            <h3>Package slideshow image set</h3>
+            <p>Planned milestone <code>docs/milestones/0005-mvp-export-package.md</code>. Package the PNG image set, manifest, and caption notes for manual TikTok slideshow upload.</p>
           </article>
           <article class="capability">
             <span class="stage">Workflow</span>
@@ -705,7 +705,7 @@
           </article>
         </div>
         <p class="callout">
-          Apollo is strongest as a strict pipeline spine &mdash; ideation feeds script, script feeds timeline, timeline feeds export.
+          Apollo is strongest as a strict pipeline spine &mdash; ideation feeds script, script feeds timeline, timeline feeds the 0004 renderer, and the renderer feeds export.
           Bootstrap determines the MVP boundary; architecture seams keep future work clean; plan-next reshapes the next increment from real results.
         </p>
       </section>

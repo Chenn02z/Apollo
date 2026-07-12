@@ -6,14 +6,15 @@ Draft
 
 ## Goal
 
-Complete the end-to-end local MVP so one topic produces one TikTok-ready clip
-package with no required human editing pass.
+Package the 0004 slideshow image set, manifest, and optional caption
+metadata into one self-contained directory ready for manual TikTok
+slideshow upload. No video. No subtitles. No thumbnail generation.
 
 ## MVP Deliverable
 
-A single local pipeline run can accept `topic` and export one final clip
-package containing the rendered video, subtitles in the chosen delivery form,
-and a thumbnail for manual upload.
+A single local pipeline run can accept `topic` and export one
+TikTok-ready slideshow image set package with no required human
+editing pass beyond uploading the images to TikTok.
 
 ## Developer Workflow
 
@@ -21,13 +22,19 @@ Requirements -> spec authoring -> development loop.
 
 ## In Scope
 
-- End-to-end orchestration of the MVP production loop.
-- Final export packaging for manual upload.
-- Thumbnail generation as part of the clip package.
+- End-to-end orchestration of the MVP production loop through
+  slideshow image export.
+- Packaging the 0004 image set and manifest into a clean export
+  directory.
+- Optional caption metadata (topic, angle, hashtags) for manual
+  TikTok upload reference.
 - Runtime and cost checks against the MVP targets.
 
 ## Out Of Scope
 
+- Video encoding or MP4 output.
+- Subtitle files (`.srt`, `.vtt`).
+- Thumbnail generation.
 - Direct social publishing.
 - Seed-link input.
 - Analytics and feedback ingestion.
@@ -44,10 +51,11 @@ Requirements -> spec authoring -> development loop.
 
 ## Acceptance Criteria
 
-- One local run from `topic` produces one TikTok-ready clip package.
+- One local run from `topic` produces one TikTok-ready slideshow
+  image set package (PNGs + manifest + optional caption notes).
 - The core flow does not require proprietary editing software.
-- Human input stays under the MVP target and runtime/cost checks are documented
-  against the target constraints.
+- Human input stays under the MVP target and runtime/cost checks are
+  documented against the target constraints.
 - Direct posting remains deferred.
 
 ## Verification
@@ -57,10 +65,10 @@ Requirements -> spec authoring -> development loop.
 
 ## Deferred
 
-Source seeding, direct publishing, analytics loops, longer-form workflows, and
-broader content families.
+Source seeding, direct publishing, analytics loops, longer-form
+workflows, video export, and broader content families.
 
 ## Open Questions
 
-- Which parts of the runtime target are feasible locally versus best-effort in
-  the first implementation pass?
+- Which parts of the runtime target are feasible locally versus
+  best-effort in the first implementation pass?

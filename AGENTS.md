@@ -17,6 +17,7 @@ Do not read source files when `explorer` exists. Do not edit files when
 `implementer` exists. Do not run verification when `test-runner` exists.
 When a skill says to use a subagent, invoke it, report it unavailable, or
 explain why not applicable. Silent substitution is a workflow violation.
+Close subagents after use.
 
 ### 1. Think Before Coding
 

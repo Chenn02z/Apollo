@@ -6,66 +6,79 @@ Accepted
 
 ## Goal
 
-Render the canonical 0003 narrated timeline draft into a visually
-intentional short-form visual draft using reusable motion-graphics
-templates — not frame-by-frame AI video.
+Render one canonical 0003 narrated timeline draft into one ordered 1080×1920
+PNG per input timeline segment. The renderer uses deterministic HTML/CSS
+templates rasterized by a headless browser. It produces slideshow images and a
+render manifest only: no video or audio output.
 
 ## Input Contract
 
-**Required:** one 0003 narrated timeline draft JSON, matching the
-shape of `docs/samples/*/03-timeline.json`.
+**Required:** one 0003 narrated timeline draft JSON, matching the shape of
+`docs/samples/*/03-timeline.json`.
 
 Consumed fields:
+
 - `topic`
 - `duration_estimate_s`
 - `timeline_segments[].start_s`
 - `timeline_segments[].end_s`
 - `timeline_segments[].visual_instruction`
 - `timeline_segments[].subtitle_text`
-- `timeline_segments[].narration_text`
 
-`start_s` / `end_s` are authoritative.
-
-**Optional:** `--narration <audio-file>` WAV or MP3. If omitted the
-output is silent but still valid. 0004 does not generate narration/TTS.
+The renderer validates that `timeline_segments` contains 3-10 segments. A
+timeline with 1-2 segments is invalid. Array order determines the slide order;
+there is exactly one output slide for each input segment and no duplicate
+slides.
 
 ## Output Contract
 
-- `output.mp4` — H.264 MP4, 1080×1920 (9:16), one scene per timeline
-  segment, burned subtitles from `subtitle_text`, optional narration
-  audio if supplied, duration equals the final segment's `end_s`.
-- `output.render.json` manifest — source timeline path, optional
-  narration source, output path, duration, resolution, per-segment
-  template and params.
+- Ordered PNG images (1080×1920), exactly one per input timeline segment.
+- `slides.manifest.json` with source topic, output directory, `image_count`,
+  and one `slides[]` entry per input segment containing index, role, file name,
+  template, and params.
 
 ## CLI Surface
 
 ```
-apollo render timeline.json [--narration audio.wav] -o output.mp4
+apollo render timeline.json -o output/
 ```
+
+## Slide Roles
+
+Every output slide has an explicit manifest role:
+
+- **intro** — the first input segment.
+- **content** — each middle input segment.
+- **ending** — the last input segment.
 
 ## In Scope
 
-- Input contract parsing and validation.
-- Deterministic keyword/regex/rule template mapping (no LLM in render
-  path).
-- Bundled reusable asset/template strategy.
-- Scene composition from timeline segments.
-- Subtitle burn-in from `subtitle_text`.
-- Optional audio mux when `--narration` is supplied.
-- Render manifest generation.
+- Input parsing and validation, including the 3-10 segment limit.
+- Deterministic keyword/regex/rule template mapping, with no LLM in the render
+  path.
+- One HTML/CSS template render per input timeline segment using a deterministic
+  headless-browser rasterizer.
+- Slide text derived from `subtitle_text`, with concise text extracted from
+  `visual_instruction` as a fallback.
+- One 1080×1920 PNG per input segment, with no duplicate slides.
+- Stable file naming: `01-intro.png`, `02-content.png`, ...,
+  `NN-ending.png`.
+- Render manifest generation with `image_count`, `output_dir`, and `slides[]`.
+- Shared visual defaults: bold, high-contrast readable type; safe margins; a
+  shared theme; scannable code and cards; no tiny text; and one idea per slide.
 - Local-first, non-proprietary render stack.
 
 ## Out Of Scope
 
+- Video output or encoding, including ffmpeg, ffprobe, and MP4 output.
+- Audio output of any kind, including TTS and narration muxing.
+- Subtitle files (`.srt`, `.vtt`, and similar).
+- Thumbnail generation.
 - Frame-by-frame AI video generation.
 - Direct publishing adapters.
 - Analytics or feedback ingestion.
-- Thumbnail generation.
 - Final export packaging.
-- Longer-form / multi-clip support.
-- Narration generation / provider choice.
-- Standalone subtitle-file export.
+- Longer-form or multi-clip support.
 - Asset authoring GUI.
 - Dynamic asset generation beyond the template vocabulary.
 
@@ -73,10 +86,9 @@ apollo render timeline.json [--narration audio.wav] -o output.mp4
 
 | Seam | Role |
 |---|---|
-| Renderer asset seam | **Primary.** Bundled templates and assets consumed by the renderer. |
+| Renderer asset seam | **Primary.** Bundled HTML/CSS templates and assets consumed by the renderer. |
 | Timeline assembly seam | Consumed read-only (0003 output). |
-| Narration provider seam | Optional input only. |
-| Subtitle output seam | Burn-in for visual draft; standalone delivery deferred to 0005. |
+| Slide text seam | `subtitle_text` preferred; `visual_instruction` fallback; no subtitle delivery artifacts. |
 
 ## Specs
 
@@ -84,7 +96,7 @@ apollo render timeline.json [--narration audio.wav] -o output.mp4
 
 ## Template Vocabulary
 
-Sample-derived deterministic templates:
+Sample-derived deterministic templates rendered as HTML/CSS:
 
 - `title_card`
 - `side_by_side`
@@ -97,49 +109,52 @@ Sample-derived deterministic templates:
 - `key_takeaways`
 - `fallback_text_card`
 
-`fallback_text_card` handles unmatched or free-form visual instructions
-with a warning and the raw instruction text.
+`fallback_text_card` handles unmatched or free-form visual instructions with a
+warning and the raw instruction text.
 
 ## Acceptance Criteria
 
-1. `apollo render` creates a playable MP4 and a manifest JSON.
-2. Output duration is within 0.1 s of the final segment's `end_s`.
-3. Every segment maps to a template or `fallback_text_card`.
-4. Subtitles are burned in per segment.
-5. No proprietary editor dependency; no frame-by-frame AI video.
-6. Optional narration audio is present when `--narration` is supplied
-   and absent when omitted.
-7. Manifest has one entry per segment and includes the source path.
-8. No re-segmentation or timing drift from source `start_s` / `end_s`.
+1. `apollo render` produces ordered 1080×1920 PNG images and a manifest JSON.
+2. The renderer accepts only 3-10 timeline segments and rejects 1-2 segments.
+3. Output contains exactly one PNG and exactly one manifest entry per input
+   timeline segment, with no duplicate slides.
+4. The first slide is `intro`, every middle slide is `content`, and the last
+   slide is `ending`.
+5. Every segment maps to one template or `fallback_text_card`.
+6. All slides use bold, high-contrast readable type, safe margins, the shared
+   theme, scannable code/cards, no tiny text, and one idea per slide.
+7. Manifest has `image_count`, `output_dir`, and `slides[]` entries with role,
+   file name, template, and params.
+8. No video, audio, subtitle files, thumbnail generation, or LLM render path.
 
 ## Verification
 
-- Unit tests for template mapping across `docs/samples/*/03-timeline.json`.
-- Unit tests for fallback and param extraction.
+- Unit tests for the 3-10 segment validation and rejection of 1-2 segments.
+- Unit tests for exact template mapping across the three sample timelines.
+- Unit tests for fallback and parameter extraction.
 - CLI smoke test using `docs/samples/caching/03-timeline.json`.
-- Duration / ffprobe test.
-- Manifest structure test.
-- No-audio / with-audio tests.
-- Dependency and toolchain check.
+- Image dimension validation: every PNG is 1080×1920.
+- Manifest structure test: `image_count` matches input segment and file counts;
+  roles, ordering, and stable file names are correct; no duplicate slide is
+  present.
+- Visual-default test: each template applies the shared theme, safe margins,
+  readable high-contrast type, and no tiny text.
+- Output assertion: no video, audio, subtitle, or thumbnail artifact is
+  generated.
 
-## Non-Blocking Spec Constraints
+## Sample Mapping Contract
 
-These are settled for milestone acceptance but left to the spec for
-exact implementation detail:
-
-- Template parameter extraction strategy.
-- Rendering backend choice.
-- Subtitle burn approach.
-- Audio muxing approach.
-- Multi-keyword precedence rules.
-- Fallback text card rendering.
-- Asset / template file format and storage layout.
-- Resolution and codec confirmation.
+- **Caching (5 slides):** title card; chef side-by-side; `getProfile` code
+  snippet; cache flowchart; and key takeaways.
+- **Java GC (6 slides):** sandcastle fallback card; JVM STOP diagram;
+  object-roots fallback card; `MaxGCPauseMillis` snippet; pause-time line
+  chart; and key takeaways.
+- **China models (5 slides):** Qwen/Llama side-by-side; code snippet; split
+  output; cost bar chart; and key takeaways.
 
 ## Deferred
 
-Standalone subtitle delivery (0005), final export packaging,
-thumbnailing, publishing, analytics.
+Final export packaging, publishing, and analytics.
 
 ## Open Questions
 

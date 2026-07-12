@@ -11,15 +11,22 @@ will implement the pipeline.
 ## MVP Boundary
 
 The MVP is one local pipeline with `topic` as the only required input. It
-should export one TikTok-ready clip package containing:
+should export one TikTok-ready slideshow image set containing:
 
-- a narrated 60-90 second technical education video
-- subtitles, burned in or bundled
-- a thumbnail
-- a final export suitable for manual TikTok upload
+- 3-10 ordered 1080x1920 PNG images (intro, content, ending)
+- a manifest with slide roles, templates, and metadata
+- optional caption notes for manual TikTok slideshow upload
+
+Renderer invariant: the input contains 3-10 segments; it produces exactly one
+1080x1920 PNG and one manifest entry per segment, with the first slide `intro`,
+each middle slide `content`, and the last slide `ending`—with no duplicated
+intro or ending slides.
+
+No video. No audio. No subtitle files.
 
 The MVP does not include:
 
+- thumbnail generation
 - direct posting to TikTok, YouTube, or other platforms
 - analytics, audience feedback loops, or channel strategy tooling
 - required human editing inside the production pipeline
@@ -32,7 +39,8 @@ The MVP does not include:
 - Docker is available
 - Core production must avoid proprietary editing software
 - The quality bar is cheap polish, not flashy full-motion AI video
-- Prefer deterministic, asset-driven rendering over frame-by-frame generation
+- Prefer deterministic HTML/CSS templates rasterized to images over
+  frame-by-frame generation or video encoding
 
 ## Workflow
 

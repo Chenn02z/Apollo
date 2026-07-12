@@ -6,31 +6,34 @@ Accepted
 
 ## Goal
 
-Render one canonical 0003 narrated timeline draft JSON into an H.264
-MP4 visual draft (1080×1920, 30 fps) with burned-in subtitles and a
-`.render.json` manifest — using deterministic, reusable motion-graphics
-templates. No LLM in the render path. No frame-by-frame AI video.
+Render one canonical 0003 narrated timeline draft JSON into one ordered
+1080×1920 PNG slideshow image per input timeline segment, plus a
+`slides.manifest.json`. Rendering uses deterministic HTML/CSS templates and a
+headless browser. There is no LLM in the render path and no video, audio,
+subtitle-file, or thumbnail output.
 
 ## Scenario
 
 ```sh
-apollo render docs/samples/caching/03-timeline.json -o /tmp/caching-render.mp4
+apollo render docs/samples/caching/03-timeline.json -o /tmp/caching-slides/
 ```
 
 The CLI:
 
-1. Validates the timeline JSON fields and timing.
-2. Maps each `visual_instruction` to a template via deterministic
-   keyword matching.
-3. Extracts template parameters from the instruction text.
-4. Renders one 1080×1920 RGBA PNG per segment using Pillow and bundled
-   asset templates.
-5. Generates a temporary SRT from `subtitle_text` / timing and burns it
-   into the MP4 via ffmpeg.
-6. Encodes the PNG sequence into H.264 MP4 at 30 fps.
-7. Muxes `--narration audio.wav` if supplied.
-8. Writes `output.render.json` manifest.
-9. Cleans up temp files.
+1. Validates the timeline JSON and requires 3-10 timeline segments. Timelines
+   with 1-2 segments fail validation.
+2. Uses input array order to assign roles: the first segment is `intro`, each
+   middle segment is `content`, and the final segment is `ending`.
+3. Maps every segment's `visual_instruction` to one deterministic template.
+4. Extracts template parameters from the instruction text.
+5. Renders one HTML page for each input segment with text derived from
+   `subtitle_text`, or from `visual_instruction` when subtitle text is absent.
+6. Rasterizes each page to one 1080×1920 PNG via a headless browser.
+7. Writes one stable file name per segment: `01-intro.png`,
+   `02-content.png`, ..., `NN-ending.png`.
+8. Writes `slides.manifest.json` with source topic, output directory,
+   `image_count`, and one `slides[]` entry per segment.
+9. Cleans up any temp files.
 
 ## Architecture Reference
 
@@ -40,57 +43,60 @@ The CLI:
 
 | Seam | Role |
 |---|---|
-| Renderer asset seam | **Built in 0004.** Bundled templates and assets consumed by the renderer. |
-| Timeline assembly seam | **Honored read-only** (0003 output consumed; no mutation). |
-| Narration provider seam | **Honored by optional input only** (`--narration` flag). |
-| Subtitle output seam | **Burn-in for visual draft.** Standalone subtitle delivery deferred to 0005. |
+| Renderer asset seam | **Built in 0004.** Bundled HTML/CSS templates and assets consumed by the renderer. |
+| Timeline assembly seam | **Honored read-only.** 0003 output is consumed without mutation. |
+| Slide text seam | `subtitle_text` is preferred and `visual_instruction` is the fallback; no subtitle delivery artifacts are produced. |
 
 ## In Scope
 
-- Input contract parsing and validation.
-- Deterministic keyword/regex template mapping (no LLM).
-- Template parameter extraction via regex/string split.
-- Bundled reusable asset/template strategy.
-- Scene composition: one 1080×1920 PNG per segment via Pillow.
-- Subtitle burn-in from `subtitle_text` via ffmpeg SRT filter.
-- Optional audio mux when `--narration` is supplied.
+- Input contract parsing and 3-10 segment validation.
+- Deterministic keyword/regex template mapping with no LLM.
+- Template parameter extraction.
+- Bundled reusable HTML/CSS templates rasterized by a headless browser.
+- One PNG per input segment with `intro`, `content`, and `ending` roles.
+- Slide text derivation from `subtitle_text` or `visual_instruction`.
 - Render manifest generation.
+- Shared visual defaults: bold, high-contrast readable type; safe margins; a
+  shared theme; scannable code and cards; no tiny text; and one idea per slide.
 - Local-first, non-proprietary render stack.
 
 ## Out Of Scope
 
+- Video output or encoding, including ffmpeg, ffprobe, and MP4 output.
+- Audio output of any kind, including TTS and narration muxing.
+- Subtitle files (`.srt`, `.vtt`, and similar).
+- Thumbnail generation.
 - Frame-by-frame AI video generation.
-- LLM or any proprietary API in the render path.
-- Standalone subtitle-file export (deferred to 0005).
+- LLM or proprietary API in the render path.
 - Direct publishing adapters.
 - Analytics or feedback ingestion.
-- Thumbnail generation.
 - Final export packaging.
-- Longer-form / multi-clip support.
-- Narration generation / provider choice.
+- Longer-form or multi-clip support.
+- Narration generation or provider choice.
 - Asset authoring GUI.
+
 ## Contracts
 
 ### Dependencies
 
-- **Pillow**: Python dependency. Used for PNG rendering (ImageDraw,
-  ImageFont, Image).
-- **ffmpeg**: External tool checked on `PATH`. Used for PNG-to-MP4
-  encoding and audio muxing.
-- No moviepy, imageio, or OpenCV.
+- **Node.js runtime** (or similar): required for the headless browser.
+- **Headless browser library**: for example Puppeteer or Playwright, used to
+  rasterize HTML/CSS templates to 1080×1920 PNGs.
+- No ffmpeg, ffprobe, moviepy, imageio, or OpenCV.
 
 ### CLI
 
 ```
-apollo render <timeline.json | -> [--narration <audio.wav | mp3>] [-o <output.mp4>]
+apollo render <timeline.json | -> [-o <output-dir>]
 ```
 
-- First positional argument: path to timeline JSON, or `-` for stdin.
-- `--narration`: optional path to WAV or MP3 audio.
-- `-o`: output MP4 path. Default: `output.mp4`.
-- Overwrites output files. Uses `-y` for ffmpeg.
-- Temp files written to a temp directory; cleaned up in a `finally` block.
-- Exit 0 on success, nonzero on validation or render failure.
+- The first positional argument is a timeline JSON path or `-` for stdin.
+- `-o` selects the output directory; default: `./output/`.
+- The command writes PNGs and `slides.manifest.json` to the output directory.
+- Existing files in that output directory may be overwritten.
+- Temp files are written to a temp directory and cleaned up in a `finally`
+  block.
+- Exit 0 on success and nonzero on validation or render failure.
 
 ### Input Contract
 
@@ -103,46 +109,89 @@ Required timeline JSON fields:
 | `timeline_segments` | array | Ordered segment objects |
 | `timeline_segments[].start_s` | number | Start in seconds |
 | `timeline_segments[].end_s` | number | End in seconds |
-| `timeline_segments[].visual_instruction` | string | Text for template mapping |
-| `timeline_segments[].subtitle_text` | string | Burned into video |
-| `timeline_segments[].narration_text` | string | Included in manifest |
+| `timeline_segments[].visual_instruction` | string | Text for deterministic template mapping |
+| `timeline_segments[].subtitle_text` | string | Preferred source for slide text |
 
 Validation rules:
 
-- `timeline_segments` must be non-empty.
-- First segment `start_s` must be `0.0`.
-- Each segment `start_s` must equal the prior segment's `end_s`
-  (contiguous, no gaps or overlaps).
+- `timeline_segments` must contain 3-10 entries; 1-2 entries are invalid.
+- The first segment's `start_s` must be `0.0`.
+- Each segment's `start_s` must equal the prior segment's `end_s`.
 - All timing values must be numeric.
-- Final `end_s` must satisfy `|final_end_s - duration_estimate_s| <= 1.0`.
-- Optional narration file, if supplied, must be readable WAV or MP3.
+- The final `end_s` must satisfy
+  `|final_end_s - duration_estimate_s| <= 1.0`.
 
 ### Output Contract
 
 | Artifact | Description |
 |---|---|
-| MP4 | H.264, 1080×1920 (9:16), 30 fps, one scene per segment, burned subtitles, optional AAC audio at 44100 Hz, duration within 0.1 s of final `end_s` |
-| `.render.json` | Manifest (same stem as MP4) |
+| PNG images | 1080×1920 (9:16), exactly one per input segment, with stable file names |
+| `slides.manifest.json` | Source topic, output directory, image count, and one slide entry per input segment |
+
+No duplicate slide may be emitted for a segment. The command emits no video,
+audio, subtitle, or thumbnail artifact.
+
+### Slide Roles
+
+| Role | Assignment |
+|---|---|
+| `intro` | First input timeline segment. |
+| `content` | Every middle input timeline segment. |
+| `ending` | Final input timeline segment. |
 
 ### Manifest Schema
 
 ```json
 {
   "source_timeline": "path/to/timeline.json",
-  "narration_source": null,
-  "output_path": "path/to/output.mp4",
-  "duration_s": 70.0,
+  "topic": "What is Caching?",
+  "output_dir": "path/to/output/",
+  "image_count": 5,
   "resolution": "1080x1920",
-  "codec": "h264",
-  "ffmpeg_version": "7.x",
-  "segments": [
+  "slides": [
     {
-      "index": 0,
-      "start_s": 0.0,
-      "end_s": 15.0,
-      "visual_instruction": "Title card: ...",
+      "index": 1,
+      "file": "01-intro.png",
+      "role": "intro",
+      "segment_index": 0,
       "template": "title_card",
-      "params": {"title": "Example"},
+      "params": {"title": "What is Caching?"},
+      "warning": null
+    },
+    {
+      "index": 2,
+      "file": "02-content.png",
+      "role": "content",
+      "segment_index": 1,
+      "template": "side_by_side",
+      "params": {"left": "chef prep", "right": "chef fumbling"},
+      "warning": null
+    },
+    {
+      "index": 3,
+      "file": "03-content.png",
+      "role": "content",
+      "segment_index": 2,
+      "template": "code_snippet",
+      "params": {"code": "getProfile"},
+      "warning": null
+    },
+    {
+      "index": 4,
+      "file": "04-content.png",
+      "role": "content",
+      "segment_index": 3,
+      "template": "flowchart",
+      "params": {"heading": "Cache hit/miss"},
+      "warning": null
+    },
+    {
+      "index": 5,
+      "file": "05-ending.png",
+      "role": "ending",
+      "segment_index": 4,
+      "template": "key_takeaways",
+      "params": {"heading": "Key takeaways"},
       "warning": null
     }
   ],
@@ -150,201 +199,136 @@ Validation rules:
 }
 ```
 
-`narration_source` is either a path string pointing to the supplied
-narration audio file, or `null` when no `--narration` is provided.
-
 ### Template Vocabulary
 
-| Template | Keyword triggers (case-insensitive, first match wins) |
-|---|---|
-| `title_card` | `title card` |
-| `key_takeaways` | `key takeaway`, `key takeaways` |
-| `code_snippet` | `code snippet` |
-| `flowchart` | `flowchart` |
-| `chart_bar` | `bar chart` |
-| `split_output` | `split screen`, `split output` |
-| `side_by_side` | `side-by-side`, `side by side` |
-| `diagram` | `diagram` |
-| `chart_line` | `line chart`, `graph` |
-| `fallback_text_card` | catch-all (no keyword match) |
+| Template | Keyword triggers (case-insensitive, first match wins) | Key params |
+|---|---|---|
+| `title_card` | `title`, `intro`, `welcome`, `opening` | `title`, `subtitle` |
+| `side_by_side` | `side-by-side`, `side by side`, `comparison`, `vs`, `versus` | `left`, `right`, `caption`, `heading` |
+| `code_snippet` | `code`, `snippet`, `python`, `javascript`, `java`, `terminal`, `command` | `code`, `language`, `heading` |
+| `diagram` | `diagram`, `architecture`, `overview`, `structure` | `description`, `heading` |
+| `flowchart` | `flow`, `flowchart`, `pipeline`, `sequence`, `step` | `steps[]`, `heading` |
+| `chart_bar` | `bar chart`, `bars`, `histogram` | `labels[]`, `values[]`, `heading`, `annotation` |
+| `chart_line` | `line chart`, `graph`, `trend`, `timeline` | `series[]`, `heading`, `annotation` |
+| `split_output` | `split`, `split screen`, `output` | `left`, `right`, `heading` |
+| `key_takeaways` | `takeaway`, `key point`, `summary`, `recap` | `heading`, `bullets[]` |
+| `fallback_text_card` | _(no match)_ | `text` |
 
-Matching is case-insensitive. Precedence is top-down: the first
-keyword found in `visual_instruction` determines the template.
+### Text Derivation
 
-The `diagram` template is limited to instructions containing the
-keyword `diagram`. Complex visual prose that does not include this
-keyword falls through to `fallback_text_card`.
+1. Use a non-empty `subtitle_text` as the primary slide text.
+2. Otherwise, derive concise text from `visual_instruction`.
+3. `title_card` uses `topic` as its title and slide text as its subtitle.
+4. `key_takeaways` uses slide text as its heading or bullets.
 
-### Parameter Extraction
+### Visual Defaults
 
-Deterministic regex/string split only. No LLM. The renderer ignores
-in-instruction colors and styles unless a template param explicitly
-defines labels; theme controls visual styling.
+Every template must use the shared theme and safe margins. Type must be bold,
+high-contrast, and readable at slideshow viewing size. Code and card layouts
+must be scannable. Tiny text is prohibited. Each slide communicates one idea.
 
-| Template | Extraction rules |
-|---|---|
-| `title_card` | `title`: first quoted string (single or double quotes), or `topic` field fallback |
-| `code_snippet` | `code`: text after the colon in the instruction |
-| `diagram` | `description`: full instruction text |
-| `flowchart` | `nodes`: split instruction on `->` arrows |
-| `chart_bar` | `labels`: split on commas or semicolons; `annotation`: illustrative overlay text |
-| `chart_line` | `series`: split on `vs` or `and` |
-| `split_output` | `left`: text before `:` or colon-like separator; `right`: text after |
-| `side_by_side` | `left`: first half; `right`: second half; `caption`: trailing quoted text if present |
-| `key_takeaways` | `heading`: phrase before colon or first sentence; `bullets`: split on commas or periods |
-| `fallback_text_card` | `text`: full instruction text |
+### Slide File Naming
 
-If extraction fails for any template, emit `fallback_text_card` with a
-warning in the manifest.
+- `01-intro.png`
+- `02-content.png`
+- `03-content.png`
+- ...
+- `NN-ending.png`
 
-### Assets Layout
+The index is zero-padded to two digits. File ordering and `segment_index` are
+identical to input timeline segment ordering.
 
-```
-repo-root/
-  assets/
-    templates/
-      title_card.json
-      key_takeaways.json
-      code_snippet.json
-      flowchart.json
-      chart_bar.json
-      chart_line.json
-      split_output.json
-      side_by_side.json
-      diagram.json
-      fallback_text_card.json
-    primitives/
-      theme.json
-      fonts/
-        <bundled-open-license-font>.ttf
-```
-
-- `theme.json`: colors, font sizes, subtitle style, background colors.
-- Bundled font: one open-license TTF. If missing, fall back to
-  `ImageFont.load_default()` and add a warning to the manifest
-  `warnings[]` array.
-
-### Subtitle Contract
-
-- Generate a temporary SRT file from `subtitle_text` and segment
-  `start_s` / `end_s`.
-- Burn into MP4 via ffmpeg subtitles filter.
-- Style derived from `theme.json` (font, size, color).
-- Wrap text around 42 characters per line.
-- If subtitle text is too long to fit the segment duration, burn anyway
-  and emit a warning.
-- No standalone subtitle output in this spec.
-
-### Audio Contract
-
-- If `--narration` is omitted: no audio track in MP4.
-- If supplied and shorter than timeline duration: pad with silence.
-- If supplied and longer than timeline duration: truncate.
-- Final MP4 duration always matches the timeline's final `end_s`.
-- Warn if audio duration mismatches timeline by more than 0.1 s.
-
-## Fixture Mapping Tables
+## Template Examples
 
 ### docs/samples/caching/03-timeline.json (5 segments)
 
-| Index | visual_instruction | Template | Key params |
+| Index | Slide content | Template | Key params |
 |---|---|---|---|
-| 0 | `Title card: 'What is Caching?' with a diagram...` | `title_card` | `title`: `What is Caching?` |
-| 1 | `Side-by-side comparison: chef prepping...` | `side_by_side` | `left`: chef prepping, `right`: chef fumbling, `caption`: `Caching is like pre-chopping ingredients.` |
-| 2 | `Code snippet on screen: function getProfile...` | `code_snippet` | `code`: function body |
-| 3 | `Flowchart: Start -> Check Cache? -> Hit?...` | `flowchart` | `nodes`: Start, Check Cache?, Hit?, Yes→Return, No→Query DB→Store→Return |
-| 4 | `Text on screen: 'Key Takeaways' with bullet points...` | `key_takeaways` | `heading`: Key Takeaways, `bullets`: 4 items |
+| 0 | Title card | `title_card` | `title`: What is Caching? |
+| 1 | Chef side-by-side | `side_by_side` | `caption`: Caching is like pre-chopping ingredients |
+| 2 | `getProfile` code snippet | `code_snippet` | `code`: getProfile |
+| 3 | Cache flowchart | `flowchart` | `heading`: Cache hit/miss |
+| 4 | Key takeaways | `key_takeaways` | `heading`: Key takeaways |
 
 ### docs/samples/java-garbage-collection/03-timeline.json (6 segments)
 
-| Index | visual_instruction | Template | Key params |
+| Index | Slide content | Template | Key params |
 |---|---|---|---|
-| 0 | `Animated sandcastle being built, then a giant hand...` | `fallback_text_card` | `text`: full instruction |
-| 1 | `Diagram of JVM threads frozen, with a red 'STOP' sign...` | `diagram` | `description`: full instruction |
-| 2 | `Web of objects with roots, live objects in green...` | `fallback_text_card` | `text`: full instruction |
-| 3 | `Code snippet: -XX:MaxGCPauseMillis=200...` | `code_snippet` | `code`: `-XX:MaxGCPauseMillis=200, with G1 heap regions shown as colored squares` |
-| 4 | `Graph comparing pause times: default vs. tuned G1GC...` | `chart_line` | `series`: default vs. tuned G1GC |
-| 5 | `Text overlay: 'Key Takeaway: Stop-the-world...` | `key_takeaways` | `heading`: Key Takeaway, `bullets`: 3 items |
+| 0 | Sandcastle fallback card | `fallback_text_card` | `text`: sandcastle instruction |
+| 1 | JVM STOP diagram | `diagram` | `heading`: JVM STOP |
+| 2 | Object-roots fallback card | `fallback_text_card` | `text`: object roots instruction |
+| 3 | `MaxGCPauseMillis` snippet | `code_snippet` | `code`: MaxGCPauseMillis |
+| 4 | Pause-time line chart | `chart_line` | `heading`: Pause time |
+| 5 | Key takeaways | `key_takeaways` | `heading`: Key takeaways |
 
 ### docs/samples/china-open-source-models/03-timeline.json (5 segments)
 
-| Index | visual_instruction | Template | Key params |
+| Index | Slide content | Template | Key params |
 |---|---|---|---|
-| 0 | `Side-by-side model comparison cards: Qwen 2.5 7B vs...` | `side_by_side` | `left`: Qwen 2.5 7B, `right`: Llama 3 8B |
-| 1 | `Python code snippet showing loading two...` | `code_snippet` | `code`: pipeline loading snippet |
-| 2 | `Split screen: left shows Qwen output... right shows Llama...` | `split_output` | `left`: Qwen output, `right`: Llama output |
-| 3 | `Bar chart comparing inference cost...` | `chart_bar` | `labels`: Qwen, Llama; `annotation`: 4x cost reduction |
-| 4 | `Key takeaways slide: 'Chinese open-source...'` | `key_takeaways` | `heading`: Chinese open-source, `bullets`: 3 items |
+| 0 | Qwen/Llama side-by-side | `side_by_side` | `left`: Qwen, `right`: Llama |
+| 1 | Code snippet | `code_snippet` | `code`: model comparison snippet |
+| 2 | Split output | `split_output` | `left`: Qwen, `right`: Llama |
+| 3 | Cost bar chart | `chart_bar` | `heading`: Cost comparison |
+| 4 | Key takeaways | `key_takeaways` | `heading`: Key takeaways |
 
 ## Failure Modes
 
 | Failure | Handling |
 |---|---|
 | Missing required timeline field | Structured error, exit nonzero |
+| Segment count below 3 or above 10 | Structured error, exit nonzero |
 | Non-contiguous or overlapping `start_s`/`end_s` | Structured error, exit nonzero |
-| First `start_s` ≠ 0.0 | Structured error, exit nonzero |
+| First `start_s` is not `0.0` | Structured error, exit nonzero |
 | `|final_end_s - duration_estimate_s| > 1.0` | Structured error, exit nonzero |
-| Empty `timeline_segments` | Structured error, exit nonzero |
-| ffmpeg not on PATH | Structured error, exit nonzero |
-| Pillow not installed | Structured error, exit nonzero |
-| Unreadable narration file | Structured error, exit nonzero |
-| Narration file format not WAV/MP3 | Structured error, exit nonzero |
+| Headless browser not available | Structured error, exit nonzero |
 | Template extraction fails | Emit `fallback_text_card`, add warning to manifest |
-| Bundled font missing | Use `ImageFont.load_default()`, warn in manifest |
-| Subtitle text too long for segment | Burn anyway, warn in manifest |
-| Narration audio shorter than timeline | Pad silence, warn if mismatch > 0.1 s |
-| Narration audio longer than timeline | Truncate, warn if mismatch > 0.1 s |
-| ffmpeg encode failure | Structured error, exit nonzero |
+| Font or asset missing | Use system fallback, warn in manifest |
+| Rasterization fails | Structured error, exit nonzero |
 | Temp file cleanup failure | Log warning, exit nonzero |
 
 ## Acceptance Criteria
 
-1. `apollo render timeline.json -o output.mp4` exits 0 and produces a
-   playable H.264 MP4 at 1080×1920, 30 fps.
-2. `ffprobe` confirms: resolution 1080×1920, codec h264, duration
-   within 0.1 s of the final segment's `end_s`.
-3. Every segment maps to exactly one template or `fallback_text_card`.
-4. Subtitles are burned into the MP4 for every segment.
-5. When `--narration` is supplied, AAC audio at 44100 Hz is present;
-   when omitted, no audio track exists.
-6. Manifest JSON is written with one entry per segment, correct
-   timing, template name, params, and source path.
-7. No LLM or proprietary API is invoked in the render path.
-8. No moviepy, imageio, or OpenCV dependency.
-9. Temp files are cleaned up after render (no orphaned artifacts).
-10. `docs/samples/caching/03-timeline.json` renders without errors and
-    manifest contains 5 segments with correct template assignments.
-11. `docs/samples/java-garbage-collection/03-timeline.json` renders
-    with 6 segments: segments 0 and 2 use `fallback_text_card`
-    (no keyword match), segment 1 uses `diagram`, segment 3 uses
-    `code_snippet`, segment 4 uses `chart_line`, and segment 5 uses
-    `key_takeaways`.
-12. `docs/samples/china-open-source-models/03-timeline.json` renders
-    with 5 segments and correct template assignments.
+1. `apollo render timeline.json -o output/` produces ordered 1080×1920 PNGs
+   and `slides.manifest.json`.
+2. The command accepts 3-10 segments and rejects timelines with 1-2 segments.
+3. There is exactly one PNG and one manifest `slides[]` entry per input
+   timeline segment, with no duplicate slides.
+4. Manifest roles are `intro` for the first segment, `content` for each middle
+   segment, and `ending` for the last segment.
+5. Every segment maps to exactly one template or `fallback_text_card`.
+6. All templates use the shared theme, safe margins, bold high-contrast
+   readable type, scannable code/cards, no tiny text, and one idea per slide.
+7. No video, audio, subtitle file, or thumbnail is generated.
+8. Temp files are cleaned up after render.
+9. The caching sample produces exactly five slides: title card, chef
+   side-by-side, `getProfile` code snippet, cache flowchart, and key
+   takeaways.
+10. The Java GC sample produces exactly six slides: sandcastle fallback card,
+    JVM STOP diagram, object-roots fallback card, `MaxGCPauseMillis` snippet,
+    pause-time line chart, and key takeaways.
+11. The China models sample produces exactly five slides: Qwen/Llama
+    side-by-side, code snippet, split output, cost bar chart, and key
+    takeaways.
 
 ## Verification
 
-- **Template mapping unit test**: assert each of the three sample
-  timelines maps all segments to expected templates.
-- **Param extraction unit test**: assert extracted params for title,
-  code, flowchart, diagram, chart_bar, chart_line, split_output,
-  side_by_side, key_takeaways, and fallback.
-- **CLI smoke test**:
-  `apollo render docs/samples/caching/03-timeline.json -o /tmp/test.mp4`
-  exits 0.
-- **ffprobe check**:
-  `ffprobe -v error -show_entries stream=codec_name,width,height
-  -show_entries format=duration -of json /tmp/test.mp4` confirms
-  h264, 1080×1920, duration ≈ final `end_s`.
-- **Manifest test**: parsed `.render.json` has correct segment count,
-  timing, and no unexpected warnings.
-- **No-audio test**: render without `--narration`, verify no audio
-  stream in ffprobe output.
-- **With-audio test**: render with `--narration`, verify AAC stream
-  present and duration matches.
-- **Dependency check**: `import PIL` and `ffmpeg -version` both
-  succeed.
-- **Cleanup check**: no temp files remain after a successful render.
+- **Segment-count test:** accept 3 and 10 segments; reject 1, 2, and 11.
+- **Template mapping test:** assert the exact five/six/five mappings for the
+  three sample timelines.
+- **Param extraction test:** assert the caching title, chef caption,
+  `getProfile`, and cache hit/miss parameters.
+- **CLI smoke test:**
+  `apollo render docs/samples/caching/03-timeline.json -o /tmp/test-slides/`
+  exits 0 and yields five images.
+- **Image dimension check:** every PNG is 1080×1920.
+- **Manifest test:** `image_count` equals segment and PNG counts; roles,
+  ordering, file names, and `segment_index` are correct; no duplicate slide is
+  present.
+- **Visual-default test:** rendered templates meet shared-theme, safe-margin,
+  high-contrast, no-tiny-text, scannability, and one-idea requirements.
+- **Output exclusion test:** no video, audio, subtitle, or thumbnail artifact
+  is generated.
+- **Cleanup check:** no temp files remain after a successful render.
 
 ## Open Questions
 
