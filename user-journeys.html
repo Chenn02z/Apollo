@@ -291,20 +291,20 @@
           <span class="eyebrow">Apollo · Planned MVP</span>
           <h1>Turn one technical topic into a clear carousel.</h1>
           <p>
-            Apollo is a planned local CLI for technical-content creators. Its
-            first release will turn a topic into seven consistently themed,
+            Apollo is a planned Codex-native workflow for technical-content
+            creators. Its first release will turn a topic into seven consistently themed,
             legible 1080×1350 PNG slides without manual HTML editing.
           </p>
           <div class="meta">
-            <span class="chip">Local CLI</span>
+            <span class="chip">Codex skill</span>
             <span class="chip">Seven slides</span>
-            <span class="chip">Deterministic HTML</span>
+            <span class="chip">Constrained HTML</span>
             <span class="chip">PNG output</span>
           </div>
         </div>
         <div class="hero-side">
           <div class="score">
-            <strong>Topic → JSON → PNG</strong>
+            <strong>Topic → skill → agents → JSON → HTML → PNG</strong>
             <span>Runtime is not implemented yet; this is the approved MVP path.</span>
           </div>
         </div>
@@ -324,7 +324,7 @@
               <span class="status status-growing">Planned</span>
             </div>
             <ul>
-              <li>Run <code>apollo generate "ACID properties in databases"</code>.</li>
+              <li>Invoke the <code>apollo-generate</code> Codex skill for <code>ACID properties in databases</code>.</li>
               <li>The MVP keeps inputs intentionally small: the topic is required; slide count and theme use defaults.</li>
               <li>The reference style is concise, technical, diagram-led, and interview-oriented.</li>
             </ul>
@@ -334,7 +334,7 @@
             <div class="journey-head">
               <div>
                 <h3>2. Get a structured seven-slide story</h3>
-                <p>A content pass compresses the topic into a teachable carousel before any pixels are rendered.</p>
+                <p>A Codex custom agent compresses the topic into a teachable carousel before any pixels are rendered.</p>
               </div>
               <span class="status status-growing">Planned</span>
             </div>
@@ -348,15 +348,15 @@
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>3. Render fixed, themed layouts</h3>
-                <p>A deterministic HTML/CSS renderer fills a small set of reusable layouts rather than generating arbitrary slides.</p>
+                <h3>3. Compose constrained themed HTML</h3>
+                <p>A future Codex custom worker creates HTML within the repository-owned database theme assets and templates.</p>
               </div>
               <span class="status status-growing">Planned</span>
             </div>
             <ul>
-              <li>One initial theme and seven layouts provide consistent typography, spacing, diagrams, footer, and slide numbering.</li>
+              <li>The local database theme pack is derived from the reference style and provides the approved visual assets and templates.</li>
               <li>Every slide renders at 1080×1350 pixels.</li>
-              <li>The renderer produces <code>index.html</code> and a render manifest.</li>
+              <li>The HTML contract requires exactly seven sequential slides, with no scripts, network access, or external assets.</li>
             </ul>
           </article>
 
@@ -396,11 +396,11 @@
                 <h3>6. Grow only after the baseline works</h3>
                 <p>The first three milestones prove the simple path before Apollo expands.</p>
               </div>
-              <span class="status status-growing">Draft sequence</span>
+              <span class="status status-growing">0001 Accepted; 0002–0003 Draft</span>
             </div>
             <ul>
               <li><code>0001</code>: carousel contract and content.</li>
-              <li><code>0002</code>: fixed renderer and PNG output.</li>
+              <li><code>0002-fixed-carousel-renderer</code>: constrained HTML generation and PNG output.</li>
               <li><code>0003</code>: validation and proof across five topics.</li>
             </ul>
           </article>
@@ -413,7 +413,7 @@
           <article class="capability">
             <span class="stage">Input</span>
             <h3>Start with one topic</h3>
-            <p>Use a local <code>apollo generate "&lt;topic&gt;"</code> command. Extra options are deferred until defaults prove insufficient.</p>
+            <p>Use the <code>apollo-generate</code> Codex skill with one topic. Extra options are deferred until defaults prove insufficient.</p>
           </article>
           <article class="capability">
             <span class="stage">Content</span>
@@ -423,7 +423,7 @@
           <article class="capability">
             <span class="stage">Render</span>
             <h3>Use one consistent visual system</h3>
-            <p>Render fixed HTML/CSS layouts with a single initial theme, diagram-led teaching, and reliable mobile dimensions.</p>
+            <p>Use constrained agent-authored HTML with one local database theme pack, then render reliable mobile dimensions.</p>
           </article>
           <article class="capability">
             <span class="stage">Export</span>
@@ -438,11 +438,11 @@
           <article class="capability">
             <span class="stage">Scope</span>
             <h3>Stay local for now</h3>
-            <p>Posting, scheduling, extra themes, automatic citations, generated assets, and vision repair are post-MVP.</p>
+            <p>An AI theme, theme plugins, retries, automatic citations, generated assets, and vision repair are post-MVP.</p>
           </article>
         </div>
         <p class="callout">
-          The renderer, CLI, and validation commands are planned—not available runtime capabilities yet. Apollo's first proof is five technical topics rendered without manual HTML edits.
+          The future HTML/render and validation stages are planned—not available runtime capabilities yet. Apollo has no shell CLI or direct LLM API runtime. Its first proof is five technical topics rendered without manual HTML edits.
         </p>
       </section>
 
@@ -455,7 +455,7 @@
           </article>
           <article class="artifact">
             <h3>Render source</h3>
-            <p><code>index.html</code>, styles, and a render manifest make the deterministic result inspectable and rerenderable.</p>
+            <p><code>index.html</code>, local theme assets, and a render manifest make the constrained result inspectable and rerenderable.</p>
           </article>
           <article class="artifact">
             <h3>Slide images</h3>

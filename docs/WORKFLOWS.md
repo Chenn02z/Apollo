@@ -42,6 +42,9 @@ changes:
 9. When a phase ships, run `plan-next` to propose the next increment.
 10. Update docs and spec status when decisions settle.
 
+Current MVP milestone status: `0001-carousel-contract-and-content` is
+Accepted and ready for `$spec`; `0002` and `0003` remain Draft.
+
 Small documentation or cleanup tasks may skip a formal spec when the user makes
 that explicit or when the change is obviously local and reversible.
 
