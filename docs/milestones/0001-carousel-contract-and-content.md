@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -132,4 +132,4 @@ and reports the run path.
 
 ## Open Questions
 
-None. This milestone is ready for `$spec`.
+None.

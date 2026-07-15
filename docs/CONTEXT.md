@@ -47,9 +47,8 @@
 
 ## Workflow Boundaries
 
-- Milestone `0001` is Accepted and may go to `$spec`; milestones `0002` and
-  `0003` remain Draft and must go through `$requirements` before `$spec` or
-  implementation.
+- Milestone `0001` is Verified. Milestones `0002` and `0003` remain Draft and
+  must go through `$requirements` before `$spec` or implementation.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries;
   this file owns durable terminology.

@@ -1,0 +1,83 @@
+{
+  "version": "1",
+  "topic": "ACID properties in databases",
+  "slides": [
+    {
+      "number": 1,
+      "role": "hook",
+      "title": "ACID: the promise behind reliable data",
+      "body": "When an app moves money, places an order, or saves a record, a database transaction needs a dependable outcome.",
+      "items": [
+        "All succeeds, or none does",
+        "Rules stay true",
+        "Committed data survives"
+      ]
+    },
+    {
+      "number": 2,
+      "role": "concept",
+      "title": "ACID defines transaction guarantees",
+      "body": "ACID is a set of four properties that help databases handle changes safely, even with errors and concurrent users.",
+      "items": [
+        "Atomicity",
+        "Consistency",
+        "Isolation"
+      ]
+    },
+    {
+      "number": 3,
+      "role": "breakdown",
+      "title": "The four properties, in plain language",
+      "body": "Atomicity makes a transaction all-or-nothing. Consistency preserves valid rules. Isolation separates concurrent work. Durability preserves commits.",
+      "items": [
+        "A: no partial results",
+        "C: valid state to valid state",
+        "I and D: safe concurrency and persistence"
+      ]
+    },
+    {
+      "number": 4,
+      "role": "example",
+      "title": "Example: transferring $100",
+      "body": "A transfer debits one account and credits another. If the credit fails, atomicity rolls back the debit; a completed transfer remains after a crash.",
+      "items": [
+        "Both balance updates commit together",
+        "Concurrent transfers do not corrupt balances",
+        "Recovery retains the completed transfer"
+      ]
+    },
+    {
+      "number": 5,
+      "role": "comparison",
+      "title": "ACID is about correctness, not speed",
+      "body": "Stronger guarantees can require locking, coordination, or logging. Systems sometimes trade some guarantees for availability or lower latency.",
+      "items": [
+        "ACID prioritizes reliable transactions",
+        "Eventual consistency accepts temporary divergence",
+        "Choose based on the business risk"
+      ]
+    },
+    {
+      "number": 6,
+      "role": "application",
+      "title": "Use transactions for related changes",
+      "body": "Wrap changes that must succeed together in one transaction: payments, inventory reservations, account updates, and order creation.",
+      "items": [
+        "Keep transactions short",
+        "Define database constraints",
+        "Handle retries deliberately"
+      ]
+    },
+    {
+      "number": 7,
+      "role": "takeaway",
+      "title": "ACID turns risky updates into dependable ones",
+      "body": "Atomicity, consistency, isolation, and durability provide the foundation for data people can trust when failures and concurrency occur.",
+      "items": [
+        "Group dependent work in transactions",
+        "Let constraints enforce rules",
+        "Match guarantees to the workload"
+      ]
+    }
+  ]
+}

@@ -1,28 +1,24 @@
 # Apollo
 
 Apollo is a Codex-native staged workflow for turning a technical topic into an
-interview-oriented carousel: seven legible 1080×1350 PNG slides with a
-consistent visual theme.
+interview-oriented carousel. Its shipped first stage creates a validated
+seven-slide content artifact; rendering is planned separately.
 
 ## MVP
 
 Invoke the `apollo-generate` Codex skill (explicitly, or through an equivalent
 carousel-generation request) with a topic such as `ACID properties in databases`.
 
-The staged workflow will produce a run directory containing:
+The shipped `apollo-generate` stage produces a run directory containing:
 
 - `request.json`
 - `carousel-content.json`
-- `index.html`
-- seven PNG slides
-- `render-manifest.json`
 
-The MVP is local-only and Codex-native. Custom-agent workers produce structured
-content and constrained HTML; Playwright screenshots that HTML. Apollo does not
-run a standalone LLM API client or require a runtime API key. A
-repository-owned `database` theme pack supplies the local visual assets and
-templates; the HTML/render worker must produce seven sequential slides using
-only those approved assets. Deterministic validation follows in milestone 0003.
+Apollo is local-only and Codex-native. The shipped custom-agent content stage
+produces structured copy; the future renderer will produce constrained HTML,
+seven PNG slides, and a manifest. Apollo does not run a standalone LLM API
+client or require a runtime API key. Deterministic render validation is planned
+for milestone 0003.
 
 `docs/reference/html/index.html` is source material for the `database` theme
 pack; it is not raw runtime output.
@@ -39,6 +35,6 @@ analytics, web UI, and authentication are post-MVP.
 
 ## Development
 
-The product is being bootstrapped. Shape Draft milestones through
+Milestone 0001 is Verified. Shape Draft milestones 0002 and 0003 through
 `$requirements`, create an Accepted implementation contract with `$spec`, then
 implement through `$dev-loop`.

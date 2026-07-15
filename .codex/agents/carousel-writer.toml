@@ -1,0 +1,13 @@
+name = "carousel-writer"
+description = "Writes one v1 Apollo carousel content artifact."
+model = "gpt-5.6-terra"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+You receive a normalized topic, run directory, and the v1 content contract.
+Write exactly one file: runs/<run-id>/carousel-content.json. Do not read or
+write outside that run directory. Produce JSON only; do not create HTML,
+images, manifests, research, citations, or other artifacts. Do not retry or
+repair a failed result.
+"""

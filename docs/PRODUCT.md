@@ -16,10 +16,14 @@ visually inconsistent.
 
 ## MVP Boundary
 
-The MVP is complete when the `apollo-generate` Codex skill receives a topic and
-its Codex-native stages create, without manual HTML edits:
+The shipped first stage lets the `apollo-generate` Codex skill receive a topic
+and create:
 
 - `request.json` and `carousel-content.json`
+
+The MVP is complete when later Codex-native stages add, without manual HTML
+edits:
+
 - one constrained, agent-authored `index.html`
 - seven 1080×1350 PNG slides using the local `database` theme pack
 - `render-manifest.json`
@@ -45,7 +49,7 @@ and embeddings.
 - **One visual identity first.** The reference-derived `database` theme pack
   provides consistency before theme choice breadth.
 - **Inspectable local output.** Every run leaves its input, content, HTML,
-  images, and manifest together.
+  images, and manifest together once the render stages ship.
 - **Reference-derived assets, not raw reuse.**
   `docs/reference/html/index.html` informs the `database` theme pack but is not
   raw runtime output.
@@ -67,9 +71,9 @@ HTML editing.
 
 ## MVP Milestone Ladder
 
-1. `0001-carousel-contract-and-content`: `apollo-generate` skill, request,
-   and bounded seven-slide content artifact.
-2. `0002-fixed-carousel-renderer`: repository-owned visual assets/templates,
-   constrained HTML generation, and local PNG export.
-3. `0003-render-validation-and-mvp-proof`: deterministic validation and the
-   five-topic manual proof set.
+1. `0001-carousel-contract-and-content` — Verified: `apollo-generate` skill,
+   request, and bounded seven-slide content artifact.
+2. `0002-fixed-carousel-renderer` — Draft: repository-owned visual
+   assets/templates, constrained HTML generation, and local PNG export.
+3. `0003-render-validation-and-mvp-proof` — Draft: deterministic validation
+   and the five-topic manual proof set.

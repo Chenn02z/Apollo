@@ -288,11 +288,11 @@
     <section class="hero">
       <div class="hero-grid">
         <div class="hero-copy">
-          <span class="eyebrow">Apollo · Planned MVP</span>
+          <span class="eyebrow">Apollo · Content Stage Available</span>
           <h1>Turn one technical topic into a clear carousel.</h1>
           <p>
-            Apollo is a planned Codex-native workflow for technical-content
-            creators. Its first release will turn a topic into seven consistently themed,
+            Apollo's verified first stage turns a topic into a validated
+            seven-slide content artifact. The planned renderer will add themed,
             legible 1080×1350 PNG slides without manual HTML editing.
           </p>
           <div class="meta">
@@ -305,7 +305,7 @@
         <div class="hero-side">
           <div class="score">
             <strong>Topic → skill → agents → JSON → HTML → PNG</strong>
-            <span>Runtime is not implemented yet; this is the approved MVP path.</span>
+            <span>Content generation is available; HTML, PNG, and render validation are planned.</span>
           </div>
         </div>
       </div>
@@ -321,11 +321,11 @@
                 <h3>1. Give Apollo a topic</h3>
                 <p>A technical-content creator starts locally with one clear subject.</p>
               </div>
-              <span class="status status-growing">Planned</span>
+              <span class="status status-ready">Available</span>
             </div>
             <ul>
               <li>Invoke the <code>apollo-generate</code> Codex skill for <code>ACID properties in databases</code>.</li>
-              <li>The MVP keeps inputs intentionally small: the topic is required; slide count and theme use defaults.</li>
+              <li>The available stage accepts exactly one required topic.</li>
               <li>The reference style is concise, technical, diagram-led, and interview-oriented.</li>
             </ul>
           </article>
@@ -336,10 +336,10 @@
                 <h3>2. Get a structured seven-slide story</h3>
                 <p>A Codex custom agent compresses the topic into a teachable carousel before any pixels are rendered.</p>
               </div>
-              <span class="status status-growing">Planned</span>
+              <span class="status status-ready">Available</span>
             </div>
             <ul>
-              <li>Slide roles are fixed: hook, context, teaching slides, example or interview tip, and recap.</li>
+              <li>Slide roles are fixed: hook, concept, breakdown, example, comparison, application, and takeaway.</li>
               <li>Each slide has one primary idea and bounded copy so it remains mobile-legible.</li>
               <li>The artifact is <code>carousel-content.json</code>.</li>
             </ul>
@@ -396,10 +396,10 @@
                 <h3>6. Grow only after the baseline works</h3>
                 <p>The first three milestones prove the simple path before Apollo expands.</p>
               </div>
-              <span class="status status-growing">0001 Accepted; 0002–0003 Draft</span>
+              <span class="status status-growing">0001 Verified; 0002–0003 Draft</span>
             </div>
             <ul>
-              <li><code>0001</code>: carousel contract and content.</li>
+              <li><code>0001</code>: verified carousel contract and content.</li>
               <li><code>0002-fixed-carousel-renderer</code>: constrained HTML generation and PNG output.</li>
               <li><code>0003</code>: validation and proof across five topics.</li>
             </ul>
@@ -408,7 +408,7 @@
       </section>
 
       <section class="panel">
-        <h2>Approved MVP Capability</h2>
+        <h2>Current Stage and Planned MVP Capabilities</h2>
         <div class="capability-grid">
           <article class="capability">
             <span class="stage">Input</span>
@@ -423,17 +423,17 @@
           <article class="capability">
             <span class="stage">Render</span>
             <h3>Use one consistent visual system</h3>
-            <p>Use constrained agent-authored HTML with one local database theme pack, then render reliable mobile dimensions.</p>
+            <p>Planned: constrained agent-authored HTML with one local database theme pack and reliable mobile dimensions.</p>
           </article>
           <article class="capability">
             <span class="stage">Export</span>
             <h3>Save individual PNGs</h3>
-            <p>Use browser screenshots to create one 1080×1350 image per slide in a local run folder.</p>
+            <p>Planned: browser screenshots will create one 1080×1350 image per slide in a local run folder.</p>
           </article>
           <article class="capability">
             <span class="stage">Validate</span>
             <h3>Reject broken layouts</h3>
-            <p>Verify dimensions, slide count, nonempty output, and text or page overflow before completing a run.</p>
+            <p>Planned: verify dimensions, slide count, nonempty output, and text or page overflow before completing a run.</p>
           </article>
           <article class="capability">
             <span class="stage">Scope</span>
@@ -442,27 +442,27 @@
           </article>
         </div>
         <p class="callout">
-          The future HTML/render and validation stages are planned—not available runtime capabilities yet. Apollo has no shell CLI or direct LLM API runtime. Its first proof is five technical topics rendered without manual HTML edits.
+          The available stage produces only <code>request.json</code> and validated <code>carousel-content.json</code>. HTML/render and validation are planned; Apollo has no shell CLI or direct LLM API runtime.
         </p>
       </section>
 
       <section class="panel">
-        <h2>Expected Run Artifacts</h2>
+        <h2>Current and Planned Run Artifacts</h2>
         <div class="artifact-grid">
           <article class="artifact">
-            <h3>Request and content</h3>
+            <h3>Available: request and content</h3>
             <p><code>request.json</code> records the topic; <code>carousel-content.json</code> preserves the seven-slide narrative.</p>
           </article>
           <article class="artifact">
-            <h3>Render source</h3>
+            <h3>Planned: render source</h3>
             <p><code>index.html</code>, local theme assets, and a render manifest make the constrained result inspectable and rerenderable.</p>
           </article>
           <article class="artifact">
-            <h3>Slide images</h3>
+            <h3>Planned: slide images</h3>
             <p><code>slide-01.png</code> through <code>slide-07.png</code> are the final carousel assets.</p>
           </article>
           <article class="artifact">
-            <h3>Validation result</h3>
+            <h3>Planned: validation result</h3>
             <p>A run report records whether dimensions, count, output files, and overflow checks passed.</p>
           </article>
         </div>

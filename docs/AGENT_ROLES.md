@@ -27,8 +27,14 @@ Read-only subagents may run in parallel when their questions are independent.
 - `test-runner`: targeted verification worker.
 - `doc-curator`: documentation maintainer.
 
-Only `implementer`, `test-runner`, and `doc-curator` should edit files, and
-only when the main workflow calls for it.
+Only these development-workflow agents should edit files, and only when the
+main workflow calls for it.
+
+## Runtime Writers
+
+- `carousel-writer`: writes only its delegated
+  `runs/<run-id>/carousel-content.json` artifact during the `apollo-generate`
+  runtime stage.
 
 Write-capable subagents must have disjoint file ownership. Use one
 `implementer` at a time unless an Accepted spec explicitly decomposes disjoint
@@ -43,4 +49,3 @@ write scopes. `doc-curator` may edit docs and skill or agent rules when
 - Keep model/provider choices in agent config or explicit specs.
 - Do not use shell scripts as the orchestration brain.
 - Preserve user-owned worktree changes. Do not revert unrelated edits.
-

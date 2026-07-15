@@ -2,8 +2,9 @@
 
 ## Current Structure
 
-Apollo currently contains its product documentation and a visual/content
-reference at `docs/reference/html/index.html`. It has no product runtime yet.
+Apollo includes the verified content-stage runtime and a visual/content
+reference at `docs/reference/html/index.html`. HTML rendering and render
+validation are not implemented yet.
 
 The MVP runtime is a local Codex-native staged workflow. Skills enter stages,
 Codex custom agents perform bounded generation work, and deterministic local
@@ -19,7 +20,7 @@ topic → `apollo-generate` skill → carousel-writer → request/content JSON �
 
 ## Approved MVP Boundaries
 
-These are the minimum boundaries the first implementation must establish.
+These are the approved boundaries for the staged implementation.
 
 - **Run artifact boundary:** a run directory contains the artifacts available
   after its completed stages. Milestone 0001 writes only request and validated
