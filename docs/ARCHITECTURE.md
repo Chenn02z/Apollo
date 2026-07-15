@@ -1,36 +1,41 @@
-# Architecture
-
-Documents the current code structure, approved seams, and explicitly deferred
-architecture. Seams are lightweight boundaries that exist now so future
-features can be added without rewrites — they are never speculative blueprints
-or unused frameworks.
-
-Update through `$context` when architecture decisions settle. Bootstrap seeds
-this from the MVP boundary; `plan-next` and `$requirements` consult it when
-shaping the next milestone.
+# Apollo Architecture
 
 ## Current Structure
 
-Describe the code layout and component boundaries as they exist today. Keep
-this concise — a component map, not a class diagram.
+Apollo currently contains its product documentation and a visual/content
+reference at `docs/reference/html/index.html`. It has no product runtime yet.
 
-## Approved Seams
+The MVP runtime will be a local Node CLI using Playwright. It will write each
+generation to an inspectable run directory rather than a database or service.
 
-Boundaries the codebase deliberately exposes for future extension. Each seam
-should be lightweight and live in the repo (an interface, a plugin hook, a
-config entry point). List only what exists in code, not what is planned.
+## MVP Flow
 
-For each seam:
-- **What**: the boundary (interface, hook, config key)
-- **Why**: what future feature it unblocks
-- **Current path**: what's wired today
+```text
+topic → request/content JSON → fixed HTML renderer → Playwright PNG export → validation
+```
+
+## Approved MVP Boundaries
+
+These are the minimum boundaries the first implementation must establish.
+
+- **Run artifact boundary:** a run directory contains request, content, HTML,
+  images, and manifest. This makes a failed output inspectable and permits a
+  future stage to consume prior artifacts.
+- **Content/render boundary:** `carousel-content.json` holds slide copy and
+  layout-ready fields; the renderer turns that data into HTML and PNGs. Future
+  research or visual-planning stages can replace the producer without rewriting
+  export code.
+- **Renderer/layout boundary:** one renderer selects from exactly seven fixed
+  layouts under one fixed theme. New themes or layouts remain later additions,
+  not an MVP plugin system.
+- **Validation boundary:** rendering reports deterministic dimensions, slide
+  count, and overflow failures independently from content generation.
 
 ## Deferred Architecture
 
-Features or structural changes that are intentionally NOT built yet. Each
-entry names what is deferred, which milestone or phase it belongs to, and
-what seam (if any) was left open for it.
-
----
-
-*Template — replace during `$bootstrap`.*
+- Research, citation, visual-spec, and vision-review stages are post-MVP;
+  their artifact contracts must not be built until their milestone is shaped.
+- Generated assets, multiple themes, caching, publishing, scheduling,
+  analytics, web UI, authentication, and hosted execution are post-MVP.
+- The reference HTML stays isolated from the renderer until a future accepted
+  milestone explicitly imports a reusable pattern from it.

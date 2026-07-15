@@ -1,77 +1,66 @@
-# Product Backbone
+# Apollo Product
 
 ## Product Intent
 
-This repository is a reusable AI harness for indie developers. The harness
-gives a software project durable workflow structure through specs, explicit
-handovers, role-specific subagents, and stable repo terminology.
+Apollo is a local CLI that turns a technical topic into a seven-slide,
+interview-oriented PNG carousel. It gives a technical-content creator a
+repeatable way to produce clear, consistently themed educational slides without
+manually editing HTML.
 
-It is not an app runtime and it is not tied to one domain. Your product code,
-framework choices, and runtime architecture should live alongside this harness,
-not inside its core rules.
+## Target User And Pain
 
-## Current Scope
+The initial user is a creator producing technical interview-preparation
+content. They need concise, accurate-enough-for-manual-review slides with
+consistent visual presentation; composing each carousel by hand is slow and
+visually inconsistent.
 
-- first-run bootstrap onboarding for a newly forked product repo
-- repo operating instructions and workflow skills
-- milestone and spec structure
-- Codex agent presets for planning, grilling, exploration, implementation,
-  verification, review, and documentation
-- context docs that prevent terminology drift
-- generic templates for specs and milestones
-- architecture documentation and incremental phase planning
+## MVP Boundary
 
-## Non-Goals For Now
+The MVP is complete when `apollo generate "<topic>"` runs locally using Node
+and Playwright and creates, without manual HTML edits:
 
-- runtime application code
-- deployment scaffolding
-- framework-specific project generators
-- domain-specific examples or sample products
-- team collaboration workflows beyond a single main agent coordinating subagents
+- `request.json` and `carousel-content.json`
+- one `index.html`
+- seven 1080×1350 PNG slides using one fixed theme and seven fixed layouts
+- `render-manifest.json`
+- actionable failure diagnostics when text or slide content overflows
+
+It uses one content-generation pass with no formal source/citation workflow.
+It is manually reviewed against ACID properties, indexes, caching, REST vs
+GraphQL, and embeddings.
 
 ## Product Principles
 
-- **Start by interrogating the product**: a fresh fork should not proceed on
-  vague direction; bootstrap should force a usable product backbone first.
-- **Specs define truth**: implementation traces to accepted requirements.
-- **Skills define process**: repeatable workflows live in `.agents/skills/`.
-- **Agents execute roles**: model, reasoning, and permission presets live in
-  `.codex/agents/`.
-- **Main agent owns judgment**: subagents gather, challenge, implement, and
-  review; the main agent reconciles and reports.
-- **The harness is product-agnostic**: domain assumptions belong in your own
-  product docs and specs.
-- **Model routing follows risk**: ambiguous or high-impact work gets stronger
-  models; narrow exploration can use cheaper ones.
-- **Bash is not the orchestration brain**.
-- **Prioritize user-visible functionality over infrastructure completeness**:
-  MVP means the smallest real end-to-end product loop — reduce breadth, not
-  reality. Deliver a concrete, useful experience before filling in every seam.
+- **Meaning in data; pixels in code.** Content is structured data; the fixed
+  renderer owns dimensions, layout, and image production.
+- **One idea per slide.** Keep technical explanations concise, diagram-led,
+  and suitable for a phone screen.
+- **One visual identity first.** Consistency beats theme choice breadth.
+- **Inspectable local output.** Every run leaves its input, content, HTML,
+  images, and manifest together.
+- **Reference, not reuse.** `docs/reference/html/index.html` informs the
+  quality bar but is not runtime or renderer code.
 
-## Success Criteria
+## Explicit Post-MVP Cutoff
 
-- a fresh fork can be turned into product-specific docs and an initial
-  milestone through a structured grilling session
-- the MVP boundary drives architectural seams, not the other way around
-- vague requests become clear milestones or specs
-- specs are grilled before implementation
-- implementation follows a consistent explorer -> implementer -> verifier ->
-  reviewer loop
-- docs, specs, skills, and agent presets remain aligned
-- developers can add any product domain without rewriting the harness itself
-- shipped milestones feed into phase-level replanning without upfront over-design
+- multi-agent orchestration and retries
+- source-backed research and citations
+- visual-spec artifacts, vision review, and automated repair loops
+- generated image assets
+- more themes, a topic taxonomy, caching, or scheduling
+- publishing, analytics, web UI, authentication, and hosted workflows
 
-## Roadmap Backbone
+## Success Metric
 
-1. First-run adoption: `$bootstrap` converts the template into a product
-   backbone with durable docs, an MVP milestone ladder, and architecture seams.
-2. Operating contract: `AGENTS.md`.
-3. Workflow foundation: requirements, spec, dev-loop, context, plan-next, and
-   test skills.
-4. Agent foundation: role/model/permission presets under `.codex/agents/`.
-5. Template foundation: milestone, spec, and architecture templates under
-   `docs/`.
-6. Incremental delivery: `plan-next` proposes the next phase after a phase
-   ships, using completed work to reshape future milestones.
-7. Domain adoption: each downstream product adds its own accepted milestones,
-   specs, code, and docs without changing the shared harness by default.
+All five proof topics render seven legible, consistently themed PNG slides at
+the required dimensions with no deterministic overflow failures and no manual
+HTML editing.
+
+## MVP Milestone Ladder
+
+1. `0001-carousel-contract-and-content`: CLI request and bounded seven-slide
+   content artifact.
+2. `0002-fixed-carousel-renderer`: fixed theme/layout renderer and local PNG
+   export.
+3. `0003-render-validation-and-mvp-proof`: deterministic validation and the
+   five-topic manual proof set.
