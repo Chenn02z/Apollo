@@ -1,4 +1,0 @@
-{
-    "topic": "How Java Garbage Collection Works in 60 Seconds",
-    "angle": "Explain the basic mechanism of Garbage Collection (GC) in Java, including how it automatically frees memory by removing unused objects to prevent memory leaks."
-}
