@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -244,6 +244,11 @@ uses that installed Chromium and permits no runtime route or subresource.
 - Run failure cases for invalid input, prohibited HTML, a route attempt, and a
   staged screenshot failure; confirm each leaves no success manifest or keeps
   the prior complete published set intact.
+
+**Verification exception:** Codex agent TOML cannot express a dynamic,
+per-run single-file sandbox allowlist. The `carousel-renderer` preset scopes
+this boundary by instruction; its exact path restriction remains a platform
+limitation rather than a mechanically enforced TOML rule.
 
 ## Open Questions
 

@@ -38,3 +38,7 @@ analytics, web UI, and authentication are post-MVP.
 Milestone 0001 is Verified and 0002 is Accepted. Create its implementation
 contract with `$spec`, then implement through `$dev-loop`; shape Draft
 milestone 0003 through `$requirements` first.
+
+Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
+playwright install chromium`. The renderer's targeted checks are `npm run
+test:renderer`.
