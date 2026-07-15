@@ -12,13 +12,13 @@
   manifest.
 - **content artifact:** `carousel-content.json`, the bounded seven-slide copy
   consumed by the renderer.
-- **HTML/render worker:** the future Codex custom agent stage that turns the
-  content artifact into constrained HTML using approved local theme assets,
-  then produces HTML, PNGs, and a manifest with deterministic local tools.
+- **renderer stage:** `apollo-render` validates a content artifact, delegates
+  once to `carousel-renderer` for HTML, then uses deterministic local tools for
+  PNG export and the manifest.
 - **database theme pack:** the sole local 1080×1350 MVP visual system, derived
   from `docs/reference/html/index.html` and stored as repository-owned assets
   and templates.
-- **constrained HTML contract:** exactly seven sequential identifiable slides;
+- **constrained HTML contract:** seven ordered identifiable 1080×1350 slides;
   approved local theme assets only; no scripts, network access, or external
   assets.
 - **overflow diagnostic:** a deterministic rendering failure that identifies
@@ -32,8 +32,8 @@
   content-stage entry skill; there is no shell CLI, standalone LLM API client,
   or runtime API key.
 - Milestone 0001 produces only `request.json` and validated
-  `carousel-content.json`. Future Codex-native HTML/render and validation
-  stages produce the remaining HTML, PNG, manifest, and validation artifacts.
+  `carousel-content.json`. The Accepted renderer stage adds HTML, PNG, and a
+  manifest; validation remains a later stage.
 - Formal citations, an AI theme, theme taxonomy or plugins, retries,
   visual-spec artifacts, vision repair, generated imagery, publishing,
   scheduling, analytics, web UI, and authentication are post-MVP.
@@ -42,13 +42,14 @@
 
 ## Maturity Gaps
 
-- Local render/export and validation tool commands are not yet established;
-  their respective future stages must record them.
+- Overflow diagnostics and the five-topic proof remain future validation-stage
+  work.
 
 ## Workflow Boundaries
 
-- Milestone `0001` is Verified. Milestones `0002` and `0003` remain Draft and
-  must go through `$requirements` before `$spec` or implementation.
+- Milestone `0001` is Verified; `0002` is Accepted and may proceed to `$spec`.
+  Milestone `0003` remains Draft and must go through `$requirements` before
+  `$spec` or implementation.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries;
   this file owns durable terminology.

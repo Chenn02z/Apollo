@@ -1,64 +1,89 @@
-# Milestone: Constrained HTML Generation And PNG Export
+# Milestone: Fixed Carousel Renderer
 
 ## Status
 
-Draft
+Accepted
 
 ## Goal
 
-Use a future Codex-native HTML/render worker to turn approved seven-slide
-content artifacts into constrained HTML using one repository-owned 1080×1350
-`database` theme pack, then export local PNGs through Playwright.
+Turn one validated v1 content artifact into a fixed, local seven-slide HTML
+carousel and PNG export without manual HTML editing.
 
 ## MVP Deliverable
 
-A creator receives repository-owned visual assets/templates, a constrained
-agent-authored `index.html`, seven PNG slides, and `render-manifest.json` from
-a valid content artifact without manual HTML editing.
+For a valid `runs/<run-id>/carousel-content.json`, `apollo-render` produces
+`index.html`, `slides/slide-01.png` through `slides/slide-07.png`, and a
+success `render-manifest.json` in that run directory.
 
 ## In Scope
 
-- Repository-owned visual assets and templates derived from
-  `docs/reference/html/index.html` as one local 1080×1350 `database` theme
-  pack. The reference remains source material, not raw runtime output.
-- One Codex custom HTML/render worker stage after the content artifact is
-  available; it is entered by a future Codex skill, not a shell CLI or direct
-  LLM API client.
-- A constrained HTML output contract: exactly seven sequential identifiable
-  slides; approved local theme assets only; no network, scripts, or external
-  assets.
-- Node + Playwright local screenshot export plus HTML, PNG, and manifest output
-  in the run directory.
+- A Codex-native `apollo-render` skill that validates the v1 content artifact
+  before delegating once to `carousel-renderer`.
+- One `carousel-renderer` agent that writes only `index.html` using the local,
+  reference-derived `database` theme and vendored local font files.
+- A fixed HTML contract: seven ordered 1080×1350 roots with
+  `data-slide="1"` through `data-slide="7"`; inline CSS is allowed.
+- Static HTML scanning and Playwright export with all routes aborted.
+- Local Node/npm and Playwright setup, with `package-lock.json` committed.
+- A success manifest containing its version, run ID, source content version,
+  1080×1350 dimensions, ordered artifact paths, and slide count.
 
 ## Out Of Scope
 
-- An AI theme, theme taxonomy or plugin system, retries, generated imagery,
-  vision review, and publishing.
+- Theme selection, theme plugins, remote or generated assets, retries,
+  repair, visual review, overflow validation, publishing, and a shell CLI.
 
-## Architecture Seams
+## Contracts And Failure Behavior
 
-- Implement the content/HTML, theme/HTML, and HTML/export boundaries in
-  `docs/ARCHITECTURE.md` without a theme plugin framework.
+- `apollo-render` accepts only a valid v1 `carousel-content.json` at
+  `runs/<run-id>/carousel-content.json`. Invalid input fails before delegation.
+- `carousel-renderer` writes only `runs/<run-id>/index.html`; deterministic
+  local export writes the PNGs and manifest.
+- Export stages all PNGs, then atomically replaces the complete renderer
+  artifact set only after all seven screenshots succeed.
+- HTML may use vendored local theme/font assets only. It must not contain
+  script elements, event-handler attributes, network URLs, `@import`, or
+  non-theme assets.
+- The renderer takes no retry or repair pass.
+- On an HTML-contract or export failure, retain the input and any generated
+  HTML for inspection. Preserve the prior complete renderer artifacts, or
+  leave no success manifest; a manifest must never point to altered or partial
+  PNGs.
 
 ## Acceptance Criteria
 
-- The HTML-generation agent produces exactly seven sequential identifiable
-  slides using approved local `database` theme assets only, with no scripts,
-  network access, or external assets.
-- Each generated slide is 1080×1350 pixels when rendered.
-- A valid seven-slide artifact renders seven consistently themed PNG files via
-  Playwright.
-- The manifest identifies the rendered run and slide count.
+- A valid v1 artifact results in exactly seven ordered PNGs at 1080×1350 and
+  a success manifest whose run ID, source version (`"1"`), dimensions, slide
+  count, and ordered paths match the run artifacts.
+- Invalid content prevents agent delegation and produces no success manifest.
+- A failed export cannot expose partial PNGs through a previous success
+  manifest.
+- The static scan rejects prohibited HTML constructs and non-local assets;
+  Playwright aborts every route during export.
+- The repository documents the supported Node LTS policy and uses
+  `npm ci` followed by `npx playwright install chromium` for local setup;
+  dependency changes include the committed `package-lock.json`.
+- Rendered output follows the locally derived `database` visual direction;
+  `docs/reference/html/index.html` remains source material, never runtime
+  output or a remote asset source.
 
 ## Verification
 
-- Targeted HTML/export tests plus a manual visual check against the
-  reference-derived `database` theme direction.
+- Targeted tests cover valid export, pre-delegation input rejection, HTML
+  contract rejection, manifest creation, and failed exports preserving the
+  prior complete artifact set or leaving no success manifest.
+- Run the documented npm/Playwright setup and a seven-slide export; inspect
+  dimensions, manifest paths, and that route interception saw no allowed
+  network request.
 
-## Deferred
+## Settled Decisions
 
-- Overflow enforcement and the five-topic proof set move to milestone 0003.
+- npm + Playwright is the local renderer toolchain; Chromium is the required
+  browser.
+- Typography is vendored locally; runtime rendering never fetches fonts or
+  other assets.
+- Milestone 0003 owns overflow validation and the five-topic proof set.
 
 ## Open Questions
 
-- Exact project-local Node/package commands.
+None.

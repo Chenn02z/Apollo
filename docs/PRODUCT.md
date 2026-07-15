@@ -73,7 +73,7 @@ HTML editing.
 
 1. `0001-carousel-contract-and-content` — Verified: `apollo-generate` skill,
    request, and bounded seven-slide content artifact.
-2. `0002-fixed-carousel-renderer` — Draft: repository-owned visual
+2. `0002-fixed-carousel-renderer` — Accepted: repository-owned visual
    assets/templates, constrained HTML generation, and local PNG export.
 3. `0003-render-validation-and-mvp-proof` — Draft: deterministic validation
    and the five-topic manual proof set.

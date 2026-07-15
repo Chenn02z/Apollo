@@ -15,8 +15,8 @@ The shipped `apollo-generate` stage produces a run directory containing:
 - `carousel-content.json`
 
 Apollo is local-only and Codex-native. The shipped custom-agent content stage
-produces structured copy; the future renderer will produce constrained HTML,
-seven PNG slides, and a manifest. Apollo does not run a standalone LLM API
+produces structured copy; the Accepted renderer milestone will add constrained
+HTML, seven PNG slides, and a manifest. Apollo does not run a standalone LLM API
 client or require a runtime API key. Deterministic render validation is planned
 for milestone 0003.
 
@@ -35,6 +35,6 @@ analytics, web UI, and authentication are post-MVP.
 
 ## Development
 
-Milestone 0001 is Verified. Shape Draft milestones 0002 and 0003 through
-`$requirements`, create an Accepted implementation contract with `$spec`, then
-implement through `$dev-loop`.
+Milestone 0001 is Verified and 0002 is Accepted. Create its implementation
+contract with `$spec`, then implement through `$dev-loop`; shape Draft
+milestone 0003 through `$requirements` first.
