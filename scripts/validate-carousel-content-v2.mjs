@@ -3,7 +3,6 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateText } from "./validate-carousel-content.mjs";
 
-const roles = new Set(["hook", "overview", "concept", "example", "deep-dive", "interview", "takeaway"]);
 const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
 const exactly = (value, keys) => object(value) && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
 const fail = message => { throw new Error(message); };
@@ -16,9 +15,9 @@ function validateRequest(request, runId) {
 function validateContent(content, topic) {
   if (!exactly(content, ["version", "topic", "slides"]) || content.version !== "2" || content.topic !== topic || !Array.isArray(content.slides) || content.slides.length < 6 || content.slides.length > 10) fail(`Invalid slide count: ${content.slides?.length ?? "unknown"}; expected 6–10`);
   content.slides.forEach((slide, index) => {
-    if (!exactly(slide, ["number", "role", "title", "body", "items"]) || slide.number !== index + 1 || !roles.has(slide.role) || !Array.isArray(slide.items) || slide.items.length > 4) fail(`Invalid slide ${index + 1}`);
-    const expected = index === 0 ? "hook" : index === 1 ? "overview" : index === content.slides.length - 1 ? "takeaway" : null;
-    if ((expected && slide.role !== expected) || (!expected && !["concept", "example", "deep-dive", "interview"].includes(slide.role))) fail(`Invalid role on slide ${index + 1}`);
+    if (!exactly(slide, ["number", "role", "title", "body", "items"]) || slide.number !== index + 1 || !Array.isArray(slide.items) || slide.items.length > 4) fail(`Invalid slide ${index + 1}`);
+    const permittedRoles = index === 0 ? ["hook"] : index === 1 ? ["overview"] : index === content.slides.length - 1 ? ["takeaway"] : ["concept", "example", "deep-dive", "interview"];
+    if (!permittedRoles.includes(slide.role)) fail(`Invalid role on slide ${index + 1}: received ${JSON.stringify(slide.role)}; permitted roles: ${permittedRoles.join(", ")}`);
     validateText(slide.title, 80); validateText(slide.body, 300); slide.items.forEach(item => validateText(item, 100));
   });
 }

@@ -36,3 +36,20 @@ test("generated v2 typography clears Chromium overflow validation", async t => {
   catch (error) { if (/browserType\.launch/.test(error.message)) return t.skip("Chromium cannot launch in this sandbox."); throw error; }
   assert.equal(JSON.parse(readFileSync(join(path, "render-manifest-v2.json"))).slideCount, 6);
 });
+
+test("the populated database v2 shell clears export validation", async t => {
+  const { chromium } = await import("playwright");
+  if (!existsSync(chromium.executablePath())) return t.skip("Run npx playwright install chromium for this local integration check.");
+  const shell = readFileSync("assets/database/carousel-v2-shell.html", "utf8");
+  const slide = index => shell.match(/<section class="carousel-slide"[\s\S]*?<\/section>/)?.[0]
+    .replaceAll("{{number}}", String(index + 1))
+    .replaceAll("{{number_padded}}", String(index + 1).padStart(2, "0"))
+    .replaceAll("{{count_padded}}", "06")
+    .replaceAll("{{topic}}", "Indexing")
+    .replace("{{content}}", `<span class="tag">the trade</span><h1>Find rows without reading every row</h1><p class="lead">An index trades write work for faster reads.</p><div class="cards"><article class="card">B-tree</article><article class="card">Hash</article></div>`);
+  const html = shell.replace(/\s*<!-- Repeat[\s\S]*?<section class="carousel-slide"[\s\S]*?<\/section>/, Array.from({ length: 6 }, (_, index) => slide(index)).join(""));
+  const path = run(); writeFileSync(join(path, "index-v2.html"), html);
+  try { await exportRunV2(path, { chromium }); }
+  catch (error) { if (/browserType\.launch/.test(error.message)) return t.skip("Chromium cannot launch in this sandbox."); throw error; }
+  assert.equal(JSON.parse(readFileSync(join(path, "render-manifest-v2.json"))).slideCount, 6);
+});
