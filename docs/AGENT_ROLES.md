@@ -35,6 +35,12 @@ main workflow calls for it.
 - `carousel-writer`: writes only its delegated
   `runs/<run-id>/carousel-content.json` artifact during the `apollo-generate`
   runtime stage.
+- `carousel-writer-v2`: writes only its delegated
+  `runs/<run-id>/carousel-content-v2.json` artifact during the
+  `apollo-generate-v2` runtime stage.
+- `carousel-renderer-v2`: writes only its delegated
+  `runs/<run-id>/index-v2.html` artifact during the `apollo-render-v2` runtime
+  stage.
 
 Write-capable subagents must have disjoint file ownership. Use one
 `implementer` at a time unless an Accepted spec explicitly decomposes disjoint

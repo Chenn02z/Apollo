@@ -8,16 +8,17 @@
 - **Codex-native stage:** a bounded workflow stage entered through a Codex
   skill and performed by a Codex custom agent or deterministic local tool.
 - **run:** one generated output directory containing artifacts completed so
-  far. Milestone 0001 has `request.json` and validated
-  `carousel-content.json`; later Codex-native stages add HTML, images, and a
-  manifest.
+  far. V1 uses `request.json`, `carousel-content.json`, `index.html`, PNGs,
+  and a manifest; the parallel v2 path uses `request-v2.json`,
+  `carousel-content-v2.json`, `index-v2.html`, `slides-v2/`, and
+  `render-manifest-v2.json`.
 - **content artifact:** `carousel-content.json`, the bounded seven-slide copy
   consumed by the v1 renderer. A v2 content artifact uses 6–10 slides selected
   from its teaching beats; it is a parallel versioned path.
 - **renderer stage:** `apollo-render` is the unchanged v1 default. The separate
   `apollo-render-v2` validates a v2 artifact, delegates once to
-  `carousel-renderer` for HTML, then uses deterministic local tools for PNG
-  export and the manifest.
+  `carousel-renderer-v2` for HTML, then uses deterministic local tools for
+  overflow checks, PNG export, and the manifest.
 - **database theme pack:** the sole local 1080×1350 MVP visual system, derived
   from `docs/reference/html/index.html` and stored as repository-owned assets
   and templates.
@@ -39,8 +40,9 @@
   content-stage entry skill; there is no shell CLI, standalone LLM API client,
   or runtime API key.
 - The verified v1 workflow produces `request.json`, validated
-  `carousel-content.json`, HTML, PNGs, and a manifest; validation remains a
-  later stage.
+  `carousel-content.json`, HTML, PNGs, and a manifest. The separate verified
+  v2 workflow validates its 6–10-slide artifact and rendered capacity before
+  publishing its v2 PNGs and manifest.
 - Formal citations, an AI theme, theme taxonomy or plugins, retries,
   visual-spec artifacts, vision repair, generated imagery, publishing,
   scheduling, analytics, web UI, and authentication are post-MVP.
@@ -49,13 +51,11 @@
 
 ## Maturity Gaps
 
-- Overflow diagnostics and the five-topic proof remain future validation-stage
-  work.
+- The broader five-topic proof remains future work.
 
 ## Workflow Boundaries
 
-- Milestones `0001` and `0002` are Verified. Milestone `0003` is Accepted and
-  may proceed to `$spec`; `0004` remains Draft and must go through
+- Milestones `0001`, `0002`, and `0003` are Verified. `0004` remains Draft and must go through
   `$requirements` before `$spec` or implementation.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries;

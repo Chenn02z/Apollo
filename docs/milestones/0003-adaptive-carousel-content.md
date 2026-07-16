@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -113,8 +113,9 @@ None.
 
 ## Handoff
 
-- **Producer:** `$requirements`
-- **Consumer:** `$spec`
-- **Status:** Accepted
-- **Proposed spec:** `docs/specs/0003-adaptive-carousel-content-v2.md`
+- **Producer:** `$dev-loop`
+- **Consumer:** `$context`
+- **Status:** Verified
+- **Implemented spec:** `docs/specs/0003-adaptive-carousel-content-v2.md`
+- **Manual ACID review evidence:** dev-loop handoff, not a repository artifact.
 - **Unresolved blockers:** None.

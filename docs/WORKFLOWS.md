@@ -44,7 +44,7 @@ changes:
 
 Current MVP milestone status: `0001-carousel-contract-and-content` is
 Verified; `0002-fixed-carousel-renderer` is Verified;
-`0003-adaptive-carousel-content` is Accepted; `0004` remains Draft.
+`0003-adaptive-carousel-content` is Verified; `0004` remains Draft.
 
 Small documentation or cleanup tasks may skip a formal spec when the user makes
 that explicit or when the change is obviously local and reversible.

@@ -3,9 +3,9 @@
 ## Product Intent
 
 Apollo is a Codex-native staged workflow that turns a technical topic into a
-seven-slide, interview-oriented PNG carousel. It gives a technical-content
-creator a repeatable way to produce clear, consistently themed educational
-slides without manually editing HTML.
+fixed seven-slide v1 or adaptive 6–10-slide v2, interview-oriented PNG
+carousel. It gives a technical-content creator a repeatable way to produce
+clear, consistently themed educational slides without manually editing HTML.
 
 ## Target User And Pain
 
@@ -16,8 +16,8 @@ visually inconsistent.
 
 ## MVP Boundary
 
-The verified v1 workflow lets the `apollo-generate` Codex skill receive a
-topic and create:
+The verified v1 workflow lets the `apollo-generate` Codex skill receive a topic
+and create:
 
 - `request.json` and `carousel-content.json`
 - one constrained, agent-authored `index.html`
@@ -29,8 +29,14 @@ pass, with no formal source/citation workflow. Apollo has no standalone LLM API
 client or runtime API key. The HTML pass may use only the approved local
 `database` theme assets and templates, and must output exactly seven sequential
 identifiable slides with no scripts, network access, or external assets.
-Playwright screenshots those slides deterministically. Overflow diagnostics and
-the five-topic proof remain future work.
+Playwright screenshots those slides deterministically. V1 overflow diagnostics
+and the five-topic proof remain future work.
+
+The separate verified v2 workflow uses `apollo-generate-v2` and
+`apollo-render-v2`. It writes `request-v2.json`, `carousel-content-v2.json`,
+`index-v2.html`, `slides-v2/`, and `render-manifest-v2.json`; the validated v2
+content artifact alone selects 6–10 slides. V2 performs deterministic
+structural, overflow, export, and manifest validation before publication.
 
 ## Product Principles
 
@@ -69,7 +75,7 @@ HTML editing.
    request, and bounded seven-slide content artifact.
 2. `0002-fixed-carousel-renderer` — Verified: repository-owned visual
    assets/templates, constrained HTML generation, and local PNG export.
-3. `0003-adaptive-carousel-content` — Accepted: a versioned v2 path with
+3. `0003-adaptive-carousel-content` — Verified: a versioned v2 path with
    content-derived 6–10 slide carousels and concrete teaching content.
 4. `0004-render-validation-and-mvp-proof` — Draft: deterministic validation
    and the five-topic manual proof set.

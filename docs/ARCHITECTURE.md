@@ -2,11 +2,11 @@
 
 ## Current Structure
 
-Apollo includes the verified v1 content and renderer stages plus a
-visual/content reference at `docs/reference/html/index.html`. Render validation
-remains a later milestone. Milestone 0003 introduces the separate
-`apollo-generate-v2` and `apollo-render-v2` entry points for an adaptive 6–10
-slide v2 path; it does not change v1 runs or defaults.
+Apollo includes verified v1 content and renderer stages plus a verified parallel
+v2 `apollo-generate-v2` and `apollo-render-v2` path for adaptive 6–10-slide
+content. The v2 path performs deterministic structural, overflow, export, and
+manifest validation without changing v1 runs or defaults. The workspace also
+includes a visual/content reference at `docs/reference/html/index.html`.
 
 The MVP runtime is a local Codex-native staged workflow. Skills enter stages,
 Codex custom agents perform bounded generation work, and deterministic local
@@ -17,7 +17,8 @@ standalone LLM API client or runtime API key.
 ## MVP Flow
 
 ```text
-topic → `apollo-generate` skill → carousel-writer → request/content JSON → `apollo-render` → carousel-renderer → HTML/PNG/manifest → future validator
+topic → `apollo-generate` → carousel-writer → v1 JSON → `apollo-render` → carousel-renderer → v1 HTML/PNG/manifest
+topic → `apollo-generate-v2` → carousel-writer-v2 → v2 JSON → `apollo-render-v2` → carousel-renderer-v2 → v2 HTML/validated PNG/manifest
 ```
 
 ## Approved MVP Boundaries
@@ -32,7 +33,7 @@ These are the approved boundaries for the staged implementation.
   preserves the prior complete set, or leaves no success manifest. This makes
   failed output inspectable and permits a future stage to consume prior
   artifacts.
-- **Content/HTML boundary:** milestone 0001's v1 `carousel-content.json` holds
+- **Content/HTML boundary:** v1 `carousel-content.json` holds
   fixed seven-slide copy and layout-ready fields. The shipped `apollo-generate`
   and `apollo-render` remain v1 defaults; `apollo-render` delegates once to
   `carousel-renderer`, which turns it into one HTML page. Milestone 0003 adds
@@ -49,8 +50,9 @@ These are the approved boundaries for the staged implementation.
   PNG; it does not make visual or content decisions.
 - **Validation boundary:** v2 reports deterministic dimensions, content-derived
   slide count, and overflow failures independently from content generation;
-  it validates structural limits, not semantic concreteness. Milestone 0004
-  owns the broader five-topic proof across v1 and v2.
+  it validates structural limits, not semantic concreteness. Its deterministic
+  validation is shipped; milestone 0004 retains the broader five-topic proof
+  across v1 and v2.
 
 ## Deferred Architecture
 
