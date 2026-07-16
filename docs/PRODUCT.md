@@ -17,17 +17,16 @@ visually inconsistent.
 ## MVP Boundary
 
 The workflow lets the `apollo-generate` Codex skill receive a topic and create
-`request.json` and `carousel-content.json`; it may also write versioned,
-evidence-backed, non-blocking review artifacts. An `approve_with_warnings` or
-`reject` review can trigger up to two candidate rewrites by the content writer.
+`request.json` and `carousel-content.json`, with versioned, evidence-backed,
+non-blocking review artifacts. An `approve_with_warnings` or `reject` review
+can trigger up to two candidate rewrites by the content writer.
 Initial content and each candidate get up to three writer attempts; each
 validated candidate is promoted and followed by another review (three reviews
 total). Validation removes an invalid selected artifact, while an unavailable
 or invalid review ends that loop without blocking the run.
-`apollo-render` validates
-the content, deterministically expands the fixed local shell into `index.html`,
-and exports one 1080×1350 PNG per content slide in `slides/`, followed by
-`render-manifest.json`.
+`apollo-render` validates the content, deterministically expands the fixed
+local shell into `index.html`, and exports one 1080×1350 PNG per content slide
+in `slides/`, followed by `render-manifest.json`.
 
 The validated content artifact alone selects 7–10 slides. The workflow uses a
 custom-agent content pass with at most two review-driven rewrites, followed by
@@ -43,12 +42,15 @@ runtime API key.
 
 - **Codex-native stages.** Skills enter the workflow and custom agents perform
   bounded work; Playwright owns deterministic image production.
-- **Meaning before pixels.** One agent creates structured content; deterministic
-  local tooling expands it into constrained HTML from approved theme assets.
+- **Meaning before pixels.** A writer and reviewer create validated structured
+  content; deterministic local tooling currently expands it into constrained
+  HTML from approved theme assets. Planned stages separate carousel-wide visual
+  direction from body-fragment composition.
 - **One idea per slide.** Keep technical explanations concise, diagram-led,
   and suitable for a phone screen.
 - **One visual identity first.** The reference-derived `database` theme pack
-  provides consistency before theme choice breadth.
+  currently provides consistency. The planned template archive retains a
+  single selected template per carousel while allowing distinct body layouts.
 - **Inspectable local output.** Every run leaves its input, content, HTML,
   images, and manifest together.
 - **Reference-derived assets, not raw reuse.**
@@ -58,20 +60,26 @@ runtime API key.
 ## Explicit Post-MVP Cutoff
 
 - unbounded retry or repair loops
-- source-backed research and citations
-- visual-spec artifacts, vision review, and automated repair loops
-- generated image assets
-- an AI theme, a theme taxonomy or plugin system, caching, or scheduling
-- publishing, analytics, web UI, authentication, and hosted workflows
+- generated image assets, an AI theme, a theme taxonomy or plugin system, and
+  caching
+- analytics, web UI, authentication, and hosted workflows
 
 ## Success Metric
 
 The five proof topics render adaptive 7–10-slide PNG carousels at the required
 dimensions with no deterministic overflow failures and no manual HTML editing.
 
-## MVP Milestone Ladder
+## Milestone Ladder
 
-1. `0003-adaptive-carousel-content` — Verified: adaptive content,
-   validation, rendering, and export for content-derived 7–10 slide carousels.
-2. `0004-pipeline-reliability` — Accepted: deterministic reliability
-   validation and the five-topic proof; not shipped.
+1. `0001-adaptive-carousel-content` — Verified: writer, reviewer, bounded
+   revisions, and validated adaptive 7–10-slide content artifacts.
+2. `0002-deterministic-fixed-shell-rendering-baseline` — Implemented:
+   current six-variant shell, deterministic validation, PNG export, and atomic
+   publication; not user-Verified.
+3. `0003-template-archive-and-carousel-art-direction` — Draft: one initial
+   `database-blueprint` template, template contracts, and `carousel-layout.json`.
+4. `0004-constrained-slide-composition` — Draft: validated body fragments,
+   locked deterministic shell assembly, and export integration.
+
+Research/citations, visual review/repair, and publishing/scheduling are
+deferred roadmap ideas, not active milestones.

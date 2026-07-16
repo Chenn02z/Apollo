@@ -42,9 +42,11 @@ changes:
 9. When a phase ships, run `plan-next` to propose the next increment.
 10. Update docs and spec status when decisions settle.
 
-Current MVP milestone status: `0003-adaptive-carousel-content` is Verified;
-`0004-pipeline-reliability` is Accepted for reliability work and is not
-shipped.
+Current milestone status: `0001-adaptive-carousel-content` is Verified,
+including bounded content review and revision;
+`0002-deterministic-fixed-shell-rendering-baseline` is Implemented but not
+user-Verified; and `0003-template-archive-and-carousel-art-direction` plus
+`0004-constrained-slide-composition` are Draft.
 
 Small documentation or cleanup tasks may skip a formal spec when the user makes
 that explicit or when the change is obviously local and reversible.

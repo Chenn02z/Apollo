@@ -5,9 +5,9 @@ adaptive 7–10-slide, interview-oriented carousel.
 
 ## MVP
 
-Use `apollo-generate` to create structured content, then `apollo-render` to
-deterministically populate the fixed local shell and export 1080×1350 PNG
-slides. Each local run has:
+Use `apollo-generate` to create and review structured content, then
+`apollo-render` to deterministically populate the fixed local shell and export
+1080×1350 PNG slides. Each local run has:
 
 - `request.json`
 - `carousel-content.json`
@@ -36,15 +36,22 @@ Apollo is for creators making concise technical interview-preparation
 carousels. The first proof set is ACID properties, indexes, caching, REST vs
 GraphQL, and embeddings.
 
-Source-backed research, citations, visual-review repair loops, an AI theme,
-theme taxonomy or plugins, generated imagery, publishing, scheduling,
-analytics, web UI, and authentication are post-MVP.
+The next stages split visual planning from composition: a template archive and
+`carousel-art-director`, then constrained `carousel-composer` body fragments.
+Research/citations, visual-review repair loops, publishing, scheduling,
+analytics, web UI, and authentication are deferred roadmap ideas. Generated
+imagery, an AI theme, and a theme taxonomy or plugin system remain out of
+scope.
 
 ## Development
 
-Milestone `0003-adaptive-carousel-content` is Verified. Milestone
-`0004-pipeline-reliability` is Accepted for reliability work and the five-topic
-proof; it is not shipped.
+`0001-adaptive-carousel-content` is user-Verified, including the bounded
+writer/reviewer/revision loop, and ends at validated `carousel-content.json`.
+`0002-deterministic-fixed-shell-rendering-baseline` is Implemented but not
+user-Verified: it is the current six-variant render/export baseline.
+`0003-template-archive-and-carousel-art-direction` and
+`0004-constrained-slide-composition` are Draft. Content still carries current
+variant fields until `0004` is verified.
 
 Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
 playwright install chromium`. The renderer's targeted checks are `npm run
