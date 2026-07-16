@@ -78,17 +78,14 @@
 
 ## Maturity Gaps
 
-- `0001-adaptive-carousel-content` is user-Verified, including bounded review
-  and revision. Existing fixed-shell render/export code is Implemented but has
-  not been user-Verified as a milestone.
 - `0003-template-archive-and-carousel-art-direction` and
   `0004-constrained-slide-composition` open the next seams without moving
   shell, safety, or screenshot ownership out of deterministic code.
 
 ## Workflow Boundaries
 
-- `0001-adaptive-carousel-content` is Verified; `0002` is Implemented;
-  `0003` and `0004` are Draft.
+- `0001-adaptive-carousel-content` and `0002` are Verified; `0003` and `0004`
+  are Draft.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries; this file owns durable
   terminology.

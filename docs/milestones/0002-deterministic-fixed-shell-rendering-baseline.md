@@ -2,7 +2,7 @@
 
 ## Status
 
-Implemented
+Verified
 
 ## Goal
 
@@ -36,30 +36,29 @@ and any manual HTML editing.
 
 ## Verification State
 
-- Code and targeted checks exist, but this baseline is not user-Verified.
+- User-Verified on run `5ff4bf18-fd88-4e58-9da9-2481064879ce`.
+- `npm run test:renderer` passed 17/17 targeted checks.
 
 ## Acceptance Criteria
 
-- Validated content with 7–10 slides is the sole source of the exported slide
-  count; export creates ordered `slides/slide-01.png` through the final slide,
+- Validated 7–10-slide content was the sole source of the exported slide
+  count; export created ordered `slides/slide-01.png` through the final slide,
   each 1080×1350, plus a matching `render-manifest.json`.
-- Only the fixed local `database` shell and one of its six closed variants are
-  rendered. Content slots are escaped; scripts, external resources, network
-  activity, unsupported markup, shell drift, and overflow fail the render.
-- A failed export does not publish a partial artifact set or replace a valid
-  prior manifest.
-- A user visually inspects a representative successful run's PNGs for readable
-  fixed chrome, intact layout, and acceptable appearance across all six
-  variants. This criterion is required before the milestone can become
-  `Verified`.
+- Only the fixed local `database` shell and its six closed variants were
+  rendered. Escaped content slots and checks rejected scripts, external
+  resources, network activity, unsupported markup, shell drift, and overflow.
+- Failed export checks did not publish a partial artifact set or replace a
+  valid prior manifest.
+- The user visually inspected run `5ff4bf18-fd88-4e58-9da9-2481064879ce` and
+  approved its PNGs for readable fixed chrome, intact layout, and acceptable
+  appearance across all six variants.
 
 ## Verification Procedure
 
-1. Run `npm run test:renderer`.
-2. Run `apollo-render` on a validated 7–10-slide artifact and inspect its
-   ordered PNGs and manifest for the criteria above.
-3. Record the inspected run and user decision; retain `Implemented` until that
-   visual verification passes, then update the milestone to `Verified`.
+1. Ran `npm run test:renderer`; all 17 checks passed.
+2. Rendered validated run `5ff4bf18-fd88-4e58-9da9-2481064879ce` and inspected
+   its ordered PNGs and manifest.
+3. Recorded the user's approval and updated the milestone to `Verified`.
 
 ## Handoff
 

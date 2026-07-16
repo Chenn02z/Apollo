@@ -47,8 +47,8 @@ scope.
 
 `0001-adaptive-carousel-content` is user-Verified, including the bounded
 writer/reviewer/revision loop, and ends at validated `carousel-content.json`.
-`0002-deterministic-fixed-shell-rendering-baseline` is Implemented but not
-user-Verified: it is the current six-variant render/export baseline.
+`0002-deterministic-fixed-shell-rendering-baseline` is user-Verified: it is
+the current six-variant render/export baseline.
 `0003-template-archive-and-carousel-art-direction` and
 `0004-constrained-slide-composition` are Draft. Content still carries current
 variant fields until `0004` is verified.

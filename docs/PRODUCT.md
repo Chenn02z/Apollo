@@ -73,9 +73,9 @@ dimensions with no deterministic overflow failures and no manual HTML editing.
 
 1. `0001-adaptive-carousel-content` — Verified: writer, reviewer, bounded
    revisions, and validated adaptive 7–10-slide content artifacts.
-2. `0002-deterministic-fixed-shell-rendering-baseline` — Implemented:
-   current six-variant shell, deterministic validation, PNG export, and atomic
-   publication; not user-Verified.
+2. `0002-deterministic-fixed-shell-rendering-baseline` — Verified: current
+   six-variant shell, deterministic validation, PNG export, and atomic
+   publication.
 3. `0003-template-archive-and-carousel-art-direction` — Draft: one initial
    `database-blueprint` template, template contracts, and `carousel-layout.json`.
 4. `0004-constrained-slide-composition` — Draft: validated body fragments,
