@@ -25,7 +25,3 @@ The composer cannot change validated content, template CSS, header/footer,
 shell, scripts, or external resources. Remove current closed variants only
 after this milestone is Verified; archival runs need no compatibility renderer.
 
-## Handoff
-
-- Next milestone: `0004-deterministic-fixed-shell-rendering-baseline.md`.
-

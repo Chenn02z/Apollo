@@ -31,4 +31,4 @@ they are not removed by this historical milestone.
 
 ## Handoff
 
-- Next milestone: `0002-template-archive-and-carousel-art-direction.md`.
+- Next milestone: `0002-deterministic-fixed-shell-rendering-baseline.md`.

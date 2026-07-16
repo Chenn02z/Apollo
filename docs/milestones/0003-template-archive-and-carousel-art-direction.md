@@ -28,4 +28,4 @@ selection is deferred.
 
 ## Handoff
 
-- Next milestone: `0003-constrained-slide-composition.md`.
+- Next milestone: `0004-constrained-slide-composition.md`.
