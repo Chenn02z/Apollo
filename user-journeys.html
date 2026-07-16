@@ -291,9 +291,9 @@
           <span class="eyebrow">Apollo · Content Stage Available</span>
           <h1>Turn one technical topic into a clear carousel.</h1>
           <p>
-            Apollo's verified first stage turns a topic into a validated
-            seven-slide content artifact. The Accepted renderer milestone will add themed,
-            legible 1080×1350 PNG slides without manual HTML editing.
+            Apollo's verified v1 stages turn a topic into a validated
+            seven-slide carousel with themed, legible 1080×1350 PNG slides
+            without manual HTML editing.
           </p>
           <div class="meta">
             <span class="chip">Codex skill</span>
@@ -305,7 +305,7 @@
         <div class="hero-side">
           <div class="score">
             <strong>Topic → skill → agents → JSON → HTML → PNG</strong>
-            <span>Content generation is available; the renderer is Accepted but unshipped, and validation is planned.</span>
+            <span>V1 generation and rendering are available; adaptive v2 content is Accepted and validation is planned.</span>
           </div>
         </div>
       </div>
@@ -349,9 +349,9 @@
             <div class="journey-head">
               <div>
                 <h3>3. Compose constrained themed HTML</h3>
-                <p>A planned Codex custom renderer creates HTML within the repository-owned database theme assets and templates.</p>
+                <p>A Codex custom renderer creates HTML within the repository-owned database theme assets and templates.</p>
               </div>
-              <span class="status status-growing">Planned</span>
+              <span class="status status-ready">Available</span>
             </div>
             <ul>
               <li>The local database theme pack is derived from the reference style and provides the approved visual assets and templates.</li>
@@ -366,7 +366,7 @@
                 <h3>4. Export shareable PNG slides</h3>
                 <p>Browser rendering captures each slide exactly, without a per-pixel image-generation cost.</p>
               </div>
-              <span class="status status-growing">Planned</span>
+              <span class="status status-ready">Available</span>
             </div>
             <ul>
               <li>Playwright screenshots each <code>.slide</code> independently.</li>
@@ -394,14 +394,15 @@
             <div class="journey-head">
               <div>
                 <h3>6. Grow only after the baseline works</h3>
-                <p>The first three milestones prove the simple path before Apollo expands.</p>
+                <p>V1 is verified; the next requirement adds depth without changing existing runs.</p>
               </div>
-              <span class="status status-growing">0001 Verified; 0002 Accepted; 0003 Draft</span>
+              <span class="status status-growing">0001/0002 Verified; 0003 Accepted; 0004 Draft</span>
             </div>
             <ul>
               <li><code>0001</code>: verified carousel contract and content.</li>
-              <li><code>0002-fixed-carousel-renderer</code>: constrained HTML generation and PNG output.</li>
-              <li><code>0003</code>: validation and proof across five topics.</li>
+              <li><code>0002-fixed-carousel-renderer</code>: verified constrained HTML generation and PNG output.</li>
+              <li><code>0003-adaptive-carousel-content</code>: Accepted v2 content with 6–10 slides selected from teaching beats.</li>
+              <li><code>0004</code>: validation and proof across five topics.</li>
             </ul>
           </article>
         </div>
@@ -423,12 +424,12 @@
           <article class="capability">
             <span class="stage">Render</span>
             <h3>Use one consistent visual system</h3>
-            <p>Planned: constrained agent-authored HTML with one local database theme pack and reliable mobile dimensions.</p>
+            <p>Constrained agent-authored HTML uses one local database theme pack and reliable mobile dimensions.</p>
           </article>
           <article class="capability">
             <span class="stage">Export</span>
             <h3>Save individual PNGs</h3>
-            <p>Planned: browser screenshots will create one 1080×1350 image per slide in a local run folder.</p>
+            <p>Browser screenshots create one 1080×1350 image per slide in a local run folder.</p>
           </article>
           <article class="capability">
             <span class="stage">Validate</span>
@@ -442,7 +443,7 @@
           </article>
         </div>
         <p class="callout">
-          The available stage produces only <code>request.json</code> and validated <code>carousel-content.json</code>. HTML/render and validation are planned; Apollo has no shell CLI or direct LLM API runtime.
+          V1 produces <code>request.json</code>, validated <code>carousel-content.json</code>, HTML, PNGs, and a manifest. Adaptive v2 content and validation are planned; Apollo has no shell CLI or direct LLM API runtime.
         </p>
       </section>
 
@@ -454,11 +455,11 @@
             <p><code>request.json</code> records the topic; <code>carousel-content.json</code> preserves the seven-slide narrative.</p>
           </article>
           <article class="artifact">
-            <h3>Planned: render source</h3>
+            <h3>Available: render source</h3>
             <p><code>index.html</code>, local theme assets, and a render manifest make the constrained result inspectable and rerenderable.</p>
           </article>
           <article class="artifact">
-            <h3>Planned: slide images</h3>
+            <h3>Available: slide images</h3>
             <p><code>slide-01.png</code> through <code>slide-07.png</code> are the final carousel assets.</p>
           </article>
           <article class="artifact">

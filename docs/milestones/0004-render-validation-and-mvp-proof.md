@@ -18,7 +18,8 @@ GraphQL, and embeddings.
 
 ## In Scope
 
-- Deterministic image dimensions, expected-count, and overflow checks.
+- Deterministic image dimensions, expected-count, and overflow checks for v1's
+  fixed seven slides and v2's content-derived count `N`.
 - Actionable diagnostics in the run/report output.
 - Manual content and visual review of the five proof topics.
 
@@ -34,14 +35,14 @@ GraphQL, and embeddings.
 ## Acceptance Criteria
 
 - Overflow, wrong dimensions, and wrong slide count fail with useful
-  diagnostics.
-- All five proof topics produce seven legible 1080×1350 PNGs without manual
-  HTML edits.
+  diagnostics; v1 expects seven slides and v2 expects the content-derived `N`.
+- All five proof topics produce legible 1080×1350 PNGs without manual HTML
+  edits: seven for v1, or `N` (6–10) for v2.
 
 ## Verification
 
-- Automated deterministic checks on generated output.
-- Manual review of all five proof carousels.
+- Automated deterministic checks on generated v1 and v2 output.
+- Manual review of all five proof carousels across the applicable v1/v2 paths.
 
 ## Deferred
 
