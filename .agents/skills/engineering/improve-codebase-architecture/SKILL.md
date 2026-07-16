@@ -41,7 +41,7 @@ Look for friction:
 
 ### 3. Present candidates
 
-Write a self-contained HTML report to `<tmpdir>/architecture-review-<timestamp>.html`.
+Write a self-contained HTML report to `docs/techdebt/architecture-review-<timestamp>.html`.
 Use [HTML-REPORT.md](HTML-REPORT.md) for structure. Create durable follow-up
 tickets under `docs/techdebt/` using [TECHDEBT-TICKET.md](TECHDEBT-TICKET.md).
 Default new tickets to `proposed`.
@@ -57,4 +57,3 @@ against product intent, milestone docs, code, and terminology.
 If the candidate changes product requirements or executable behavior, route to
 `requirements` or `spec` before implementation. If it can proceed from an
 Accepted spec, route implementation to `dev-loop` after the design settles.
-

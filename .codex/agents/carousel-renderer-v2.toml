@@ -1,9 +1,0 @@
-name = "carousel-renderer-v2"
-description = "Deprecated: v2 HTML is populated deterministically by scripts/populate-carousel-v2.mjs."
-model = "gpt-5.6-terra"
-model_reasoning_effort = "medium"
-sandbox_mode = "workspace-write"
-
-developer_instructions = """
-Do not write v2 HTML. The v2 render skill uses the repository-owned deterministic populater so content cannot alter shell structure, classes, or typography.
-"""

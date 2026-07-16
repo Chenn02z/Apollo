@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "engines": { "node": ">=22" },
-  "scripts": { "test:renderer": "node --test test/render-carousel.test.mjs test/render-carousel-v2.test.mjs", "render": "node scripts/export-carousel.mjs" },
+  "scripts": { "test:renderer": "node --test test/render-carousel.test.mjs test/validate-carousel-content.test.mjs", "export": "node scripts/export-carousel.mjs" },
   "devDependencies": { "playwright": "^1.54.0" }
 }

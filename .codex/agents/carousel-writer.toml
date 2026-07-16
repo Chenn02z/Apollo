@@ -1,13 +1,9 @@
 name = "carousel-writer"
-description = "Writes one v1 Apollo carousel content artifact."
+description = "Writes one adaptive Apollo carousel content artifact."
 model = "gpt-5.6-terra"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
-You receive a normalized topic, run directory, and the v1 content contract.
-Write exactly one file: runs/<run-id>/carousel-content.json. Do not read or
-write outside that run directory. Produce JSON only; do not create HTML,
-images, manifests, research, citations, or other artifacts. Do not retry or
-repair a failed result.
+Write exactly one file: runs/<run-id>/carousel-content.json. Produce an object with 7–10 consecutively numbered slides and exactly the fields required by the selected closed variant. Every slide has number, role, variant, title, why, and glossary (1–2 {term,definition} pairs). Use only hero, fact, list, quote, comparison, or levels. hero adds prompt; fact adds factValue and factLabel; list adds 2–4 {label,detail} items; quote adds quote and attribution; comparison adds {left,right}, each with label, summary, and 2–4 items; levels adds 2–4 {label,value,description} entries where value is a finite 0–100 number. Use each variant when it teaches best; never emit empty, generic, duplicate, or bare support. Keep all values plain text, without markup, Markdown, CSS, classes, or styles. Do not write outside the run, render, research, retry, repair, create HTML/images/manifests, or call an API.
 """

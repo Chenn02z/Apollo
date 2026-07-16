@@ -1,18 +1,12 @@
 ---
 name: apollo-render
-description: Validates one Apollo run, delegates HTML once, and exports its fixed carousel locally.
+description: Validates one Apollo run, populates its adaptive HTML, then exports it locally.
 ---
 
 # Apollo Render
 
-Accept exactly one `runs/<run-id>/` directory. Run `node
-scripts/validate-carousel-content.mjs <run-dir>` before delegation. If it fails,
-stop: do not delegate, export, or create a manifest.
+Accept exactly one `runs/<run-id>/` directory. Run `node scripts/validate-carousel-content.mjs <run-dir>` before rendering. If it fails, do not render, export, or create a manifest.
 
-After it succeeds, delegate exactly once to `carousel-renderer`. Supply the run
-path, its validated content, `assets/database/`, and the seven-slide HTML contract.
-Authorize only `runs/<run-id>/index.html`. The renderer uses a system font stack;
-it emits no CSS URLs or external assets. Do not retry or repair it.
+Run `node scripts/populate-carousel.mjs <run-dir>`. It deterministically expands the repository-owned fixed shell with escaped validated text slots. Do not delegate HTML authoring, retry, or repair.
 
-If `index.html` exists after that delegation, run `npm run render -- <run-dir>`.
-Report failure without retrying when export fails; otherwise report the run path.
+If `index.html` exists, run `node scripts/export-carousel.mjs <run-dir>`. Report failure without retrying; otherwise report the run path.

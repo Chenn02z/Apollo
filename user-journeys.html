@@ -291,14 +291,12 @@
           <span class="eyebrow">Apollo · Content Stage Available</span>
           <h1>Turn one technical topic into a clear carousel.</h1>
           <p>
-            Apollo's verified paths turn a topic into either a fixed seven-slide
-            v1 carousel or an adaptive 6–10-slide v2 carousel, with themed,
+            Apollo turns a topic into an adaptive 7–10-slide carousel, with themed,
             legible 1080×1350 PNG slides and no manual HTML editing.
           </p>
           <div class="meta">
             <span class="chip">Codex skill</span>
-            <span class="chip">V1: seven slides</span>
-            <span class="chip">V2: 6–10 slides</span>
+            <span class="chip">7–10 slides</span>
             <span class="chip">Constrained HTML</span>
             <span class="chip">PNG output</span>
           </div>
@@ -306,7 +304,7 @@
         <div class="hero-side">
           <div class="score">
             <strong>Topic → skill → agents → JSON → HTML → PNG</strong>
-            <span>V1 and adaptive v2 generation, rendering, export, and deterministic validation are available.</span>
+            <span>Generation, rendering, export, and deterministic validation are available.</span>
           </div>
         </div>
       </div>
@@ -325,8 +323,8 @@
               <span class="status status-ready">Available</span>
             </div>
             <ul>
-              <li>Invoke <code>apollo-generate</code> for fixed v1 or <code>apollo-generate-v2</code> for adaptive v2 content, for example <code>ACID properties in databases</code>.</li>
-              <li>Each generation entry point accepts exactly one required topic.</li>
+              <li>Invoke <code>apollo-generate</code> with a topic, for example <code>ACID properties in databases</code>.</li>
+              <li>The generation entry point accepts exactly one required topic.</li>
               <li>The reference style is concise, technical, diagram-led, and interview-oriented.</li>
             </ul>
           </article>
@@ -340,9 +338,9 @@
               <span class="status status-ready">Available</span>
             </div>
             <ul>
-              <li>V1 has its fixed seven-slide story; v2 selects 6–10 slides from teaching beats.</li>
-              <li>V2 uses a closed role sequence and bounded plain-text copy so each slide remains mobile-legible.</li>
-              <li>The artifacts are <code>carousel-content.json</code> for v1 and <code>carousel-content-v2.json</code> for v2.</li>
+              <li>Content selects 7–10 slides from teaching beats.</li>
+              <li>A closed role sequence and bounded plain-text copy keep each slide mobile-legible.</li>
+              <li>The artifact is <code>carousel-content.json</code>.</li>
             </ul>
           </article>
 
@@ -350,14 +348,14 @@
             <div class="journey-head">
               <div>
                 <h3>3. Compose constrained themed HTML</h3>
-                <p>A Codex custom renderer creates HTML within the repository-owned database theme assets and templates.</p>
+                <p>Deterministic local tooling expands validated content into the repository-owned database shell.</p>
               </div>
               <span class="status status-ready">Available</span>
             </div>
             <ul>
-              <li>The local database theme pack is derived from the reference style and provides the approved visual assets and templates.</li>
+              <li>The local database theme pack is derived from the reference style and provides the approved shell, assets, and templates.</li>
               <li>Every slide renders at 1080×1350 pixels.</li>
-              <li>V1 has exactly seven sequential slides; v2 has 6–10 content-derived slides. Neither permits scripts, network access, or external assets.</li>
+              <li>Each carousel has 7–10 content-derived slides and permits no scripts, network access, or external assets.</li>
             </ul>
           </article>
 
@@ -370,8 +368,8 @@
               <span class="status status-ready">Available</span>
             </div>
             <ul>
-              <li>Playwright screenshots each v1 or v2 slide independently.</li>
-              <li>V1 outputs <code>slide-01.png</code> through <code>slide-07.png</code>; v2 outputs the ordered files in <code>slides-v2/</code>.</li>
+              <li>Playwright screenshots each slide independently.</li>
+              <li>The ordered files are stored in <code>slides/</code>.</li>
               <li>All run artifacts stay in a local, inspectable run directory.</li>
             </ul>
           </article>
@@ -382,10 +380,10 @@
                 <h3>5. Trust the basic checks</h3>
                 <p>The MVP catches mechanical failures before presenting the carousel as complete.</p>
               </div>
-              <span class="status status-ready">Available for v2</span>
+              <span class="status status-ready">Available</span>
             </div>
             <ul>
-              <li>V2 checks structural content limits, slide count, image dimensions, ordered manifest paths, and browser overflow before publication.</li>
+              <li>Apollo checks structural content limits, slide count, image dimensions, ordered manifest paths, and browser overflow before publication.</li>
               <li>This first release does not promise automatic research, citations, vision review, or publishing.</li>
               <li>Accuracy review remains a human responsibility during the MVP.</li>
             </ul>
@@ -395,15 +393,13 @@
             <div class="journey-head">
               <div>
                 <h3>6. Grow only after the baseline works</h3>
-                <p>V1 and v2 are verified; 0004 is Accepted for v2-only reliability work and is not shipped.</p>
+                <p>The adaptive workflow is verified; 0004 is Accepted for reliability work and is not shipped.</p>
               </div>
-              <span class="status status-growing">0001/0002/0003 Verified; 0004 Accepted</span>
+              <span class="status status-growing">0003 Verified; 0004 Accepted</span>
             </div>
             <ul>
-              <li><code>0001</code>: verified carousel contract and content.</li>
-              <li><code>0002-fixed-carousel-renderer</code>: verified constrained HTML generation and PNG output.</li>
-              <li><code>0003-adaptive-carousel-content</code>: verified v2 content, validation, rendering, and export for 6–10 slides selected from teaching beats.</li>
-              <li><code>0004</code>: v2-only reliability validation and proof across five topics.</li>
+              <li><code>0003-adaptive-carousel-content</code>: verified content, validation, rendering, and export for 7–10 slides selected from teaching beats.</li>
+              <li><code>0004-pipeline-reliability</code>: reliability validation and proof across five topics.</li>
             </ul>
           </article>
         </div>
@@ -419,13 +415,13 @@
           </article>
           <article class="capability">
             <span class="stage">Content</span>
-            <h3>Make a fixed or adaptive carousel</h3>
-            <p>Generate concise structured copy for a fixed seven-slide v1 or adaptive 6–10-slide v2 carousel.</p>
+            <h3>Make an adaptive carousel</h3>
+            <p>Generate concise structured copy for an adaptive 7–10-slide carousel.</p>
           </article>
           <article class="capability">
             <span class="stage">Render</span>
             <h3>Use one consistent visual system</h3>
-            <p>Constrained agent-authored HTML uses one local database theme pack and reliable mobile dimensions.</p>
+            <p>Deterministically populated HTML uses one local database theme pack and reliable mobile dimensions.</p>
           </article>
           <article class="capability">
             <span class="stage">Export</span>
@@ -435,7 +431,7 @@
           <article class="capability">
             <span class="stage">Validate</span>
             <h3>Reject broken layouts</h3>
-            <p>V2 verifies structural limits, dimensions, content-derived slide count, manifest paths, and text or page overflow before completing a run.</p>
+            <p>Apollo verifies structural limits, dimensions, content-derived slide count, manifest paths, and text or page overflow before completing a run.</p>
           </article>
           <article class="capability">
             <span class="stage">Scope</span>
@@ -444,7 +440,7 @@
           </article>
         </div>
         <p class="callout">
-          V1 produces <code>request.json</code>, validated <code>carousel-content.json</code>, HTML, PNGs, and a manifest. V2 separately produces <code>request-v2.json</code>, <code>carousel-content-v2.json</code>, <code>index-v2.html</code>, <code>slides-v2/</code>, and <code>render-manifest-v2.json</code>. Apollo has no shell CLI or direct LLM API runtime.
+          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>. Apollo has no shell CLI or direct LLM API runtime.
         </p>
       </section>
 
@@ -452,20 +448,16 @@
         <h2>Current and Planned Run Artifacts</h2>
         <div class="artifact-grid">
           <article class="artifact">
-            <h3>Available: fixed v1 content</h3>
-            <p><code>request.json</code> records the topic; <code>carousel-content.json</code> preserves the seven-slide narrative.</p>
-          </article>
-          <article class="artifact">
-            <h3>Available: adaptive v2 content</h3>
-            <p><code>request-v2.json</code> and <code>carousel-content-v2.json</code> preserve the validated 6–10-slide narrative.</p>
+            <h3>Available: adaptive content</h3>
+            <p><code>request.json</code> records the topic; <code>carousel-content.json</code> preserves the 7–10-slide narrative.</p>
           </article>
           <article class="artifact">
             <h3>Available: render and images</h3>
-            <p>V1 uses <code>index.html</code> and seven PNGs; v2 uses <code>index-v2.html</code>, <code>slides-v2/</code>, and <code>render-manifest-v2.json</code>.</p>
+            <p><code>index.html</code>, <code>slides/</code>, and <code>render-manifest.json</code> preserve the rendered carousel.</p>
           </article>
           <article class="artifact">
-            <h3>Available: v2 validation</h3>
-            <p>V2 rejects malformed content and rendered overflow before publishing its PNGs and manifest.</p>
+            <h3>Available: validation</h3>
+            <p>Apollo rejects malformed content and rendered overflow before publishing its PNGs and manifest.</p>
           </article>
         </div>
       </section>

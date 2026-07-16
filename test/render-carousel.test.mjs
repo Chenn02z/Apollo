@@ -1,34 +1,41 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import test from "node:test";
-import { exportRun, pngSize, scanHtml } from "../scripts/export-carousel.mjs";
+import { exportRun, scanHtml } from "../scripts/export-carousel.mjs";
+import { populateHtml } from "../scripts/populate-carousel.mjs";
 
-const html = `<style>body{margin:0}.carousel-slide{width:1080px;height:1350px}</style><main id="carousel">${Array.from({ length: 7 }, (_, i) => `<section class="carousel-slide" data-slide="${i + 1}">slide</section>`).join("")}</main>`;
 const png = Buffer.from("89504e470d0a1a0a0000000d4948445200000438000005460806000000000000", "hex");
-function fakeChromium({ route = false, screenshot = false } = {}) { return { launch: async () => ({ newPage: async () => ({ route: async (_p, handler) => { if (route) await handler({ abort: async () => {} }); }, setContent: async () => {}, evaluate: async () => ({ roots: 7, slides: ["1", "2", "3", "4", "5", "6", "7"] }), locator: () => ({ evaluate: async () => ({ width: 1080, height: 1350 }), screenshot: async ({ path }) => { if (screenshot) throw Error("shot"); writeFileSync(path, png); } }) }), close: async () => {} }) }; }
-function run() { const root = mkdtempSync(join(tmpdir(), "apollo-render-")); const path = join(root, "runs", "run-1"); mkdirSync(path, { recursive: true }); writeFileSync(join(path, "index.html"), html); return path; }
+const html = count => `<style>body{margin:0}.carousel-slide{width:1080px;height:1350px}.slide-content{padding:1px}</style><main id="carousel">${Array.from({ length: count }, (_, i) => `<section class="carousel-slide" data-slide="${i + 1}"><div class="slide-content">slide</div></section>`).join("")}</main>`;
+function fakeChromium({ count = 7, route = false, overflow = [], screenshot = false } = {}) {
+  return { launch: async () => ({
+    newPage: async () => ({
+      route: async (_pattern, handler) => { if (route) await handler({ abort: async () => {} }); }, setContent: async () => {},
+      evaluate: async () => ({ roots: count, slides: Array.from({ length: count }, (_, i) => String(i + 1)), violations: overflow }),
+      locator: () => ({ evaluate: async () => ({ width: 1080, height: 1350 }), screenshot: async ({ path }) => { if (screenshot) throw Error("shot"); writeFileSync(path, png); } }),
+    }), close: async () => {},
+  }) };
+}
+const variants = ["hero", "fact", "list", "quote", "comparison", "levels", "list"];
+function slide(number, role, variant = variants[(number - 1) % variants.length]) { const common = { number, role, variant, title: `Slide ${number}`, why: "This explains a concrete database decision.", glossary: [{ term: "Transaction", definition: "A unit of database work." }] }; if (variant === "hero") return { ...common, prompt: "Start with the failure mode." }; if (variant === "fact") return { ...common, factValue: "1 unit", factLabel: "One visible database result." }; if (variant === "list") return { ...common, items: [{ label: "Atomicity", detail: "First concrete mechanism." }, { label: "Consistency", detail: "Second concrete mechanism." }] }; if (variant === "quote") return { ...common, quote: "A safe system never exposes a half-finished result.", attribution: "Database practice" }; if (variant === "comparison") return { ...common, comparison: { left: { label: "Lower", summary: "More concurrency.", items: ["Fewer checks", "More risk"] }, right: { label: "Higher", summary: "More protection.", items: ["More checks", "Less risk"] } } }; return { ...common, levels: [{ label: "Basic", value: 25, description: "Minimal protection." }, { label: "Strong", value: 75, description: "More coordination." }] }; }
+function run(count = 7) { const root = mkdtempSync(join(tmpdir(), "apollo-render-")), path = join(root, "runs", "run-1"), roles = ["hook", "overview", ...Array.from({ length: count - 3 }, (_, i) => ["concept", "example", "deep-dive", "interview"][i % 4]), "takeaway"]; mkdirSync(path, { recursive: true }); const content = { topic: "ACID", slides: roles.map((role, i) => slide(i + 1, role)) }; writeFileSync(join(path, "request.json"), JSON.stringify({ topic: "ACID", runId: "run-1", createdAt: "2026-07-16T00:00:00.000Z", model: "gpt-5.6-terra", effort: "medium" })); writeFileSync(join(path, "carousel-content.json"), JSON.stringify(content)); writeFileSync(join(path, "index.html"), populateHtml(content)); return path; }
 
-test("exports seven PNGs and the closed manifest", async () => { const path = run(); await exportRun(path, { chromium: fakeChromium() }); const manifest = JSON.parse(readFileSync(join(path, "render-manifest.json"))); assert.equal(manifest.runId, "run-1"); assert.deepEqual(manifest.slides, Array.from({ length: 7 }, (_, i) => `slides/slide-${String(i + 1).padStart(2, "0")}.png`)); });
-test("rejects prohibited HTML before launch", async () => { const path = run(); writeFileSync(join(path, "index.html"), html.replace("<style>", "<script></script><style>")); await assert.rejects(exportRun(path, { chromium: fakeChromium() })); });
-test("fails every routed subresource without publishing", async () => { const path = run(); await assert.rejects(exportRun(path, { chromium: fakeChromium({ route: true }) })); assert.throws(() => readFileSync(join(path, "render-manifest.json"))); });
-test("keeps a prior complete set on screenshot failure", async () => { const path = run(); await exportRun(path, { chromium: fakeChromium() }); const old = readFileSync(join(path, "render-manifest.json"), "utf8"); await assert.rejects(exportRun(path, { chromium: fakeChromium({ screenshot: true }) })); assert.equal(readFileSync(join(path, "render-manifest.json"), "utf8"), old); });
-test("static contract requires one carousel, direct roots, and safe URLs", () => { assert.throws(() => scanHtml(html.replace('data-slide="7"', 'data-slide="8"'))); assert.throws(() => scanHtml(html.replace("</style>", "a{background:url(x)}</style>"))); assert.throws(() => scanHtml(html.replace("</style>", "@\\69mport 'x';</style>"))); assert.throws(() => scanHtml(html.replace('<section class="carousel-slide" data-slide="1">', '<div><section class="carousel-slide" data-slide="1">').replace("</section>", "</section></div>"))); assert.throws(() => scanHtml(html.replace("</main>", '<main id="carousel"></main></main>'))); assert.throws(() => scanHtml(html.replace("<main", '<svg><use xlink:href="https://x"></use></svg><main'))); });
-test("allows prose backslashes outside CSS but rejects escaped CSS URLs", () => { assert.doesNotThrow(() => scanHtml(html.replace("slide</section>", "C:\\work</section>"))); assert.throws(() => scanHtml(html.replace("body{", "\\75\\72\\6c("))); });
-test("render skill and agent retain the one-delegation boundary", () => {
-  const skill = readFileSync(".agents/skills/apollo/apollo-render/SKILL.md", "utf8");
-  const agent = readFileSync(".codex/agents/carousel-renderer.toml", "utf8");
-  assert.equal((skill.match(/delegate exactly once/gi) ?? []).length, 1);
-  assert.match(skill, /validate-carousel-content\.mjs/); assert.match(skill, /do not delegate, export, or create a manifest/i);
-  assert.match(agent, /Write exactly one file:[\s\S]*index\.html/); assert.match(agent, /Do not emit meta, script, link/); assert.match(agent, /workspace-write sandboxing; it cannot express a[\s\S]*filesystem allowlist/);
+test("exports seven and ten content-derived PNG sets and closed manifests", async () => { for (const count of [7, 10]) { const path = run(count); await exportRun(path, { chromium: fakeChromium({ count }) }); const manifest = JSON.parse(readFileSync(join(path, "render-manifest.json"))); assert.deepEqual(manifest.slides, Array.from({ length: count }, (_, i) => `slides/slide-${String(i + 1).padStart(2, "0")}.png`)); } });
+test("rejects forbidden HTML, routes, and precise overflow", async () => { assert.throws(() => scanHtml(html(7).replace('class="slide-content">slide', 'class="x">slide'), 7)); const path = run(); await assert.rejects(exportRun(path, { chromium: fakeChromium({ route: true }) })); assert.equal(existsSync(join(path, "render-manifest.json")), false); const overflowPath = run(); await assert.rejects(exportRun(overflowPath, { chromium: fakeChromium({ overflow: ["slide 2: descendant height overflowed"] }) }), /slide 2: descendant height overflowed/); });
+test("rejects markup that drifts from the fixed shell", async () => { const path = run(); writeFileSync(join(path, "index.html"), readFileSync(join(path, "index.html"), "utf8").replace('class="tag"', 'class="tag changed"')); await assert.rejects(exportRun(path, { chromium: fakeChromium() }), /Template fidelity/); });
+test("rejects escaped CSS bypasses", () => { for (const css of ["a{background:u\\72l(x)}", "@\\69mport 'x'", "a{ov\\65rflow:\\68idden}"]) assert.throws(() => scanHtml(html(7).replace("</style>", `${css}</style>`), 7)); });
+test("keeps a structurally valid prior manifest regardless of key order", async () => {
+  const path = run(); await exportRun(path, { chromium: fakeChromium() }); const manifest = JSON.parse(readFileSync(join(path, "render-manifest.json"))); writeFileSync(join(path, "render-manifest.json"), JSON.stringify({ slides: manifest.slides, height: 1350, width: 1080, runId: "run-1", slideCount: 7 })); const before = readFileSync(join(path, "render-manifest.json"), "utf8"); await assert.rejects(exportRun(path, { chromium: fakeChromium({ screenshot: true }) })); assert.equal(readFileSync(join(path, "render-manifest.json"), "utf8"), before);
 });
-test("exports real Chromium DOM roots, dimensions, routes, and PNGs when installed", async t => {
-  const { chromium } = await import("playwright");
-  if (!existsSync(chromium.executablePath())) return t.skip("Run npx playwright install chromium for this local integration check.");
+test("removes invalid prior manifests before static failure and never follows slide directory symlinks", async () => {
+  const path = run(); writeFileSync(join(path, "render-manifest.json"), "{}"); writeFileSync(join(path, "index.html"), "<script></script>"); await assert.rejects(exportRun(path, { chromium: fakeChromium() })); assert.equal(existsSync(join(path, "render-manifest.json")), false);
+  const linked = run(), outside = join(dirname(linked), "outside"); mkdirSync(outside); writeFileSync(join(outside, "slide-01.png"), "outside"); mkdirSync(join(linked, "slides")); rmSync(join(linked, "slides"), { recursive: true }); symlinkSync(outside, join(linked, "slides")); writeFileSync(join(linked, "render-manifest.json"), JSON.stringify({ runId: "run-1", width: 1080, height: 1350, slideCount: 7, slides: Array.from({ length: 7 }, (_, i) => `slides/slide-${String(i + 1).padStart(2, "0")}.png`) })); writeFileSync(join(linked, "index.html"), "<script></script>"); await assert.rejects(exportRun(linked, { chromium: fakeChromium() })); assert.equal(readFileSync(join(outside, "slide-01.png"), "utf8"), "outside"); assert.equal(existsSync(join(linked, "render-manifest.json")), false);
+});
+test("rich closed variants export through real Chromium", async t => {
+  const { chromium } = await import("playwright"); if (!existsSync(chromium.executablePath())) return t.skip("Run npx playwright install chromium for this local integration check.");
   const path = run();
   try { await exportRun(path, { chromium }); }
   catch (error) { if (/browserType\.launch/.test(error.message)) return t.skip("Chromium cannot launch in this sandbox."); throw error; }
-  assert.deepEqual(pngSize(join(path, "slides", "slide-01.png")), { width: 1080, height: 1350 });
   assert.equal(JSON.parse(readFileSync(join(path, "render-manifest.json"))).slideCount, 7);
 });

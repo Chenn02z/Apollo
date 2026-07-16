@@ -2,10 +2,10 @@
 
 ## Product Intent
 
-Apollo is a Codex-native staged workflow that turns a technical topic into a
-fixed seven-slide v1 or adaptive 6–10-slide v2, interview-oriented PNG
-carousel. It gives a technical-content creator a repeatable way to produce
-clear, consistently themed educational slides without manually editing HTML.
+Apollo is a Codex-native staged workflow that turns a technical topic into an
+adaptive 7–10-slide, interview-oriented PNG carousel. It gives a
+technical-content creator a repeatable way to produce clear, consistently
+themed educational slides without manually editing HTML.
 
 ## Target User And Pain
 
@@ -16,40 +16,32 @@ visually inconsistent.
 
 ## MVP Boundary
 
-The verified v1 workflow lets the `apollo-generate` Codex skill receive a topic
-and create:
+The workflow lets the `apollo-generate` Codex skill receive a topic and create
+`request.json` and `carousel-content.json`. `apollo-render` validates that
+content, deterministically expands the fixed local shell into `index.html`,
+and exports one 1080×1350 PNG per content slide in `slides/`, followed by
+`render-manifest.json`.
 
-- `request.json` and `carousel-content.json`
-- one constrained, agent-authored `index.html`
-- seven 1080×1350 PNG slides using the local `database` theme pack
-- `render-manifest.json`
-
-It uses one custom-agent content pass followed by one custom-agent HTML/render
-pass, with no formal source/citation workflow. Apollo has no standalone LLM API
-client or runtime API key. The HTML pass may use only the approved local
-`database` theme assets and templates, and must output exactly seven sequential
-identifiable slides with no scripts, network access, or external assets.
-Playwright screenshots those slides deterministically. V1 overflow diagnostics
-and the five-topic proof remain future work.
-
-The separate verified v2 workflow uses `apollo-generate-v2` and
-`apollo-render-v2`. It writes `request-v2.json`, `carousel-content-v2.json`,
-`index-v2.html`, `slides-v2/`, and `render-manifest-v2.json`; the validated v2
-content artifact alone selects 6–10 slides. V2 performs deterministic
-structural, overflow, export, and manifest validation before publication.
+The validated content artifact alone selects 7–10 slides. The workflow uses
+one custom-agent content pass and deterministic rendering, with no formal
+source/citation workflow. HTML uses only the approved local `database` theme
+assets and templates; it has no scripts, network access, or external assets.
+Playwright captures slides and deterministic validation checks structure,
+overflow, dimensions, export, and manifest data before publication. Apollo has
+no standalone LLM API client or runtime API key.
 
 ## Product Principles
 
 - **Codex-native stages.** Skills enter the workflow and custom agents perform
   bounded work; Playwright owns deterministic image production.
-- **Meaning before pixels.** One agent creates structured content; a later
-  agent composes constrained HTML from approved local theme assets.
+- **Meaning before pixels.** One agent creates structured content; deterministic
+  local tooling expands it into constrained HTML from approved theme assets.
 - **One idea per slide.** Keep technical explanations concise, diagram-led,
   and suitable for a phone screen.
 - **One visual identity first.** The reference-derived `database` theme pack
   provides consistency before theme choice breadth.
 - **Inspectable local output.** Every run leaves its input, content, HTML,
-  images, and manifest together once the render stages ship.
+  images, and manifest together.
 - **Reference-derived assets, not raw reuse.**
   `docs/reference/html/index.html` informs the `database` theme pack but is not
   raw runtime output.
@@ -65,17 +57,12 @@ structural, overflow, export, and manifest validation before publication.
 
 ## Success Metric
 
-The five proof topics render adaptive 6–10-slide v2 PNG carousels at the
-required dimensions with no deterministic overflow failures and no manual HTML
-editing.
+The five proof topics render adaptive 7–10-slide PNG carousels at the required
+dimensions with no deterministic overflow failures and no manual HTML editing.
 
 ## MVP Milestone Ladder
 
-1. `0001-carousel-contract-and-content` — Verified: `apollo-generate` skill,
-   request, and bounded seven-slide content artifact.
-2. `0002-fixed-carousel-renderer` — Verified: repository-owned visual
-   assets/templates, constrained HTML generation, and local PNG export.
-3. `0003-adaptive-carousel-content` — Verified: a versioned v2 path with
-   content-derived 6–10 slide carousels and concrete teaching content.
-4. `0004-render-validation-and-mvp-proof` — Accepted: v2-only deterministic
-   reliability validation and the five-topic proof set; not shipped.
+1. `0003-adaptive-carousel-content` — Verified: adaptive content,
+   validation, rendering, and export for content-derived 7–10 slide carousels.
+2. `0004-pipeline-reliability` — Accepted: deterministic reliability
+   validation and the five-topic proof; not shipped.
