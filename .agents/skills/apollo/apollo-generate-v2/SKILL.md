@@ -1,6 +1,6 @@
 ---
 name: apollo-generate-v2
-description: Produces validated adaptive 6–10-slide Apollo v2 content for one topic.
+description: Produces validated adaptive 7–10-slide Apollo v2 content for one topic.
 ---
 
 # Apollo Generate v2

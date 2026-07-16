@@ -5,8 +5,8 @@ description: Validates one Apollo v2 run, delegates adaptive HTML once, then exp
 
 # Apollo Render v2
 
-Accept exactly one `runs/<run-id>/` directory. Run `node scripts/validate-carousel-content-v2.mjs <run-dir>` before delegation. If it fails, do not delegate, export, or create a v2 manifest.
+Accept exactly one `runs/<run-id>/` directory. Run `node scripts/validate-carousel-content-v2.mjs <run-dir>` before rendering. If it fails, do not render, export, or create a v2 manifest.
 
-Delegate exactly once to `carousel-renderer-v2`, supplying validated content, run path, `assets/database/carousel-v2-shell.html`, and content-derived count. The shell is authoritative: it may write only `runs/<run-id>/index-v2.html` by filling its slots; it uses the shell's inline CSS and no scripts or external assets. Do not retry or repair.
+Run `node scripts/populate-carousel-v2.mjs <run-dir>`. It deterministically expands the repository-owned fixed shell with escaped validated text slots. Do not delegate HTML authoring, retry, or repair.
 
 If `index-v2.html` exists, run `node scripts/export-carousel-v2.mjs <run-dir>`. Report failure without retrying; otherwise report the run path.

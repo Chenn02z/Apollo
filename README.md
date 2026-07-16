@@ -39,7 +39,8 @@ analytics, web UI, and authentication are post-MVP.
 
 ## Development
 
-Milestones 0001, 0002, and 0003 are Verified. Milestone 0004 remains Draft.
+Milestones 0001, 0002, and 0003 are Verified. Milestone 0004 is Accepted for
+v2-only reliability work; it is not shipped.
 
 Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
 playwright install chromium`. The renderer's targeted checks are `npm run

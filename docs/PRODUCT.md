@@ -65,9 +65,9 @@ structural, overflow, export, and manifest validation before publication.
 
 ## Success Metric
 
-All five proof topics render seven legible, consistently themed PNG slides at
-the required dimensions with no deterministic overflow failures and no manual
-HTML editing.
+The five proof topics render adaptive 6–10-slide v2 PNG carousels at the
+required dimensions with no deterministic overflow failures and no manual HTML
+editing.
 
 ## MVP Milestone Ladder
 
@@ -77,5 +77,5 @@ HTML editing.
    assets/templates, constrained HTML generation, and local PNG export.
 3. `0003-adaptive-carousel-content` — Verified: a versioned v2 path with
    content-derived 6–10 slide carousels and concrete teaching content.
-4. `0004-render-validation-and-mvp-proof` — Draft: deterministic validation
-   and the five-topic manual proof set.
+4. `0004-render-validation-and-mvp-proof` — Accepted: v2-only deterministic
+   reliability validation and the five-topic proof set; not shipped.

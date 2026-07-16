@@ -7,16 +7,26 @@ import { validateRunV2 } from "../scripts/validate-carousel-content-v2.mjs";
 import { createRunV2 } from "../scripts/create-carousel-run-v2.mjs";
 
 const intermediate = ["concept", "example", "deep-dive", "interview"];
-function fixture(count = 6) {
+const variants = ["hero", "fact", "list", "quote", "comparison", "levels", "list"];
+function slide(number, role, variant = variants[(number - 1) % variants.length]) {
+  const common = { number, role, variant, title: `Slide ${number}`, why: "This explains a concrete database decision.", glossary: [{ term: "Transaction", definition: "A unit of database work." }] };
+  if (variant === "hero") return { ...common, prompt: "Start with the failure mode." };
+  if (variant === "fact") return { ...common, factValue: "1 unit", factLabel: "One visible database result." };
+  if (variant === "list") return { ...common, items: [{ label: "A", detail: "First concrete mechanism." }, { label: "B", detail: "Second concrete mechanism." }] };
+  if (variant === "quote") return { ...common, quote: "A safe system never exposes a half-finished result.", attribution: "Database practice" };
+  if (variant === "comparison") return { ...common, comparison: { left: { label: "Lower", summary: "More concurrency.", items: ["Fewer checks", "More risk"] }, right: { label: "Higher", summary: "More protection.", items: ["More checks", "Less risk"] } } };
+  return { ...common, levels: [{ label: "Basic", value: 25, description: "Minimal protection." }, { label: "Strong", value: 75, description: "More coordination." }] };
+}
+function fixture(count = 7) {
   const root = mkdtempSync(join(tmpdir(), "apollo-v2-")), run = join(root, "runs", "run-1"), request = { contractVersion: "2", topic: "ACID", runId: "run-1", createdAt: "2026-07-16T00:00:00.000Z", model: "gpt-5.6-terra", effort: "medium" };
   const roles = ["hook", "overview", ...Array.from({ length: count - 3 }, (_, i) => intermediate[i % intermediate.length]), "takeaway"];
-  return { run, request, content: { version: "2", topic: "ACID", slides: roles.map((role, i) => ({ number: i + 1, role, title: `Slide ${i + 1}`, body: "Plain prose.", items: [] })) } };
+  return { run, request, content: { version: "2", topic: "ACID", slides: roles.map((role, i) => slide(i + 1, role)) } };
 }
 function write(value) { mkdirSync(value.run, { recursive: true }); writeFileSync(join(value.run, "request-v2.json"), JSON.stringify(value.request)); writeFileSync(join(value.run, "carousel-content-v2.json"), JSON.stringify(value.content)); }
 
-test("accepts six and ten adaptive slides", () => { for (const count of [6, 10]) { const value = fixture(count); write(value); assert.equal(validateRunV2(value.run).slides.length, count); } });
+test("accepts seven and ten adaptive structured slides", () => { for (const count of [7, 10]) { const value = fixture(count); write(value); assert.equal(validateRunV2(value.run).slides.length, count); } });
 test("rejects count, roles, closed schemas, markup, and Unicode limit violations", () => {
-  const changes = [value => value.content.slides.pop(), value => value.content.slides.push(value.content.slides.at(-1)), value => { value.content.slides[1].role = "concept"; }, value => { value.content.extra = true; }, value => { value.content.slides[0].title = "😀".repeat(81); }, value => { value.content.slides[0].body = "<b>x</b>"; }];
+  const changes = [value => value.content.slides.pop(), value => value.content.slides.push(value.content.slides.at(-1)), value => { value.content.slides[1].role = "concept"; }, value => { value.content.extra = true; }, value => { value.content.slides[0].title = "😀".repeat(81); }, value => { value.content.slides[0].prompt = "<b>x</b>"; }];
   for (const change of changes) { const value = fixture(); change(value); write(value); assert.throws(() => validateRunV2(value.run)); assert.equal(existsSync(join(value.run, "carousel-content-v2.json")), false); assert.equal(existsSync(join(value.run, "request-v2.json")), true); }
 });
 test("reports unsupported intermediate roles and removes invalid content", () => {

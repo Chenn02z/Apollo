@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { pngSize } from "./export-carousel.mjs";
 import { validateRunV2 } from "./validate-carousel-content-v2.mjs";
+import { populateHtmlV2 } from "./populate-carousel-v2.mjs";
 
 const fail = message => { throw new Error(message); };
 const isFile = path => { try { return lstatSync(path).isFile() && !lstatSync(path).isSymbolicLink(); } catch { return false; } };
@@ -11,6 +12,9 @@ const isDirectory = path => { try { return lstatSync(path).isDirectory() && !lst
 const paths = count => Array.from({ length: count }, (_, index) => `slides-v2/slide-${String(index + 1).padStart(2, "0")}.png`);
 const manifestFor = (runId, count) => ({ version: "2", runId, sourceContentVersion: "2", width: 1080, height: 1350, slideCount: count, slides: paths(count) });
 const exactly = (value, keys) => value !== null && typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
+const typography = [".masthead", ".section-label", ".content h1", ".footer"];
+const typeProperties = ["fontFamily", "fontSize", "fontWeight", "fontStyle", "lineHeight", "letterSpacing", "textTransform"];
+const referenceContent = { version: "2", topic: "reference", slides: [{ number: 1, role: "hook", variant: "hero", title: "Reference", why: "Reference layout.", prompt: "Reference prompt.", glossary: [{ term: "Reference", definition: "A local baseline." }] }] };
 
 export function scanHtmlV2(html, count) {
   const css = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map(match => match[1]).join("\n").replace(/\\([0-9a-f]{1,6})\s?/gi, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16)));
@@ -36,6 +40,30 @@ function validManifest(run, count) {
     return paths(count).every(path => { if (!isFile(join(run, path))) return false; const size = pngSize(join(run, path)); return size.width === 1080 && size.height === 1350; });
   } catch { return false; }
 }
+export async function verifyExportV2(runDirectory, { chromium } = {}) {
+  const content = validateRunV2(runDirectory), count = content.slides.length, run = resolve(runDirectory), htmlPath = join(run, "index-v2.html");
+  if (basename(dirname(run)) !== "runs" || !isFile(htmlPath)) fail("Missing renderer HTML");
+  const html = readFileSync(htmlPath, "utf8");
+  if (html !== populateHtmlV2(content)) fail("Template fidelity failed: index-v2.html is not the canonical shell expansion");
+  scanHtmlV2(html, count); if (!validManifest(run, count)) fail("Invalid v2 publication"); if (!chromium) ({ chromium } = await import("playwright"));
+  await inspectV2Dom(html, count, { chromium });
+  return content;
+}
+export async function inspectV2Dom(html, count, { chromium } = {}) {
+  if (!chromium) ({ chromium } = await import("playwright")); let browser;
+  try {
+    browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1 }), reference = await browser.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1 }); let routed = false;
+    for (const target of [page, reference]) await target.route("**/*", route => { routed = true; return route.abort(); });
+    await reference.setContent(populateHtmlV2(referenceContent), { waitUntil: "load" }); await page.setContent(html, { waitUntil: "load" }); if (routed) fail("A subresource route was attempted");
+    const baseline = await reference.evaluate(({ typography, typeProperties }) => Object.fromEntries(typography.map(selector => [selector, Object.fromEntries(typeProperties.map(property => [property, getComputedStyle(document.querySelector(selector)).getPropertyValue(property.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`))]))])), { typography, typeProperties });
+    const result = await page.evaluate(({ typography, typeProperties, baseline }) => {
+      const roots = [...document.querySelectorAll("#carousel > section.carousel-slide[data-slide]")], violations = [];
+      roots.forEach((root, slide) => { const rootRect = root.getBoundingClientRect(); [root, ...root.querySelectorAll("*")].forEach(node => { const style = getComputedStyle(node), place = node === root ? "root" : "descendant", rect = node.getBoundingClientRect(), width = Math.ceil(rect.width - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth)), height = Math.ceil(rect.height - parseFloat(style.borderTopWidth) - parseFloat(style.borderBottomWidth)); for (const property of ["overflow", "overflowX", "overflowY"]) if (["hidden", "clip"].includes(style[property])) violations.push(`slide ${slide + 1}: ${place} has prohibited ${property}`); if (node.scrollWidth > width) violations.push(`slide ${slide + 1}: ${place} width overflowed (${node.scrollWidth} > ${width})`); if (node.scrollHeight > height) violations.push(`slide ${slide + 1}: ${place} height overflowed (${node.scrollHeight} > ${height})`); if (node !== root && style.display !== "none" && style.visibility !== "hidden") { for (const [edge, actual, bound] of [["left", rect.left, rootRect.left], ["top", rect.top, rootRect.top], ["right", rect.right, rootRect.right], ["bottom", rect.bottom, rootRect.bottom]]) if ((edge === "left" || edge === "top") ? actual < bound : actual > bound) violations.push(`slide ${slide + 1}: descendant rect escaped ${edge} (${actual} vs ${bound})`); } }); typography.forEach(selector => { const node = root.querySelector(selector); typeProperties.forEach(property => { const value = getComputedStyle(node).getPropertyValue(property.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)); if (value !== baseline[selector][property]) violations.push(`slide ${slide + 1}: ${selector} typography ${property} (${value} vs ${baseline[selector][property]})`); }); }); });
+      return violations;
+    }, { typography, typeProperties, baseline });
+    if (result.length) fail(result[0]);
+  } finally { if (browser) await browser.close(); }
+}
 function snapshot(run, count) {
   if (!validManifest(run, count)) return null;
   const backup = mkdtempSync(join(tmpdir(), "apollo-render-v2-backup-")); cpSync(join(run, "slides-v2"), join(backup, "slides-v2"), { recursive: true }); cpSync(join(run, "render-manifest-v2.json"), join(backup, "render-manifest-v2.json")); return backup;
@@ -49,16 +77,21 @@ export async function exportRunV2(runDirectory, { chromium } = {}) {
   const content = validateRunV2(runDirectory); const count = content.slides.length; const run = resolve(runDirectory); const runId = basename(run); const htmlPath = join(run, "index-v2.html");
   if (!validManifest(run, count)) rmSync(join(run, "render-manifest-v2.json"), { force: true });
   if (basename(dirname(run)) !== "runs" || !isFile(htmlPath)) fail("Missing renderer HTML");
-  const html = readFileSync(htmlPath, "utf8"); scanHtmlV2(html, count); if (!chromium) ({ chromium } = await import("playwright"));
+  const html = readFileSync(htmlPath, "utf8");
+  if (html !== populateHtmlV2(content)) fail("Template fidelity failed: index-v2.html is not the canonical shell expansion");
+  scanHtmlV2(html, count); if (!chromium) ({ chromium } = await import("playwright"));
+  await inspectV2Dom(html, count, { chromium });
   const stage = mkdtempSync(join(tmpdir(), "apollo-render-v2-stage-")); let browser;
   try {
     browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1 }); let routed = false;
     await page.route("**/*", route => { routed = true; return route.abort(); }); await page.setContent(html, { waitUntil: "load" }); if (routed) fail("A subresource route was attempted");
-    const inspection = await page.evaluate(() => {
+    const inspection = await page.evaluate(({ typography, typeProperties }) => {
       const roots = [...document.querySelectorAll("#carousel > section.carousel-slide[data-slide]")], slides = [...document.querySelectorAll("[data-slide]")].map(node => node.getAttribute("data-slide")), violations = [];
-      roots.forEach((root, slide) => { if (root.children.length !== 1 || !root.firstElementChild?.classList.contains("slide-content")) violations.push(`slide ${slide + 1}: root must have one direct .slide-content child`); [root, ...root.querySelectorAll("*")].forEach(node => { const style = getComputedStyle(node), place = node === root ? "root" : "descendant"; for (const property of ["overflow", "overflowX", "overflowY"]) if (["hidden", "clip"].includes(style[property])) violations.push(`slide ${slide + 1}: ${place} has prohibited ${property}`); if (node.scrollWidth > node.clientWidth) violations.push(`slide ${slide + 1}: ${place} width overflowed`); if (node.scrollHeight > node.clientHeight) violations.push(`slide ${slide + 1}: ${place} height overflowed`); }); });
+      const baseline = Object.fromEntries(typography.map(selector => [selector, Object.fromEntries(typeProperties.map(property => [property, getComputedStyle(roots[0].querySelector(selector)).getPropertyValue(property.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`))]))]));
+      roots.forEach((root, slide) => { if (root.children.length !== 1 || !root.firstElementChild?.classList.contains("slide-content")) violations.push(`slide ${slide + 1}: root must have one direct .slide-content child`); const rootRect = root.getBoundingClientRect(); [root, ...root.querySelectorAll("*")].forEach(node => { const style = getComputedStyle(node), place = node === root ? "root" : "descendant", rect = node.getBoundingClientRect(), width = Math.ceil(rect.width - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth)), height = Math.ceil(rect.height - parseFloat(style.borderTopWidth) - parseFloat(style.borderBottomWidth)); for (const property of ["overflow", "overflowX", "overflowY"]) if (["hidden", "clip"].includes(style[property])) violations.push(`slide ${slide + 1}: ${place} has prohibited ${property}`); if (node.scrollWidth > width) violations.push(`slide ${slide + 1}: ${place} width overflowed (${node.scrollWidth} > ${width})`); if (node.scrollHeight > height) violations.push(`slide ${slide + 1}: ${place} height overflowed (${node.scrollHeight} > ${height})`); if (node !== root && style.display !== "none" && style.visibility !== "hidden") { for (const [edge, actual, bound] of [["left", rect.left, rootRect.left], ["top", rect.top, rootRect.top], ["right", rect.right, rootRect.right], ["bottom", rect.bottom, rootRect.bottom]]) if ((edge === "left" || edge === "top") ? actual < bound : actual > bound) violations.push(`slide ${slide + 1}: descendant rect escaped ${edge} (${actual} vs ${bound})`); } }); });
+      roots.forEach((root, slide) => typography.forEach(selector => typeProperties.forEach(property => { const value = getComputedStyle(root.querySelector(selector)).getPropertyValue(property.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)); if (value !== baseline[selector][property]) violations.push(`slide ${slide + 1}: ${selector} typography ${property} (${value} vs ${baseline[selector][property]})`); })));
       return { roots: roots.length, slides, violations };
-    });
+    }, { typography, typeProperties });
     if (inspection.roots !== count || inspection.slides.join(",") !== Array.from({ length: count }, (_, index) => String(index + 1)).join(",")) fail("HTML slide structure is invalid"); if (inspection.violations.length) fail(inspection.violations[0]);
     for (let index = 0; index < count; index++) { const locator = page.locator(`#carousel > section.carousel-slide[data-slide=\"${index + 1}\"]`); const box = await locator.evaluate(element => { const { width, height } = element.getBoundingClientRect(); return { width, height }; }); if (box.width !== 1080 || box.height !== 1350) fail(`Slide ${index + 1} dimensions must be 1080x1350`); await locator.screenshot({ path: join(stage, `slide-${String(index + 1).padStart(2, "0")}.png`) }); }
     await browser.close(); browser = null;

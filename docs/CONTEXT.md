@@ -51,12 +51,13 @@
 
 ## Maturity Gaps
 
-- The broader five-topic proof remains future work.
+- Milestone `0004` is Accepted for v2-only reliability work and the five-topic
+  proof; it is not shipped.
 
 ## Workflow Boundaries
 
-- Milestones `0001`, `0002`, and `0003` are Verified. `0004` remains Draft and must go through
-  `$requirements` before `$spec` or implementation.
+- Milestones `0001`, `0002`, and `0003` are Verified. `0004` is Accepted for
+  spec authoring and is not yet implemented or verified.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries;
   this file owns durable terminology.

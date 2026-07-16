@@ -51,8 +51,8 @@ These are the approved boundaries for the staged implementation.
 - **Validation boundary:** v2 reports deterministic dimensions, content-derived
   slide count, and overflow failures independently from content generation;
   it validates structural limits, not semantic concreteness. Its deterministic
-  validation is shipped; milestone 0004 retains the broader five-topic proof
-  across v1 and v2.
+  validation is shipped; milestone 0004 owns v2-only fixed-shell fidelity,
+  calibrated capacity, strict overflow validation, and the five-topic proof.
 
 ## Deferred Architecture
 
