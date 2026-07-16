@@ -16,14 +16,17 @@ standalone LLM API client or runtime API key.
 ## MVP Flow
 
 ```text
-topic → `apollo-generate` → carousel-writer → content JSON → `apollo-render` → populate-carousel → HTML/validated PNG/manifest
+topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → populate-carousel → HTML/validated PNG/manifest
 ```
 
 ## Approved MVP Boundaries
 
 - **Run artifact boundary:** a run directory contains `request.json`,
-  `carousel-content.json`, `index.html`, `slides/`, and
-  `render-manifest.json` as stages complete. Export stages PNGs before
+  `carousel-content.json`, `index.html`, `slides/`, and `render-manifest.json`
+  as stages complete; it may also contain `carousel-content.initial.json`,
+  `carousel-content.before-revision-2.json`, and versioned
+  `carousel-review-1.json` through `carousel-review-3.json` artifacts.
+  Export stages PNGs before
   atomically replacing the complete renderer artifact set only after every
   content-derived screenshot succeeds. A failure preserves the prior complete
   set, or leaves no success manifest.
@@ -44,13 +47,22 @@ topic → `apollo-generate` → carousel-writer → content JSON → `apollo-ren
   generation; it validates structural limits, not semantic concreteness.
   Milestone `0004-pipeline-reliability` owns fixed-shell fidelity, calibrated
   capacity, strict overflow validation, and the five-topic proof.
+- **Review/rewrite boundary:** `carousel-reviewer` evaluates validated content
+  and writes a versioned review that Apollo deterministically validates. An
+  `approve_with_warnings` or `reject` decision may cause `carousel-writer` to
+  write a candidate, with up to three attempts for initial content and each
+  candidate. Apollo validates each attempt; validation removes an invalid
+  selected artifact, and a failed candidate leaves prior valid content intact.
+  It performs at most two revisions and three reviews. A missing or invalid
+  review is non-blocking and stops this loop; this stage does not render slides
+  or replace deterministic validation.
 
 ## Deferred Architecture
 
 - Research, citation, visual-spec, and vision-review stages are post-MVP;
   their artifact contracts must not be built until their milestone is shaped.
-- An AI theme, theme taxonomy or plugins, retries, generated assets, caching,
-  publishing, scheduling, analytics, web UI, authentication, and hosted
+- An AI theme, theme taxonomy or plugins, unbounded retry or repair loops,
+  generated assets, caching, publishing, scheduling, analytics, web UI, authentication, and hosted
   execution are post-MVP.
 - `docs/reference/html/index.html` is source material for the local
   `database` theme pack, not raw runtime HTML.

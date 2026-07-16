@@ -23,6 +23,8 @@ successful run folders remaining under runs/.
 - Layout-aware content budgets with named escaped slots.
 - Adaptive 7–10-slide proof content that is not a repeated bare title-and-body
   layout.
+- Bounded writer recovery: up to three total attempts for initial content and
+  each review-requested candidate, without changing the review or promotion caps.
 - Deterministic dimensions, content-derived expected count, and overflow checks
   that reject every overflow, including one pixel and hidden or clipped content.
 - Five fresh, sequential proof runs and exact failed-folder cleanup.
@@ -30,8 +32,8 @@ successful run folders remaining under runs/.
 
 ## Out Of Scope
 
-- Vision-model review, automatic retry or repair, citations, publishing, and
-  analytics.
+- Vision-model review, unbounded automatic retry or repair loops, citations,
+  publishing, and analytics.
 
 ## Acceptance Criteria
 

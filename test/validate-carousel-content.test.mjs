@@ -34,6 +34,17 @@ test("reports unsupported intermediate roles and removes invalid content", () =>
   assert.throws(() => validateRun(value.run), /Invalid role on slide 3: received "decision"; permitted roles: concept, example, deep-dive, interview/);
   assert.equal(existsSync(join(value.run, "carousel-content.json")), false);
 });
+test("removes an invalid candidate without deleting valid canonical content", () => {
+  const value = fixture(); write(value); writeFileSync(join(value.run, "carousel-content.candidate.json"), "not json");
+  assert.throws(() => validateRun(value.run, { file: "carousel-content.candidate.json" }));
+  assert.equal(existsSync(join(value.run, "carousel-content.candidate.json")), false);
+  assert.equal(validateRun(value.run).topic, "ACID");
+});
+test("rejects unsafe content filenames without deleting canonical content", () => {
+  const value = fixture(); write(value);
+  assert.throws(() => validateRun(value.run, { file: "request.json" }), /Invalid content filename/);
+  assert.equal(existsSync(join(value.run, "carousel-content.json")), true);
+});
 test("creates a request after normalizing the topic", () => {
   const root = mkdtempSync(join(tmpdir(), "apollo-")), run = createRun("  ACID  ", { root, runId: "run-1", createdAt: "2026-07-16T00:00:00.000Z" });
   assert.equal(existsSync(join(run, "request.json")), true); assert.throws(() => createRun(" ", { root, runId: "run-2" }));

@@ -12,7 +12,8 @@ from one topic.
 ## Scenario
 
 A creator invokes apollo-generate for ACID properties in databases. It writes a
-request, delegates once to carousel-writer, and validates carousel-content.json.
+request, delegates to carousel-writer for up to three initial-content attempts,
+and validates carousel-content.json after each attempt.
 apollo-render validates the run, runs scripts/populate-carousel.mjs to expand
 the fixed local shell with escaped slots, then exports one 1080×1350 PNG per
 slide plus a manifest.
@@ -89,7 +90,7 @@ manifest, and preserves a prior complete publication when present.
 | Condition | Required behavior |
 | --- | --- |
 | Missing or blank topic | Fail before delegation; create no run for blank input. |
-| Writer failure, absent output, or invalid output | Retain request; remove only invalid content; do not retry or render. |
+| Initial content is absent or invalid | Retain request; retry up to three total writer attempts; the validator removes only the invalid selected content; do not render unless validation succeeds. |
 | Invalid content, count, role sequence, variant, markup, token, or capacity | Fail before rendering with a field or count diagnostic. |
 | Shell population failure or missing HTML | Retain input; do not export or publish a manifest. |
 | Prohibited HTML, clipping, or overflow | Retain HTML; publish no new output. |

@@ -341,6 +341,7 @@
               <li>Content selects 7–10 slides from teaching beats.</li>
               <li>A closed role sequence and bounded plain-text copy keep each slide mobile-legible.</li>
               <li>The artifact is <code>carousel-content.json</code>.</li>
+              <li>Initial content and each review-requested candidate get up to three writer attempts. An <code>approve_with_warnings</code> or <code>reject</code> review can request up to two validated candidate rewrites; validation removes an invalid selected artifact, the last valid content is preserved until promotion, and an unavailable or invalid review does not block the run.</li>
             </ul>
           </article>
 
@@ -385,7 +386,7 @@
             <ul>
               <li>Apollo checks structural content limits, slide count, image dimensions, ordered manifest paths, and browser overflow before publication.</li>
               <li>This first release does not promise automatic research, citations, vision review, or publishing.</li>
-              <li>Accuracy review remains a human responsibility during the MVP.</li>
+              <li>Up to three validated content reviews and two writer revisions improve publishability; initial content and each candidate get up to three writer attempts, unavailable or invalid review remains non-blocking, and human review is final.</li>
             </ul>
           </article>
 
@@ -436,11 +437,11 @@
           <article class="capability">
             <span class="stage">Scope</span>
             <h3>Stay local for now</h3>
-            <p>An AI theme, theme plugins, retries, automatic citations, generated assets, and vision repair are post-MVP.</p>
+            <p>An AI theme, theme plugins, unbounded retry or repair loops, automatic citations, generated assets, and vision repair are post-MVP.</p>
           </article>
         </div>
         <p class="callout">
-          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>. Apollo has no shell CLI or direct LLM API runtime.
+          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>; initial content and each review-requested candidate get up to three writer attempts, while up to three validated, versioned reviews may trigger two candidate content revisions, each promoted only after validation. Apollo has no shell CLI or direct LLM API runtime.
         </p>
       </section>
 
@@ -458,6 +459,10 @@
           <article class="artifact">
             <h3>Available: validation</h3>
             <p>Apollo rejects malformed content and rendered overflow before publishing its PNGs and manifest.</p>
+          </article>
+          <article class="artifact">
+            <h3>Available: advisory review</h3>
+            <p>Reviews are kept as <code>carousel-review-1.json</code> through <code>carousel-review-3.json</code>. Initial content and each <code>approve_with_warnings</code>- or <code>reject</code>-requested candidate get up to three writer attempts; validation removes an invalid selected artifact, and prior valid content is preserved before candidate promotion. An unavailable or invalid review does not block the run.</p>
           </article>
         </div>
       </section>

@@ -41,9 +41,15 @@ function validateContent(content, topic) {
   if (!exactly(content, ["topic", "slides"]) || content.topic !== topic || !Array.isArray(content.slides) || content.slides.length < 7 || content.slides.length > 10) fail(`Invalid slide count: ${content.slides?.length ?? "unknown"}; expected 7–10`);
   content.slides.forEach(validateVariant);
 }
-export function validateRun(runDirectory) {
-  const runPath = resolve(runDirectory), runId = basename(runPath), contentPath = join(runPath, "carousel-content.json"); let safe = false;
+const contentFiles = new Set(["carousel-content.json", "carousel-content.candidate.json"]);
+export function validateRun(runDirectory, { file = "carousel-content.json" } = {}) {
+  if (!contentFiles.has(file)) fail("Invalid content filename");
+  const runPath = resolve(runDirectory), runId = basename(runPath), contentPath = join(runPath, file); let safe = false;
   try { if (basename(dirname(runPath)) !== "runs" || !runId || lstatSync(dirname(runPath)).isSymbolicLink() || lstatSync(runPath).isSymbolicLink()) fail("Invalid run path"); safe = true; const requestPath = join(runPath, "request.json"); if (lstatSync(requestPath).isSymbolicLink() || lstatSync(contentPath).isSymbolicLink()) fail("Symlinked artifact"); const request = readJson(requestPath); validateRequest(request, runId); const content = readJson(contentPath); validateContent(content, request.topic); return content; }
   catch (error) { if (safe) try { if (lstatSync(contentPath).isFile() && !lstatSync(contentPath).isSymbolicLink()) rmSync(contentPath); } catch { /* preserve missing and unsafe artifacts */ } throw error; }
 }
-if (process.argv[1] === fileURLToPath(import.meta.url)) try { validateRun(process.argv[2] ?? ""); } catch (error) { console.error(`Validation failed: ${error.message}`); process.exitCode = 1; }
+if (process.argv[1] === fileURLToPath(import.meta.url)) try {
+  const [, , runDirectory, flag, file] = process.argv;
+  if (flag && (flag !== "--file" || !file || process.argv.length !== 5)) fail("Usage: validate-carousel-content.mjs <run-dir> [--file <filename>]");
+  validateRun(runDirectory ?? "", { file: file ?? "carousel-content.json" });
+} catch (error) { console.error(`Validation failed: ${error.message}`); process.exitCode = 1; }

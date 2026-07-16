@@ -7,8 +7,9 @@ Accepted
 ## Goal
 
 Make the pipeline produce five fresh, inspectable, unclipped, substantive
-7–10-slide carousels for the canonical proof topics. The pipeline neither
-retries nor repairs itself.
+7–10-slide carousels for the canonical proof topics. The pipeline retries only
+initial and review-requested candidate content artifacts, up to three total
+writer attempts each; it does not repair deterministic validation or export failures.
 
 ## Scenario
 
@@ -54,15 +55,18 @@ publishes no manifest.
 Preflight requires runs/ to be an existing real, non-symlink directory and
 empty. It rejects missing, symlinked, non-directory, or non-empty roots without
 automatic cleanup. The proof order is ACID properties, indexes, caching, REST
-vs GraphQL, embeddings. The pipeline does not retry or repair; after a failure,
-the operator records the diagnosis and corrective change, verifies the fix, and
-starts a fresh attempt of the same pending topic.
+vs GraphQL, embeddings. Initial content and each review-requested candidate get
+up to three total writer attempts; validation removes an invalid selected
+artifact, and a failed candidate leaves the last valid canonical content intact.
+After any other failure, the operator records the diagnosis and corrective
+change, verifies the fix, and starts a fresh attempt of the same pending topic.
 
 ## Failure Modes
 
 | Failure | Required result |
 | --- | --- |
 | Content exceeds capacity, uses an unknown variant, is bare, misses required support, or has outside-7–10 count | Reject before shell population with a diagnostic. |
+| Initial writer or review-requested candidate is missing or invalid | Retry that selected artifact up to three total writer attempts; validation removes an invalid selected artifact, and a failed candidate preserves canonical content. |
 | HTML changes shared chrome or a closed variant | Reject before export with a structural diagnostic. |
 | Runtime uses reference HTML or a remote asset | Reject before export. |
 | Slide content is hidden, clipped, overflowed, or visibly escapes | Reject export; no manifest. |
@@ -103,6 +107,7 @@ starts a fresh attempt of the same pending topic.
 - Source milestone: docs/milestones/0004-pipeline-reliability.md
 - Status: Accepted; implementation is authorized subject to this spec.
 - Settled decisions: reference HTML is visual/semantic source only; closed
-  deterministic variants with shared chrome; 7–10 non-bare slides; no automatic
-  retry/repair; strict overflow failure; five clean proof runs.
+  deterministic variants with shared chrome; 7–10 non-bare slides; up to three
+  writer attempts for initial and candidate artifacts; strict overflow failure;
+  five clean proof runs.
 - Required reading: this spec and docs/ARCHITECTURE.md.

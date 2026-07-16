@@ -17,18 +17,27 @@ visually inconsistent.
 ## MVP Boundary
 
 The workflow lets the `apollo-generate` Codex skill receive a topic and create
-`request.json` and `carousel-content.json`. `apollo-render` validates that
-content, deterministically expands the fixed local shell into `index.html`,
+`request.json` and `carousel-content.json`; it may also write versioned,
+evidence-backed, non-blocking review artifacts. An `approve_with_warnings` or
+`reject` review can trigger up to two candidate rewrites by the content writer.
+Initial content and each candidate get up to three writer attempts; each
+validated candidate is promoted and followed by another review (three reviews
+total). Validation removes an invalid selected artifact, while an unavailable
+or invalid review ends that loop without blocking the run.
+`apollo-render` validates
+the content, deterministically expands the fixed local shell into `index.html`,
 and exports one 1080×1350 PNG per content slide in `slides/`, followed by
 `render-manifest.json`.
 
-The validated content artifact alone selects 7–10 slides. The workflow uses
-one custom-agent content pass and deterministic rendering, with no formal
-source/citation workflow. HTML uses only the approved local `database` theme
-assets and templates; it has no scripts, network access, or external assets.
-Playwright captures slides and deterministic validation checks structure,
-overflow, dimensions, export, and manifest data before publication. Apollo has
-no standalone LLM API client or runtime API key.
+The validated content artifact alone selects 7–10 slides. The workflow uses a
+custom-agent content pass with at most two review-driven rewrites, followed by
+deterministic rendering, with no formal source/citation workflow.
+HTML uses only the
+approved local `database` theme assets and templates; it has no scripts,
+network access, or external assets. Playwright captures slides and
+deterministic validation checks structure, overflow, dimensions, export, and
+manifest data before publication. Apollo has no standalone LLM API client or
+runtime API key.
 
 ## Product Principles
 
@@ -48,7 +57,7 @@ no standalone LLM API client or runtime API key.
 
 ## Explicit Post-MVP Cutoff
 
-- retries
+- unbounded retry or repair loops
 - source-backed research and citations
 - visual-spec artifacts, vision review, and automated repair loops
 - generated image assets
