@@ -12,5 +12,15 @@
     "densities": ["sparse", "standard", "dense"],
     "visualAnchors": ["headline", "statement", "diagram", "sequence", "contrast", "collection"],
     "directions": ["centered", "top-down", "left-right", "radial"]
+  },
+  "fragmentVocabulary": {
+    "version": 1,
+    "arrangements": ["grid", "stack", "row", "split", "cluster", "center", "flow"],
+    "htmlTags": ["section", "div", "article", "figure", "figcaption", "p", "h3", "span", "strong", "em", "code", "pre", "ul", "ol", "li", "blockquote"],
+    "svgTags": ["svg", "g", "line", "polyline", "polygon", "rect", "circle", "ellipse"],
+    "classes": [
+      "cp-body", "cp-layout-grid", "cp-layout-stack", "cp-layout-row", "cp-layout-split", "cp-layout-cluster", "cp-layout-center", "cp-layout-flow",
+      "cp-density-sparse", "cp-density-standard", "cp-density-dense", "cp-group", "cp-statement", "cp-collection", "cp-comparison", "cp-sequence", "cp-timeline", "cp-example", "cp-checklist", "cp-node", "cp-annotation", "cp-connector", "cp-label", "cp-detail", "cp-emphasis", "cp-muted", "cp-code", "cp-list", "cp-gap-1", "cp-gap-2", "cp-gap-3", "cp-gap-4", "cp-span-1", "cp-span-2", "cp-span-3", "cp-span-4", "cp-diagram", "cp-pos-tl", "cp-pos-tc", "cp-pos-tr", "cp-pos-ml", "cp-pos-mc", "cp-pos-mr", "cp-pos-bl", "cp-pos-bc", "cp-pos-br", "cp-svg-canvas", "cp-svg-line", "cp-svg-line-muted", "cp-svg-node", "cp-svg-accent", "cp-svg-arrow"
+    ]
   }
 }

@@ -25,7 +25,7 @@ Do not:
 - modify the template archive or canonical database theme assets;
 - invoke rendering, population, research, retry, or repair;
 - invent unsupported vocabulary values;
-- select current legacy variants such as hero, fact, list, quote, comparison, or levels.
+- select legacy variants such as hero, fact, list, quote, comparison, or levels.
 
 Your task is to create a coherent carousel-level visual plan using the closed
 layout vocabulary below.
@@ -241,5 +241,10 @@ Output requirements:
 - slide entries must remain in the same ascending order as content;
 - each number must exactly match the corresponding content slide;
 - every entry must use only supported vocabulary values;
-- do not include comments, Markdown, code fences, explanations, or extra fields.
+- a slide may add `repeatJustification` only when repeating the preceding
+  composition or using one composition for a third time is important to the
+  carousel's visual reasoning; it must be specific, trimmed plain text of at
+  most 280 Unicode code points;
+- otherwise omit repeatJustification;
+- do not include comments, Markdown, code fences, explanations, or other fields.
 """

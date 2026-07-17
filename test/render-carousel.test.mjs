@@ -1,100 +1,150 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import test from "node:test";
-import { exportRun, scanHtml } from "../scripts/export-carousel.mjs";
-import { populateHtml, populateRun } from "../scripts/populate-carousel.mjs";
-import { prepareLayout, snapshotBoundary, validateLayout, validateLayoutStage } from "../scripts/validate-carousel-layout.mjs";
+import { parseFragment, prepareComposition, readCompositionState, validateComposition, validateFragmentSet } from "../scripts/compose-carousel.mjs";
+import { exportRun, inspectDom, pngSize, scanHtml } from "../scripts/export-carousel.mjs";
+import { validateLayout } from "../scripts/validate-carousel-layout.mjs";
 
 const png = Buffer.from("89504e470d0a1a0a0000000d4948445200000438000005460806000000000000", "hex");
-const html = count => `<style>body{margin:0}.carousel-slide{width:1080px;height:1350px}.slide-content{padding:1px}</style><main id="carousel">${Array.from({ length: count }, (_, i) => `<section class="carousel-slide" data-slide="${i + 1}"><div class="slide-content">slide</div></section>`).join("")}</main>`;
-function fakeChromium({ count = 7, route = false, overflow = [], screenshot = false } = {}) {
-  return { launch: async () => ({
-    newPage: async () => ({
-      route: async (_pattern, handler) => { if (route) await handler({ abort: async () => {} }); }, setContent: async () => {},
-      evaluate: async () => ({ roots: count, slides: Array.from({ length: count }, (_, i) => String(i + 1)), violations: overflow }),
-      locator: () => ({ evaluate: async () => ({ width: 1080, height: 1350 }), screenshot: async ({ path }) => { if (screenshot) throw Error("shot"); writeFileSync(path, png); } }),
-    }), close: async () => {},
-  }) };
+const contentValues = [
+  { type:"statement", text:"A & B remains less than 3 < 4." },
+  { type:"collection", items:[{ label:"Commit", detail:"Keep writes." },{ label:"Rollback", detail:"Discard writes." }] },
+  { type:"comparison", sides:[{ label:"Commit", items:["Both rows"] },{ label:"Rollback", items:["Neither row"] }] },
+  { type:"sequence", steps:[{ label:"Debit", detail:"Change one row." },{ label:"Credit", detail:"Change the other." }] },
+  { type:"example", setup:"Move ten credits.", code:"BEGIN;\nUPDATE accounts;", explanation:"One boundary owns both writes." },
+  { type:"checklist", items:[{ label:"Begin", detail:"Open a transaction." },{ label:"Finish", detail:"Commit or roll back." }] },
+];
+function fixture(count = 7, { root = mkdtempSync(join(tmpdir(), "apollo-render-")), runId = `run-${count}` } = {}) {
+  const run = join(root, "runs", runId), stateFile = join(root, `${runId}-composition-state.json`), roles = ["hook", "overview", ...Array.from({ length:count - 3 }, (_, index) => ["concept", "example", "deep-dive", "interview"][index % 4]), "takeaway"];
+  mkdirSync(run, { recursive:true }); const content = { topic:"ACID", slides:roles.map((role, index) => ({ number:index + 1, role, title:`Slide ${index + 1}`, why:"This explains a concrete database decision.", glossary:[{ term:"Transaction", definition:"A unit of database work." }], content:structuredClone(contentValues[index % contentValues.length]) })) };
+  const layout = { template:"database-blueprint", motif:"blueprint", slides:content.slides.map(slide => ({ number:slide.number, composition:slide.content.type === "sequence" ? "flow" : "focus", density:"standard", visualAnchor:"headline", direction:"top-down", directionNote:`Lead through slide ${slide.number}.` })) };
+  writeFileSync(join(run, "request.json"), JSON.stringify({ topic:"ACID", runId, createdAt:"2026-07-16T00:00:00.000Z", model:"gpt-5.6-terra", effort:"medium" })); writeFileSync(join(run, "carousel-content.json"), JSON.stringify(content)); writeFileSync(join(run, "carousel-layout.json"), JSON.stringify(layout)); return { root, run, stateFile, content, layout };
 }
-const variants = ["hero", "fact", "list", "quote", "comparison", "levels", "list"];
-function slide(number, role, variant = variants[(number - 1) % variants.length]) { const common = { number, role, variant, title: `Slide ${number}`, why: "This explains a concrete database decision.", glossary: [{ term: "Transaction", definition: "A unit of database work." }] }; if (variant === "hero") return { ...common, prompt: "Start with the failure mode." }; if (variant === "fact") return { ...common, factValue: "1 unit", factLabel: "One visible database result." }; if (variant === "list") return { ...common, items: [{ label: "Atomicity", detail: "First concrete mechanism." }, { label: "Consistency", detail: "Second concrete mechanism." }] }; if (variant === "quote") return { ...common, quote: "A safe system never exposes a half-finished result.", attribution: "Database practice" }; if (variant === "comparison") return { ...common, comparison: { left: { label: "Lower", summary: "More concurrency.", items: ["Fewer checks", "More risk"] }, right: { label: "Higher", summary: "More protection.", items: ["More checks", "Less risk"] } } }; return { ...common, levels: [{ label: "Basic", value: 25, description: "Minimal protection." }, { label: "Strong", value: 75, description: "More coordination." }] }; }
-function run(count = 7) { const root = mkdtempSync(join(tmpdir(), "apollo-render-")), path = join(root, "runs", "run-1"), roles = ["hook", "overview", ...Array.from({ length: count - 3 }, (_, i) => ["concept", "example", "deep-dive", "interview"][i % 4]), "takeaway"]; mkdirSync(path, { recursive: true }); const content = { topic: "ACID", slides: roles.map((role, i) => slide(i + 1, role)) }; writeFileSync(join(path, "request.json"), JSON.stringify({ topic: "ACID", runId: "run-1", createdAt: "2026-07-16T00:00:00.000Z", model: "gpt-5.6-terra", effort: "medium" })); writeFileSync(join(path, "carousel-content.json"), JSON.stringify(content)); writeFileSync(join(path, "index.html"), populateHtml(content)); return path; }
-function layout(count = 7) { return { template: "database-blueprint", motif: "blueprint", slides: Array.from({ length: count }, (_, index) => ({ number: index + 1, composition: "focus", density: "standard", visualAnchor: "headline", direction: "centered", directionNote: `Make slide ${index + 1} the visual focus.` })) }; }
+const bind = pointer => `<p data-bind="${pointer}"></p>`;
+function fragment(slide, plan) {
+  const value = slide.content, body = value.type === "statement" ? `<div class="cp-statement">${bind("/content/text")}</div>`
+    : value.type === "collection" ? `<div class="cp-collection">${value.items.flatMap((_item, index) => [bind(`/content/items/${index}/label`), bind(`/content/items/${index}/detail`)]).join("")}</div>`
+    : value.type === "comparison" ? `<div class="cp-comparison">${value.sides.flatMap((side, sideIndex) => [bind(`/content/sides/${sideIndex}/label`), ...side.items.map((_item, itemIndex) => bind(`/content/sides/${sideIndex}/items/${itemIndex}`))]).join("")}</div>`
+    : value.type === "sequence" ? `<div class="cp-sequence">${value.steps.flatMap((_step, index) => [bind(`/content/steps/${index}/label`), bind(`/content/steps/${index}/detail`)]).join("")}</div>`
+    : value.type === "example" ? `<div class="cp-example">${bind("/content/setup")}<pre class="cp-code"><code data-bind="/content/code"></code></pre>${bind("/content/explanation")}</div>`
+    : `<div class="cp-checklist">${value.items.flatMap((_item, index) => [bind(`/content/items/${index}/label`), bind(`/content/items/${index}/detail`)]).join("")}</div>`;
+  const arrangement = value.type === "sequence" ? "flow" : "stack"; return `<section class="cp-body cp-layout-${arrangement} cp-density-${plan.density}" data-composition="${plan.composition}" data-direction="${plan.direction}" data-anchor="${plan.visualAnchor}">${body}</section>`;
+}
+function svgFragment(slide, plan, shapes = '<line class="cp-svg-line" x1="0" y1="0" x2="1000" y2="600"></line>') { return `<section class="cp-body cp-layout-stack cp-density-${plan.density}" data-composition="${plan.composition}" data-direction="${plan.direction}" data-anchor="diagram"><figure class="cp-${slide.content.type} cp-diagram"><p data-bind="/content/text"></p><svg class="cp-svg-canvas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">${shapes}</svg></figure></section>`; }
+const bodyPath = (value, index = 0) => join(value.run, "slide-bodies", `${String(index + 1).padStart(2, "0")}.html`);
+function writeFragments(value) { value.content.slides.forEach((slide, index) => writeFileSync(join(value.run, "slide-bodies", `${String(index + 1).padStart(2, "0")}.html`), fragment(slide, value.layout.slides[index]))); }
+function prepared(count = 7, options) { const value = fixture(count, options); prepareComposition(value.run, value.stateFile); writeFragments(value); return value; }
+function fakeChromium({ count = 7, violation = [], screenshotError = false, image = png, onScreenshot = () => {} } = {}) { return { launch:async () => ({ newPage:async () => ({ route:async () => {}, setContent:async () => {}, evaluate:async fn => String(fn).includes("document.fonts.ready") ? { roots:count, slides:Array.from({ length:count }, (_, index) => String(index + 1)), violations:violation } : { width:1080, height:1350 }, locator:selector => ({ evaluate:async () => ({ width:1080, height:1350 }), screenshot:async ({ path }) => { const slide = Number(selector.match(/data-slide="(\d+)"/)?.[1]); await onScreenshot({ path, slide }); if (screenshotError) throw Error("shot"); writeFileSync(path, image); } }) }), close:async () => {} }) }; }
 
-test("exports seven and ten content-derived PNG sets and closed manifests", async () => { for (const count of [7, 10]) { const path = run(count); await exportRun(path, { chromium: fakeChromium({ count }) }); const manifest = JSON.parse(readFileSync(join(path, "render-manifest.json"))); assert.deepEqual(manifest.slides, Array.from({ length: count }, (_, i) => `slides/slide-${String(i + 1).padStart(2, "0")}.png`)); } });
-test("rejects forbidden HTML, routes, and precise overflow", async () => { assert.throws(() => scanHtml(html(7).replace('class="slide-content">slide', 'class="x">slide'), 7)); const path = run(); await assert.rejects(exportRun(path, { chromium: fakeChromium({ route: true }) })); assert.equal(existsSync(join(path, "render-manifest.json")), false); const overflowPath = run(); await assert.rejects(exportRun(overflowPath, { chromium: fakeChromium({ overflow: ["slide 2: descendant height overflowed"] }) }), /slide 2: descendant height overflowed/); });
-test("rejects markup that drifts from the fixed shell", async () => { const path = run(); writeFileSync(join(path, "index.html"), readFileSync(join(path, "index.html"), "utf8").replace('class="tag"', 'class="tag changed"')); await assert.rejects(exportRun(path, { chromium: fakeChromium() }), /Template fidelity/); });
-test("rejects escaped CSS bypasses", () => { for (const css of ["a{background:u\\72l(x)}", "@\\69mport 'x'", "a{ov\\65rflow:\\68idden}"]) assert.throws(() => scanHtml(html(7).replace("</style>", `${css}</style>`), 7)); });
-test("keeps a structurally valid prior manifest regardless of key order", async () => {
-  const path = run(); await exportRun(path, { chromium: fakeChromium() }); const manifest = JSON.parse(readFileSync(join(path, "render-manifest.json"))); writeFileSync(join(path, "render-manifest.json"), JSON.stringify({ slides: manifest.slides, height: 1350, width: 1080, runId: "run-1", slideCount: 7 })); const before = readFileSync(join(path, "render-manifest.json"), "utf8"); await assert.rejects(exportRun(path, { chromium: fakeChromium({ screenshot: true }) })); assert.equal(readFileSync(join(path, "render-manifest.json"), "utf8"), before);
+test("validates 7 and 10 slide fragment sets, every semantic binding, and escaped assembly", () => { for (const count of [7, 10]) { const value = fixture(count); prepareComposition(value.run, value.stateFile); writeFragments(value); const result = validateComposition(value.run, readCompositionState(value.run, value.stateFile)); assert.equal(result.fragments.length, count); assert.match(result.html, /A &amp; B remains less than 3 &lt; 4/); assert.match(result.html, /data-binding="\/content\/text"/); assert.equal((result.html.match(/class="slide-body"/g) ?? []).length, count); assert.doesNotMatch(result.html, /data-bind=|data-variant/); scanHtml(result.html, count); } });
+test("rejects unsafe syntax, attributes, SVG, bindings, and output sets", () => {
+  for (const source of ["<section><script></script></section>", "<section><!--x--></section>", "<section>&amp;</section>", "\uFEFF<section></section>", "<section>\0</section>", "<!doctype html>", "<![CDATA[x]]>", "<?x?>", "<section/>", "<SECTION></SECTION>", "<section>raw</section>", "<section class='x'></section>", "<section><div></section></div>"]) assert.throws(() => parseFragment(source));
+  const value = fixture(); prepareComposition(value.run, value.stateFile); writeFragments(value); const first = join(value.run, "slide-bodies", "01.html"), valid = readFileSync(first, "utf8"); writeFileSync(first, valid.replace(' data-composition=', ' style="x" data-composition=')); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_ATTRIBUTE/); writeFileSync(first, valid.replace("/content/text", "/title")); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_BINDING/);
+  writeFragments(value); writeFileSync(join(value.run, "slide-bodies", "extra.html"), "x"); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /COMPOSER_OUTPUT_SET/);
 });
-test("removes invalid prior manifests before static failure and never follows slide directory symlinks", async () => {
-  const path = run(); writeFileSync(join(path, "render-manifest.json"), "{}"); writeFileSync(join(path, "index.html"), "<script></script>"); await assert.rejects(exportRun(path, { chromium: fakeChromium() })); assert.equal(existsSync(join(path, "render-manifest.json")), false);
-  const linked = run(), outside = join(dirname(linked), "outside"); mkdirSync(outside); writeFileSync(join(outside, "slide-01.png"), "outside"); mkdirSync(join(linked, "slides")); rmSync(join(linked, "slides"), { recursive: true }); symlinkSync(outside, join(linked, "slides")); writeFileSync(join(linked, "render-manifest.json"), JSON.stringify({ runId: "run-1", width: 1080, height: 1350, slideCount: 7, slides: Array.from({ length: 7 }, (_, i) => `slides/slide-${String(i + 1).padStart(2, "0")}.png`) })); writeFileSync(join(linked, "index.html"), "<script></script>"); await assert.rejects(exportRun(linked, { chromium: fakeChromium() })); assert.equal(readFileSync(join(outside, "slide-01.png"), "utf8"), "outside"); assert.equal(existsSync(join(linked, "render-manifest.json")), false);
+test("rejects missing, extra, nested, misnumbered, non-regular, and symlink fragment entries", () => {
+  const cases = [value => rmSync(bodyPath(value)), value => writeFileSync(join(value.run, "slide-bodies", "extra.html"), "x"), value => mkdirSync(join(value.run, "slide-bodies", "nested")), value => { writeFileSync(join(value.run, "slide-bodies", "1.html"), readFileSync(bodyPath(value))); rmSync(bodyPath(value)); }, value => { rmSync(bodyPath(value)); mkdirSync(bodyPath(value)); }, value => { const target = join(value.run, "target.html"); writeFileSync(target, readFileSync(bodyPath(value))); rmSync(bodyPath(value)); symlinkSync(target, bodyPath(value)); }];
+  for (const mutate of cases) { const value = prepared(); mutate(value); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /COMPOSER_OUTPUT_SET/); }
 });
-test("rich closed variants export through real Chromium", async t => {
-  const { chromium } = await import("playwright"); if (!existsSync(chromium.executablePath())) return t.skip("Run npx playwright install chromium for this local integration check.");
-  const path = run();
-  try { await exportRun(path, { chromium }); }
-  catch (error) { if (/browserType\.launch/.test(error.message)) return t.skip("Chromium cannot launch in this sandbox."); throw error; }
-  assert.equal(JSON.parse(readFileSync(join(path, "render-manifest.json"))).slideCount, 7);
+test("rejects oversized and invalid UTF-8 fragment bytes before syntax", () => { for (const bytes of [Buffer.alloc(65537, 32), Buffer.from([0xc3, 0x28])]) { const value = prepared(); writeFileSync(bodyPath(value), bytes); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_BYTES/); } });
+test("accepts the closed tag hierarchy and rejects grammar, attribute, class, plan, binding, and semantic drift", () => {
+  const value = prepared(), plan = value.layout.slides[0], mega = `<section class="cp-body cp-layout-stack cp-density-standard" data-composition="focus" data-direction="top-down" data-anchor="headline"><div class="cp-statement cp-group cp-gap-1 cp-span-1"><p class="cp-label" data-bind="/content/text"></p><div class="cp-node cp-gap-2"><article class="cp-annotation"><blockquote class="cp-connector"><h3><span class="cp-detail"><strong class="cp-emphasis"><em class="cp-muted"><code></code></em></strong></span></h3><pre class="cp-code"><code></code></pre><ul class="cp-list"><li><span></span></li></ul><ol class="cp-list"><li></li></ol><figure class="cp-diagram"><figure></figure><p class="cp-pos-tl"></p><svg class="cp-svg-canvas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><g><line class="cp-svg-line" x1="0" y1="0" x2="1000" y2="600"></line></g><polyline class="cp-svg-line-muted" points="0,0 1000,600"></polyline><polygon class="cp-svg-arrow" points="0,0 20,10 0,20"></polygon><rect class="cp-svg-node" x="10" y="10" width="100" height="80" rx="10" ry="10"></rect><circle class="cp-svg-accent" cx="100" cy="100" r="20"></circle><ellipse class="cp-svg-node" cx="200" cy="200" rx="40" ry="20"></ellipse></svg><figcaption></figcaption></figure></blockquote></article></div></div></section>`;
+  writeFileSync(bodyPath(value), mega); assert.equal(validateFragmentSet(value.run, value.content, value.layout).fragments[0].arrangement, "stack");
+  const valid = fragment(value.content.slides[0], plan), cases = [
+    [source => source.replace('<div class="cp-statement">', '<ul><div class="cp-statement">').replace('</div></section>', '</div></ul></section>'), "FRAGMENT_TAG"],
+    [source => source.replace("<div", "<aside").replace("</div>", "</aside>"), "FRAGMENT_TAG"],
+    [source => source.replace(" data-composition=", ' id="x" data-composition='), "FRAGMENT_ATTRIBUTE"],
+    [source => source.replace("cp-statement", "cp-card"), "FRAGMENT_CLASS"],
+    [source => source.replace("cp-statement", "cp-statement cp-statement"), "FRAGMENT_CLASS"],
+    [source => source.replace(" data-composition=", ' class="cp-body" data-composition='), "FRAGMENT_ATTRIBUTE"],
+    [source => source.replace("<section", "<div").replace("</section>", "</div>"), "FRAGMENT_ROOT"],
+    [source => source.replace("cp-layout-stack", "cp-layout-grid"), "FRAGMENT_PLAN"],
+    [source => source.replace("cp-statement", "cp-collection"), "FRAGMENT_SEMANTICS"],
+    [source => source.replace('<p data-bind="/content/text"></p>', '<p class="cp-group" data-bind="/content/text"><span></span></p>'), "FRAGMENT_CLASS"],
+    [source => source.replace('<p data-bind="/content/text"></p>', '<p class="cp-label" data-bind="/content/text"><span></span></p>'), "FRAGMENT_BINDING"],
+    [source => source.replace("</div>", '<p data-bind="/content/text"></p></div>'), "FRAGMENT_BINDING"],
+    [source => source.replace("</p>", ""), "FRAGMENT_SYNTAX"],
+    [source => source.replace("<p ", '<p href="x" '), "FRAGMENT_ATTRIBUTE"],
+    [source => source.replace("<p ", '<p data-binding="/content/text" '), "FRAGMENT_ATTRIBUTE"],
+    [source => source.replace("<p ", '<p onclick="x" '), "FRAGMENT_ATTRIBUTE"],
+    [source => source.replace("<section ", '<section xmlns="x" '), "FRAGMENT_ATTRIBUTE"],
+  ];
+  for (const [mutate, code] of cases) { writeFileSync(bodyPath(value), mutate(valid)); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), new RegExp(code)); }
 });
-test("validates closed plans independent of JSON key order and rejects every plan category", () => {
-  const path = run(), content = JSON.parse(readFileSync(join(path, "carousel-content.json")));
-  writeFileSync(join(path, "carousel-layout.json"), JSON.stringify({ slides: layout().slides, motif: "blueprint", template: "database-blueprint" }));
-  assert.equal(validateLayout(path, content).slides.length, 7);
-  for (const [mutate, code] of [
-    [value => { value.extra = true; }, "LAYOUT_ROOT_SHAPE"], [value => { value.motif = "other"; }, "LAYOUT_TEMPLATE_OR_MOTIF"],
-    [value => { value.slides.pop(); }, "LAYOUT_SLIDE_COUNT"], [value => { value.slides[0].extra = true; }, "LAYOUT_SLIDE_SHAPE"],
-    [value => { value.slides[0].number = "1"; }, "LAYOUT_SLIDE_TYPE"], [value => { value.slides[1].number = 1; }, "LAYOUT_SLIDE_IDENTITY"],
-    [value => { value.slides[0].composition = "unknown"; }, "LAYOUT_CAPABILITY"], [value => { value.slides[0].directionNote = " "; }, "LAYOUT_NOTE"], [value => { value.slides[0].directionNote = "x".repeat(281); }, "LAYOUT_NOTE"],
-  ]) { const value = layout(); mutate(value); writeFileSync(join(path, "carousel-layout.json"), JSON.stringify(value)); assert.throws(() => validateLayout(path, content), new RegExp(code)); }
+test("enforces class-to-element and root-only class mappings", () => {
+  const value = prepared(), valid = readFileSync(bodyPath(value), "utf8"), invalid = [valid.replace("cp-statement", "cp-statement cp-list"), valid.replace("cp-statement", "cp-statement cp-code"), valid.replace("cp-statement", "cp-statement cp-label"), valid.replace("cp-statement", "cp-statement cp-diagram"), valid.replace("<p ", '<p class="cp-pos-tl" '), valid.replace("<p ", '<p class="cp-span-1" '), valid.replace("cp-statement", "cp-statement cp-body")]; for (const source of invalid) { writeFileSync(bodyPath(value), source); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_CLASS/); }
+  value.layout.slides[0].visualAnchor = "diagram"; const svg = svgFragment(value.content.slides[0], value.layout.slides[0]); for (const source of [svg.replace("cp-svg-canvas", "cp-svg-line"), svg.replace("cp-svg-line", "cp-svg-node"), svg.replace("cp-svg-line", "cp-svg-arrow"), svg.replace("<line", '<line class="cp-svg-canvas"')]) { writeFileSync(bodyPath(value), source); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_(?:ATTRIBUTE|CLASS|SVG)/); }
 });
-test("art direction gates population and export and protects the full boundary", async () => {
-  const path = run();
-  prepareLayout(path); const snapshot = snapshotBoundary(path); writeFileSync(join(path, "carousel-layout.json"), JSON.stringify(layout())); validateLayoutStage(path, snapshot); populateRun(path); await exportRun(path, { chromium: fakeChromium() });
-  assert.equal(JSON.parse(readFileSync(join(path, "render-manifest.json"))).slideCount, 7);
-  for (const mutate of [
-    path => writeFileSync(join(path, "carousel-content.initial.json"), "changed"), path => writeFileSync(join(path, "carousel-review-1.json"), "changed"),
-    path => writeFileSync(join(path, "index.html"), "stale renderer artifact"), path => writeFileSync(join(path, "render-manifest.json"), "stale renderer artifact"),
-    path => writeFileSync(join(path, "unexpected.txt"), "added"), path => rmSync(join(path, "request.json")),
-  ]) {
-    const protectedPath = run(); writeFileSync(join(protectedPath, "carousel-content.initial.json"), "history"); writeFileSync(join(protectedPath, "carousel-review-1.json"), "history"); writeFileSync(join(protectedPath, "render-manifest.json"), "prior manifest");
-    prepareLayout(protectedPath); const boundary = snapshotBoundary(protectedPath); mutate(protectedPath); writeFileSync(join(protectedPath, "carousel-layout.json"), JSON.stringify(layout()));
-    assert.throws(() => validateLayoutStage(protectedPath, boundary), /LAYOUT_PROTECTED_MUTATION/);
+test("checks every SVG geometry boundary, canonical integer, point, attribute, and element limit", () => {
+  const value = fixture(); value.layout.slides[0].visualAnchor = "diagram"; writeFileSync(join(value.run, "carousel-layout.json"), JSON.stringify(value.layout)); prepareComposition(value.run, value.stateFile); writeFragments(value);
+  const validShapes = [
+    '<line class="cp-svg-line" x1="0" y1="0" x2="1000" y2="600"></line>', '<polyline class="cp-svg-line-muted" points="0,0 1000,600"></polyline>', '<polygon class="cp-svg-arrow" points="0,0 20,10 0,20"></polygon>',
+    '<rect class="cp-svg-node" x="0" y="0" width="1000" height="600" rx="500" ry="300"></rect>', '<circle class="cp-svg-node" cx="300" cy="300" r="300"></circle>', '<ellipse class="cp-svg-node" cx="500" cy="300" rx="500" ry="300"></ellipse>',
+  ];
+  for (const shape of validShapes) { writeFileSync(bodyPath(value), svgFragment(value.content.slides[0], value.layout.slides[0], shape)); assert.equal(validateFragmentSet(value.run, value.content, value.layout).fragments.length, 7); }
+  const line = validShapes[0], tooManyPoints = Array.from({ length:65 }, (_, index) => `${index},${index}`).join(" "), tooManyElements = line.repeat(128), invalidShapes = [line.replace('x2="1000"', 'x2="1001"'), line.replace('x1="0"', 'x1="01"'), line.replace(" x1=", ' transform="x" x1='), `<polyline points="${tooManyPoints}"></polyline>`, '<rect x="0" y="0" width="0" height="1"></rect>', '<rect x="0" y="0" width="10" height="10" rx="6"></rect>', '<circle cx="0" cy="0" r="1"></circle>', '<ellipse cx="1" cy="1" rx="2" ry="1"></ellipse>', '<text></text>', '<path></path>', '<defs></defs>', '<use href="x"></use>', tooManyElements];
+  for (const shape of invalidShapes) { writeFileSync(bodyPath(value), svgFragment(value.content.slides[0], value.layout.slides[0], shape)); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_(?:TAG|ATTRIBUTE|SVG)/); }
+  writeFileSync(bodyPath(value), svgFragment(value.content.slides[0], value.layout.slides[0], line.repeat(127))); assert.equal(validateFragmentSet(value.run, value.content, value.layout).fragments.length, 7);
+});
+test("rejects reordered sequence/checklist, cross-slide, duplicate, missing, and invented bindings", () => {
+  const value = prepared(), swap = (source, left, right) => source.replace(left, "__POINTER__").replace(right, left).replace("__POINTER__", right);
+  for (const [index, left, right] of [[3, "/content/steps/0/label", "/content/steps/0/detail"], [5, "/content/items/0/label", "/content/items/0/detail"]]) { const path = bodyPath(value, index), valid = readFileSync(path, "utf8"); writeFileSync(path, swap(valid, left, right)); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_BINDING/); writeFileSync(path, valid); }
+  const first = bodyPath(value), valid = readFileSync(first, "utf8"); for (const source of [valid.replace("/content/text", "/slides/1/content/text"), valid.replace('<p data-bind="/content/text"></p>', ""), valid.replace("</div>", '<p data-bind="/content/text"></p></div>')]) { writeFileSync(first, source); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_BINDING/); }
+  writeFileSync(first, valid.replace('></p>', '>invented</p>')); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_SYNTAX/);
+});
+test("validates optional repeat justification", () => { const value = fixture(); value.layout.slides[0].repeatJustification = "Keep the two transaction outcomes comparable."; writeFileSync(join(value.run, "carousel-layout.json"), JSON.stringify(value.layout)); assert.equal(validateLayout(value.run, value.content).slides[0].repeatJustification.length > 0, true); for (const invalid of ["", " ", 1, "x".repeat(281)]) { value.layout.slides[0].repeatJustification = invalid; writeFileSync(join(value.run, "carousel-layout.json"), JSON.stringify(value.layout)); assert.throws(() => validateLayout(value.run, value.content), /LAYOUT_NOTE/); } });
+test("rejects every closed layout category and exact-shape drift", () => { const mutations = [[value => { value.extra = true; }, "LAYOUT_ROOT_SHAPE"], [value => value.slides.pop(), "LAYOUT_SLIDE_COUNT"], [value => { value.slides[0].extra = true; }, "LAYOUT_SLIDE_SHAPE"], [value => { value.slides[0].number = "1"; }, "LAYOUT_SLIDE_TYPE"], [value => { value.slides[1].number = 1; }, "LAYOUT_SLIDE_IDENTITY"], ...["composition", "density", "visualAnchor", "direction"].map(key => [value => { value.slides[0][key] = "unknown"; }, "LAYOUT_CAPABILITY"]), [value => { value.slides[0].directionNote = "<b>x</b>"; }, "LAYOUT_NOTE"]]; for (const [mutate, code] of mutations) { const value = fixture(); mutate(value.layout); writeFileSync(join(value.run, "carousel-layout.json"), JSON.stringify(value.layout)); assert.throws(() => validateLayout(value.run, value.content), new RegExp(code)); } });
+test("enforces every plan compatibility pair, density, direction, and anchor rule", () => {
+  const compatibility = { minimal:["center", "stack"], editorial:["stack", "row", "split"], split:["split", "row"], grid:["grid", "cluster"], flow:["flow", "row", "stack"], focus:["center", "cluster", "stack"] }, all = ["grid", "stack", "row", "split", "cluster", "center", "flow"];
+  for (const [composition, allowed] of Object.entries(compatibility)) {
+    for (const arrangement of allowed) { const value = fixture(); value.layout.slides[0].composition = composition; mkdirSync(join(value.run, "slide-bodies")); writeFragments(value); writeFileSync(bodyPath(value), fragment(value.content.slides[0], value.layout.slides[0]).replace("cp-layout-stack", `cp-layout-${arrangement}`)); assert.equal(validateFragmentSet(value.run, value.content, value.layout).fragments[0].arrangement, arrangement); }
+    const value = fixture(); value.layout.slides[0].composition = composition; mkdirSync(join(value.run, "slide-bodies")); writeFragments(value); writeFileSync(bodyPath(value), fragment(value.content.slides[0], value.layout.slides[0]).replace("cp-layout-stack", `cp-layout-${all.find(value => !allowed.includes(value))}`)); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_PLAN/);
   }
-  for (const archivePath of [join(process.cwd(), "templates/database-blueprint/template.json"), join(process.cwd(), "assets/database/theme.css"), join(process.cwd(), "assets/database/carousel-shell.html")]) {
-    const original = readFileSync(archivePath, "utf8"), protectedPath = run();
-    try { prepareLayout(protectedPath); const boundary = snapshotBoundary(protectedPath); writeFileSync(archivePath, `${original}\n`); writeFileSync(join(protectedPath, "carousel-layout.json"), JSON.stringify(layout())); assert.throws(() => validateLayoutStage(protectedPath, boundary), /LAYOUT_PROTECTED_MUTATION/); }
-    finally { writeFileSync(archivePath, original); }
+  const value = prepared(), first = readFileSync(bodyPath(value), "utf8"); writeFileSync(bodyPath(value), first.replace("cp-density-standard", "cp-density-dense")); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_PLAN/); writeFileSync(bodyPath(value), first.replace('data-direction="top-down"', 'data-direction="centered"')); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_PLAN/); value.layout.slides[0].visualAnchor = "diagram"; writeFileSync(bodyPath(value), first.replace('data-anchor="headline"', 'data-anchor="diagram"')); assert.throws(() => validateFragmentSet(value.run, value.content, value.layout), /FRAGMENT_SEMANTICS/);
+  value.layout.slides[0].visualAnchor = "headline"; writeFileSync(bodyPath(value), first); value.layout.slides[3].visualAnchor = "sequence"; writeFileSync(bodyPath(value, 3), readFileSync(bodyPath(value, 3), "utf8").replace('data-anchor="headline"', 'data-anchor="sequence"')); assert.equal(validateFragmentSet(value.run, value.content, value.layout).fragments.length, 7);
+});
+test("emits non-blocking repetition and equal-column review signals", () => { const value = fixture(); value.layout.slides.slice(0, 3).forEach(plan => { plan.composition = "grid"; plan.repeatJustification = "Keep related outcomes visually comparable."; }); writeFileSync(join(value.run, "carousel-layout.json"), JSON.stringify(value.layout)); prepareComposition(value.run, value.stateFile); writeFragments(value); for (let index = 0; index < 3; index++) { const path = join(value.run, "slide-bodies", `${String(index + 1).padStart(2, "0")}.html`), source = readFileSync(path, "utf8").replace("cp-layout-stack", "cp-layout-grid").replace("</section>", '<div class="cp-group"></div></section>'); writeFileSync(path, source); } const result = validateComposition(value.run, readCompositionState(value.run, value.stateFile)); assert.equal(result.warnings.some(value => value.code === "COMPOSER_EQUAL_COLUMNS"), true); assert.equal(result.warnings.some(value => value.code === "COMPOSER_REPEAT_UNJUSTIFIED" && value.path.startsWith("/slides/1")), false); });
+test("distinguishes adjacent, third-use, justified, and unequal-column warning cases", () => {
+  const adjacent = prepared(), warnings = validateFragmentSet(adjacent.run, adjacent.content, adjacent.layout).warnings; assert.equal(warnings.some(value => value.code === "COMPOSER_REPEAT_UNJUSTIFIED" && value.path === "/slides/1/repeatJustification"), true); adjacent.layout.slides[1].repeatJustification = "Continue the paired transaction explanation."; assert.equal(validateFragmentSet(adjacent.run, adjacent.content, adjacent.layout).warnings.some(value => value.path === "/slides/1/repeatJustification"), false);
+  const third = prepared(); third.layout.slides[1].composition = "focus"; writeFileSync(bodyPath(third, 1), readFileSync(bodyPath(third, 1), "utf8").replace("cp-layout-stack", "cp-layout-center")); assert.equal(validateFragmentSet(third.run, third.content, third.layout).warnings.some(value => value.code === "COMPOSER_REPEAT_UNJUSTIFIED" && value.path === "/slides/4/repeatJustification"), true);
+  const columns = fixture(); columns.layout.slides.slice(0, 3).forEach(plan => { plan.composition = "grid"; plan.repeatJustification = "Keep peers comparable."; }); mkdirSync(join(columns.run, "slide-bodies")); writeFragments(columns); for (let index = 0; index < 3; index++) writeFileSync(bodyPath(columns, index), readFileSync(bodyPath(columns, index), "utf8").replace("cp-layout-stack", "cp-layout-grid").replace("</section>", '<div class="cp-group"></div></section>')); assert.equal(validateFragmentSet(columns.run, columns.content, columns.layout).warnings.some(value => value.code === "COMPOSER_EQUAL_COLUMNS"), true); writeFileSync(bodyPath(columns, 2), readFileSync(bodyPath(columns, 2), "utf8").replace('class="cp-comparison"', 'class="cp-comparison cp-span-1"').replace('class="cp-group"', 'class="cp-group cp-span-2"')); assert.equal(validateFragmentSet(columns.run, columns.content, columns.layout).warnings.some(value => value.code === "COMPOSER_EQUAL_COLUMNS"), false);
+});
+test("protects content, layout, histories, renderer members, arbitrary run entries, archive, shell, and theme", () => {
+  const mutations = [
+    value => writeFileSync(join(value.run, "carousel-content.json"), `${readFileSync(join(value.run, "carousel-content.json"), "utf8")} `), value => writeFileSync(join(value.run, "carousel-layout.json"), `${readFileSync(join(value.run, "carousel-layout.json"), "utf8")} `),
+    value => writeFileSync(join(value.run, "carousel-review-1.json"), "changed"), value => writeFileSync(join(value.run, "index.html"), "changed"), value => mkdirSync(join(value.run, "slides")), value => writeFileSync(join(value.run, "render-manifest.json"), "changed"), value => writeFileSync(join(value.run, "escaped.html"), "changed"), value => rmSync(join(value.run, "request.json")),
+  ];
+  for (const mutate of mutations) { const value = prepared(); mutate(value); assert.throws(() => validateComposition(value.run, readCompositionState(value.run, value.stateFile)), /COMPOSER_PROTECTED_MUTATION/); }
+  for (const path of [join(process.cwd(), "templates/database-blueprint/template.json"), join(process.cwd(), "templates/database-blueprint/preview.html"), join(process.cwd(), "assets/database/carousel-shell.html"), join(process.cwd(), "assets/database/theme.css")]) { const original = readFileSync(path, "utf8"), value = prepared(); try { writeFileSync(path, `${original}\n`); assert.throws(() => validateComposition(value.run, readCompositionState(value.run, value.stateFile)), /COMPOSER_PROTECTED_MUTATION/); } finally { writeFileSync(path, original); } }
+});
+test("exports complete artifacts and restores all four members after a later failure", async () => {
+  const value = fixture(); prepareComposition(value.run, value.stateFile); writeFragments(value); await exportRun(value.run, { chromium:fakeChromium(), stateFile:value.stateFile }); assert.equal(JSON.parse(readFileSync(join(value.run, "render-manifest.json"))).slideCount, 7);
+  const before = snapshot(value.run); prepareComposition(value.run, value.stateFile); writeFragments(value); await assert.rejects(exportRun(value.run, { chromium:fakeChromium({ screenshotError:true }), stateFile:value.stateFile })); assert.deepEqual(snapshot(value.run), before);
+});
+test("restores all four members after protected, fragment, browser, export, fidelity, and publication failures", async () => {
+  const publish = async () => { const value = prepared(); await exportRun(value.run, { chromium:fakeChromium(), stateFile:value.stateFile }); return value; }, failAfterPrepare = async (configure, chromium = fakeChromium()) => { const value = await publish(), before = snapshot(value.run); prepareComposition(value.run, value.stateFile); writeFragments(value); await configure(value); await assert.rejects(exportRun(value.run, { chromium, stateFile:value.stateFile })); assert.deepEqual(snapshot(value.run), before); };
+  await failAfterPrepare(value => writeFileSync(join(value.run, "escaped.html"), "mutation"));
+  await failAfterPrepare(value => writeFileSync(bodyPath(value), readFileSync(bodyPath(value), "utf8").replace("/content/text", "/title")));
+  await failAfterPrepare(() => {}, fakeChromium({ violation:["BODY_OVERFLOW slide 1 /body: reserved body overflow"] }));
+  await failAfterPrepare(() => {}, fakeChromium({ image:Buffer.from("not png") }));
+  { const value = await publish(), before = snapshot(value.run); prepareComposition(value.run, value.stateFile); writeFragments(value); const chromium = fakeChromium({ onScreenshot:({ slide }) => { if (slide === 1) writeFileSync(bodyPath(value), readFileSync(bodyPath(value), "utf8").replace("<p data-bind", '<p class="cp-detail" data-bind')); } }); await assert.rejects(exportRun(value.run, { chromium, stateFile:value.stateFile }), /ASSEMBLY_FIDELITY/); assert.deepEqual(snapshot(value.run), before); }
+  { const value = await publish(), before = snapshot(value.run); prepareComposition(value.run, value.stateFile); writeFragments(value); const chromium = fakeChromium({ onScreenshot:({ slide }) => { if (slide === 7) { rmSync(join(value.run, "index.html")); mkdirSync(join(value.run, "index.html")); } } }); await assert.rejects(exportRun(value.run, { chromium, stateFile:value.stateFile })); assert.deepEqual(snapshot(value.run), before); }
+});
+test("withholds the manifest through capture and installs it only on successful publication", async () => { const value = prepared(); let captures = 0; await exportRun(value.run, { stateFile:value.stateFile, chromium:fakeChromium({ onScreenshot:() => { captures++; assert.equal(existsSync(join(value.run, "render-manifest.json")), false); } }) }); assert.equal(captures, 7); assert.equal(existsSync(join(value.run, "render-manifest.json")), true); });
+test("removes every candidate member after a first-render failure", async () => { const value = prepared(); await assert.rejects(exportRun(value.run, { chromium:fakeChromium({ violation:["BODY_OVERFLOW slide 2 /body/0: crossed right"] }), stateFile:value.stateFile }), /BODY_OVERFLOW/); for (const name of ["slide-bodies", "index.html", "slides", "render-manifest.json"]) assert.equal(existsSync(join(value.run, name)), false); });
+test("real Chromium exports inspectable 7/10 runs and exercises reserved-body containment", async t => {
+  const { chromium } = await import("playwright"); if (!existsSync(chromium.executablePath())) return t.skip("Run npx playwright install chromium once.");
+  const proofRoot = process.env.APOLLO_PROOF_OUTPUT; for (const count of [7, 10]) {
+    const value = fixture(count, proofRoot ? { root:proofRoot, runId:`proof-${count}` } : undefined); value.layout.slides[0].visualAnchor = "diagram"; writeFileSync(join(value.run, "carousel-layout.json"), JSON.stringify(value.layout)); prepareComposition(value.run, value.stateFile); writeFragments(value); writeFileSync(bodyPath(value), svgFragment(value.content.slides[0], value.layout.slides[0], '<line class="cp-svg-line" x1="20" y1="20" x2="980" y2="580"></line>')); const composed = validateComposition(value.run, readCompositionState(value.run, value.stateFile));
+    try { await inspectDom(composed.html, count, { chromium }); }
+    catch (error) { if (/browserType\.launch/.test(error.message)) return t.skip("Chromium cannot launch in this sandbox."); throw error; }
+    if (count === 7) for (const [selector, css, message] of [[".slide-body", "display:none", "/body"], [".cp-body", "width:1200px", "/body/0"], [".cp-body", "height:1200px", "/body/0"], [".cp-body", "position:relative;left:-8px", "/body/0"], [".cp-body", "position:relative;left:8px", "/body/0"], [".cp-body", "position:relative;top:-8px", "/body/0"], [".cp-body", "position:relative;top:8px", "/body/0"], ['[data-binding="/content/text"]', "position:relative;left:-100px", "/content/text"]]) { const html = composed.html.replace("</style>", `[data-slide=\"1\"] ${selector}{${css}}</style>`); await assert.rejects(inspectDom(html, count, { chromium }), new RegExp(`BODY_OVERFLOW slide 1 ${message.replaceAll("/", "\\/")}`)); }
+    await exportRun(value.run, { chromium, stateFile:value.stateFile }); const manifest = JSON.parse(readFileSync(join(value.run, "render-manifest.json"), "utf8")); assert.equal(manifest.slideCount, count); assert.equal(manifest.slides.length, count); manifest.slides.forEach(path => assert.deepEqual(pngSize(join(value.run, path)), { width:1080, height:1350 })); if (proofRoot) console.log(`Inspectable proof run: ${value.run}`);
   }
 });
-test("missing or invalid direction output preserves prior renderer artifacts", () => {
-  for (const output of [null, {}]) {
-    const path = run(); writeFileSync(join(path, "render-manifest.json"), "prior manifest"); const index = readFileSync(join(path, "index.html"), "utf8");
-    prepareLayout(path); const boundary = snapshotBoundary(path); if (output) writeFileSync(join(path, "carousel-layout.json"), JSON.stringify(output));
-    assert.throws(() => validateLayoutStage(path, boundary));
-    assert.equal(readFileSync(join(path, "index.html"), "utf8"), index); assert.equal(readFileSync(join(path, "render-manifest.json"), "utf8"), "prior manifest");
-  }
-});
-test("layout preparation rejects invalid runs before removing stale output", () => {
-  const path = mkdtempSync(join(tmpdir(), "apollo-invalid-")); writeFileSync(join(path, "carousel-layout.json"), "stale");
-  assert.throws(() => prepareLayout(path), /LAYOUT_RUN_OR_ARCHIVE/);
-  assert.equal(readFileSync(join(path, "carousel-layout.json"), "utf8"), "stale");
-});
-test("stale layout symlinks stop before direction", async () => {
-  const path = run(), target = join(dirname(path), "layout.json"); writeFileSync(target, "{}"); symlinkSync(target, join(path, "carousel-layout.json"));
-  assert.throws(() => prepareLayout(path), /LAYOUT_STALE_SYMLINK/);
-});
-test("layout CLI persists an external snapshot for the final boundary check", () => {
-  const path = run(), snapshot = join(dirname(dirname(dirname(path))), "snapshot.json"), script = join(process.cwd(), "scripts", "validate-carousel-layout.mjs");
-  assert.equal(spawnSync(process.execPath, [script, path, "--prepare", "--snapshot-file", snapshot]).status, 0);
-  writeFileSync(join(path, "carousel-layout.json"), JSON.stringify(layout()));
-  const result = spawnSync(process.execPath, [script, path, "--snapshot-file", snapshot], { encoding: "utf8" });
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(existsSync(snapshot), true);
-  assert.notEqual(spawnSync(process.execPath, [script, path, "--prepare", "--snapshot-file", join(path, "snapshot.json")]).status, 0);
-});
+
+function snapshot(run) { const visit = path => Object.fromEntries(readdirSync(path, { withFileTypes:true }).sort((a,b) => a.name.localeCompare(b.name)).map(entry => [entry.name, entry.isDirectory() ? visit(join(path, entry.name)) : readFileSync(join(path, entry.name)).toString("base64")])); return Object.fromEntries(["slide-bodies", "index.html", "slides", "render-manifest.json"].map(name => [name, statValue(join(run, name), visit)])); }
+function statValue(path, visit) { return isDirectory(path) ? visit(path) : readFileSync(path).toString("base64"); }
+function isDirectory(path) { try { return readdirSync(path), true; } catch { return false; } }

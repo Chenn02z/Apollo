@@ -3,11 +3,19 @@ import { appendFileSync, lstatSync, readFileSync, readdirSync, realpathSync, rea
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateRun } from "./validate-carousel-content.mjs";
+import { validateText } from "./validate-text.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const archive = join(root, "templates/database-blueprint");
 const layoutKeys = ["template", "motif", "slides"];
 const slideKeys = ["number", "composition", "density", "visualAnchor", "direction", "directionNote"];
+const fragmentContract = {
+  arrangements:["grid", "stack", "row", "split", "cluster", "center", "flow"],
+  htmlTags:["section", "div", "article", "figure", "figcaption", "p", "h3", "span", "strong", "em", "code", "pre", "ul", "ol", "li", "blockquote"],
+  svgTags:["svg", "g", "line", "polyline", "polygon", "rect", "circle", "ellipse"],
+  classes:["cp-body", "cp-layout-grid", "cp-layout-stack", "cp-layout-row", "cp-layout-split", "cp-layout-cluster", "cp-layout-center", "cp-layout-flow", "cp-density-sparse", "cp-density-standard", "cp-density-dense", "cp-group", "cp-statement", "cp-collection", "cp-comparison", "cp-sequence", "cp-timeline", "cp-example", "cp-checklist", "cp-node", "cp-annotation", "cp-connector", "cp-label", "cp-detail", "cp-emphasis", "cp-muted", "cp-code", "cp-list", "cp-gap-1", "cp-gap-2", "cp-gap-3", "cp-gap-4", "cp-span-1", "cp-span-2", "cp-span-3", "cp-span-4", "cp-diagram", "cp-pos-tl", "cp-pos-tc", "cp-pos-tr", "cp-pos-ml", "cp-pos-mc", "cp-pos-mr", "cp-pos-bl", "cp-pos-bc", "cp-pos-br", "cp-svg-canvas", "cp-svg-line", "cp-svg-line-muted", "cp-svg-node", "cp-svg-accent", "cp-svg-arrow"],
+};
+const capabilities = { compositions:["minimal", "editorial", "split", "grid", "flow", "focus"], densities:["sparse", "standard", "dense"], visualAnchors:["headline", "statement", "diagram", "sequence", "contrast", "collection"], directions:["centered", "top-down", "left-right", "radial"] };
 const exact = (value, keys) => value !== null && typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
 const fail = (code, path) => { throw new Error(`${code} ${path}`); };
 const stat = path => { try { return lstatSync(path); } catch { return null; } };
@@ -28,7 +36,8 @@ export function loadArchive() {
     const members = readdirSync(archive).sort();
     const value = JSON.parse(readFileSync(path, "utf8"));
     const assets = { css: join(archive, value.themeAssets?.css ?? ""), shell: join(archive, value.themeAssets?.shell ?? "") };
-    if (members.join() !== "examples,preview.html,template.json" || !regular(join(archive, "preview.html")) || stat(join(archive, "examples"))?.isSymbolicLink() || !stat(join(archive, "examples"))?.isDirectory() || !exact(value, ["version", "id", "theme", "themeAssets", "motifs", "capabilities"]) || value.version !== 1 || value.id !== "database-blueprint" || value.theme !== "database" || !exact(value.themeAssets, ["css", "shell"]) || value.themeAssets.css !== "../../assets/database/theme.css" || value.themeAssets.shell !== "../../assets/database/carousel-shell.html" || !Array.isArray(value.motifs) || value.motifs.join() !== "blueprint" || !exact(value.capabilities, ["compositions", "densities", "visualAnchors", "directions"]) || !regular(assets.css) || !regular(assets.shell) || realpathSync(assets.css) !== join(root, "assets/database/theme.css") || realpathSync(assets.shell) !== join(root, "assets/database/carousel-shell.html")) fail("LAYOUT_RUN_OR_ARCHIVE", path);
+    const vocabulary = value.fragmentVocabulary;
+    if (members.join() !== "examples,preview.html,template.json" || !regular(join(archive, "preview.html")) || stat(join(archive, "examples"))?.isSymbolicLink() || !stat(join(archive, "examples"))?.isDirectory() || !exact(value, ["version", "id", "theme", "themeAssets", "motifs", "capabilities", "fragmentVocabulary"]) || value.version !== 1 || value.id !== "database-blueprint" || value.theme !== "database" || !exact(value.themeAssets, ["css", "shell"]) || value.themeAssets.css !== "../../assets/database/theme.css" || value.themeAssets.shell !== "../../assets/database/carousel-shell.html" || !Array.isArray(value.motifs) || value.motifs.join() !== "blueprint" || !exact(value.capabilities, ["compositions", "densities", "visualAnchors", "directions"]) || Object.entries(capabilities).some(([key, expected]) => !Array.isArray(value.capabilities[key]) || value.capabilities[key].join() !== expected.join()) || !exact(vocabulary, ["version", "arrangements", "htmlTags", "svgTags", "classes"]) || vocabulary.version !== 1 || Object.entries(fragmentContract).some(([key, expected]) => !Array.isArray(vocabulary[key]) || vocabulary[key].join() !== expected.join()) || !regular(assets.css) || !regular(assets.shell) || realpathSync(assets.css) !== join(root, "assets/database/theme.css") || realpathSync(assets.shell) !== join(root, "assets/database/carousel-shell.html")) fail("LAYOUT_RUN_OR_ARCHIVE", path);
     return { value, path, assets: Object.values(assets) };
   } catch (error) { if (String(error.message).startsWith("LAYOUT_")) throw error; fail("LAYOUT_RUN_OR_ARCHIVE", path); }
 }
@@ -43,11 +52,17 @@ export function validateLayout(run, content) {
   if (layout.slides.length !== content.slides.length) fail("LAYOUT_SLIDE_COUNT", "$.slides");
   for (let index = 0; index < layout.slides.length; index++) {
     const slide = layout.slides[index], path = `$.slides[${index}]`;
-    if (!exact(slide, slideKeys)) fail("LAYOUT_SLIDE_SHAPE", path);
+    const keys = Object.hasOwn(slide, "repeatJustification") ? [...slideKeys, "repeatJustification"] : slideKeys;
+    if (!exact(slide, keys)) fail("LAYOUT_SLIDE_SHAPE", path);
     if (!Number.isInteger(slide.number) || typeof slide.composition !== "string" || typeof slide.density !== "string" || typeof slide.visualAnchor !== "string" || typeof slide.direction !== "string" || typeof slide.directionNote !== "string") fail("LAYOUT_SLIDE_TYPE", path);
     if (slide.number !== content.slides[index].number) fail("LAYOUT_SLIDE_IDENTITY", `${path}.number`);
     if (!template.capabilities.compositions.includes(slide.composition) || !template.capabilities.densities.includes(slide.density) || !template.capabilities.visualAnchors.includes(slide.visualAnchor) || !template.capabilities.directions.includes(slide.direction)) fail("LAYOUT_CAPABILITY", path);
     if (!slide.directionNote.trim() || slide.directionNote !== slide.directionNote.trim() || codePoints(slide.directionNote) > 280) fail("LAYOUT_NOTE", `${path}.directionNote`);
+    try { validateText(slide.directionNote, 280); } catch { fail("LAYOUT_NOTE", `${path}.directionNote`); }
+    if (Object.hasOwn(slide, "repeatJustification")) {
+      if (typeof slide.repeatJustification !== "string" || !slide.repeatJustification.trim() || slide.repeatJustification !== slide.repeatJustification.trim() || codePoints(slide.repeatJustification) > 280) fail("LAYOUT_NOTE", `${path}.repeatJustification`);
+      try { validateText(slide.repeatJustification, 280); } catch { fail("LAYOUT_NOTE", `${path}.repeatJustification`); }
+    }
   }
   return layout;
 }

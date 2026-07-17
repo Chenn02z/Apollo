@@ -14,6 +14,7 @@ Use `apollo-generate` to create and review structured content, then
 - `carousel-layout.json`
 - optionally, `carousel-content.initial.json` and `carousel-content.before-revision-2.json`
 - `carousel-review-1.json` through `carousel-review-3.json` for completed content reviews
+- `slide-bodies/`
 - `index.html`
 - `slides/`
 - `render-manifest.json`
@@ -37,11 +38,12 @@ Apollo is for creators making concise technical interview-preparation
 carousels. The first proof set is ACID properties, indexes, caching, REST vs
 GraphQL, and embeddings.
 
-The current render stage validates content, prepares an external boundary
+The render stage validates semantic content, prepares an external boundary
 snapshot, invokes `carousel-art-director` once to create `carousel-layout.json`,
-validates the plan and boundary, then uses the unchanged fixed-shell population
-and export path. Only constrained `carousel-composer` body fragments remain
-planned.
+then `carousel-composer` writes exact `slide-bodies/` fragments. Deterministic
+code binds escaped content into one fixed database shell, checks reserved-body
+containment in Playwright, and atomically publishes fragments, HTML, PNGs, and
+the manifest last.
 Research/citations, visual-review repair loops, publishing, scheduling,
 analytics, web UI, and authentication are deferred roadmap ideas. Generated
 imagery, an AI theme, and a theme taxonomy or plugin system remain out of
@@ -51,12 +53,13 @@ scope.
 
 `0001-adaptive-carousel-content` is user-Verified, including the bounded
 writer/reviewer/revision loop, and ends at validated `carousel-content.json`.
-`0002-deterministic-fixed-shell-rendering-baseline` is user-Verified: it is
-the current six-variant render/export baseline.
+`0002-deterministic-fixed-shell-rendering-baseline` is user-Verified: its
+historical six-variant render/export baseline preceded the fixed-shell migration.
 `0003-template-archive-and-carousel-art-direction` is user-Verified: the
 `database-blueprint` archive and closed art-direction plan are current.
-`0004-constrained-slide-composition` remains Draft. Content still carries
-current variant fields until `0004` is verified.
+`0004-constrained-slide-composition` is Verified: layout-neutral semantic
+content, constrained body fragments, fixed-shell assembly, and atomic export
+publication are live.
 
 Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
 playwright install chromium`. The renderer's targeted checks are `npm run

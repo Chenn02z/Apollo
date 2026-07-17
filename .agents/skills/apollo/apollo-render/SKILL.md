@@ -1,34 +1,37 @@
 ---
 name: apollo-render
-description: Validates one Apollo run, creates and validates its art-direction plan, populates the fixed shell, and exports it locally.
+description: Validates one Apollo run, directs and composes it once, then deterministically assembles and exports it.
 ---
 
 # Apollo Render
 
 Accept exactly one `runs/<run-id>/` directory.
 
-Run `node scripts/validate-carousel-content.mjs <run-dir>`. If it fails, stop.
-Do not invoke the art director, populate, export, or create a manifest.
+Run `node scripts/validate-carousel-content.mjs <run-dir>`. Stop on failure.
 
-Run `node scripts/validate-carousel-layout.mjs <run-dir> --prepare --snapshot-file <temporary-snapshot-path>`.
-This safely removes only a stale regular `carousel-layout.json`, then writes a
-deterministic boundary snapshot outside the run. If it fails, stop.
+Run `node scripts/validate-carousel-layout.mjs <run-dir> --prepare --snapshot-file <temporary-layout-snapshot>`.
+Delegate exactly once to `carousel-art-director` with the validated content,
+`templates/database-blueprint/template.json`, and `carousel-layout.json` as its
+only output. Do not retry or repair. Then run
+`node scripts/validate-carousel-layout.mjs <run-dir> --snapshot-file <temporary-layout-snapshot>`.
+Stop on failure.
 
-Delegate exactly once to `carousel-art-director` with the run path,
-`runs/<run-id>/carousel-content.json`,
-`templates/database-blueprint/template.json`, and
-`runs/<run-id>/carousel-layout.json` as its only allowed output. Do not retry
-or repair.
+Run `node scripts/compose-carousel.mjs <run-dir> --prepare --state-file <temporary-composition-state>`.
+This withholds the success manifest, backs up any prior complete four-member
+renderer set, creates the canonical empty `slide-bodies/`, and snapshots every
+protected path.
 
-Run `node scripts/validate-carousel-layout.mjs <run-dir> --snapshot-file <temporary-snapshot-path>`.
-It validates the write boundary and closed layout contract, records failures in
-the proof log, and stops before population or export on failure.
+Delegate exactly once to `carousel-composer` with the run path, validated
+content and layout paths, `templates/database-blueprint/template.json`, and the
+canonical `slide-bodies/` as its only write boundary. Do not retry or repair.
+If delegation fails, run
+`node scripts/compose-carousel.mjs <run-dir> --restore --state-file <temporary-composition-state>`
+and stop.
 
-Run `node scripts/populate-carousel.mjs <run-dir>`. It deterministically
-expands the repository-owned fixed shell with escaped, validated content. The
-existing fixed variants remain active. Do not delegate HTML authoring, retry,
-or repair.
+Run `node scripts/export-carousel.mjs <run-dir> --state-file <temporary-composition-state>`.
+It checks the protected boundary and exact fragment set, validates and binds the
+closed grammar, assembles the fixed shell, checks reserved-body containment,
+exports PNGs, and commits the manifest last. It restores the prior complete set
+or removes candidates on every failure. Do not retry or repair.
 
-Only after that command succeeds and writes its fresh valid `index.html`, run
-`node scripts/export-carousel.mjs <run-dir>`. If export fails, report failure
-without retrying; otherwise report the run path.
+Report the run path and any warning records from `proof-log.jsonl`.

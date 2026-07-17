@@ -42,7 +42,7 @@ main workflow calls for it.
 - `carousel-art-director`: writes only its delegated
   `runs/<run-id>/carousel-layout.json` artifact, exactly once; it does not
   write HTML, change content, retry, or repair.
-- `carousel-composer` (planned): writes only delegated
+- `carousel-composer`: runtime writer for exactly its delegated
   `runs/<run-id>/slide-bodies/<nn>.html` body fragments; it does not change
   content, templates, shell chrome, CSS, or export artifacts.
 

@@ -288,7 +288,7 @@
     <section class="hero">
       <div class="hero-grid">
         <div class="hero-copy">
-          <span class="eyebrow">Apollo · Content Stage Available</span>
+          <span class="eyebrow">Apollo · Pipeline Available</span>
           <h1>Turn one technical topic into a clear carousel.</h1>
           <p>
             Apollo turns a topic into an adaptive 7–10-slide carousel, with themed,
@@ -364,12 +364,13 @@
             <div class="journey-head">
               <div>
                 <h3>4. Compose constrained themed HTML</h3>
-                <p>Unchanged deterministic local tooling expands validated content into the repository-owned database shell.</p>
+                <p>A bounded composer writes fragments, then deterministic tooling binds them into the repository-owned database shell.</p>
               </div>
               <span class="status status-ready">Available</span>
             </div>
             <ul>
               <li>The local database theme pack is derived from the reference style and provides the approved shell, assets, and templates.</li>
+              <li><code>carousel-composer</code> writes exact run-local <code>slide-bodies/</code> fragments from validated semantic content and layout.</li>
               <li>Every slide renders at 1080×1350 pixels.</li>
               <li>Each carousel has 7–10 content-derived slides and permits no scripts, network access, or external assets.</li>
             </ul>
@@ -399,7 +400,7 @@
               <span class="status status-ready">Available</span>
             </div>
             <ul>
-              <li>Apollo checks structural content limits, slide count, image dimensions, ordered manifest paths, and browser overflow before publication.</li>
+              <li>Apollo checks structural content limits, fragment binding, slide count, image dimensions, ordered manifest paths, and browser containment before atomically publishing fragments, HTML, PNGs, and the manifest last.</li>
               <li>This first release does not promise automatic research, citations, vision review, or publishing.</li>
               <li>Up to three validated content reviews and two writer revisions improve publishability; initial content and each candidate get up to three writer attempts, unavailable or invalid review remains non-blocking, and human review is final.</li>
             </ul>
@@ -408,22 +409,23 @@
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>7. Grow body composition after art direction</h3>
-                <p>Content authoring, fixed-shell rendering, and art direction are verified; only constrained body-fragment composition remains planned.</p>
+                <h3>7. Use constrained body composition</h3>
+                <p>Content authoring, art direction, constrained fragments, fixed-shell rendering, and export are verified.</p>
               </div>
-              <span class="status status-growing">0001–0003 Verified</span>
+              <span class="status status-ready">0001–0004 Verified</span>
             </div>
             <ul>
               <li><code>0001-adaptive-carousel-content</code>: verified writer, reviewer, bounded revision, and validated 7–10-slide content.</li>
               <li><code>0002-deterministic-fixed-shell-rendering-baseline</code>: verified six-variant rendering and PNG export.</li>
-              <li><code>0003-template-archive-and-carousel-art-direction</code>: verified <code>database-blueprint</code> archive and closed layout plans; <code>0004-constrained-slide-composition</code> remains Draft.</li>
+              <li><code>0003-template-archive-and-carousel-art-direction</code>: verified <code>database-blueprint</code> archive and closed layout plans.</li>
+              <li><code>0004-constrained-slide-composition</code>: verified semantic content, constrained fragments, fixed-shell assembly, containment, and atomic publication.</li>
             </ul>
           </article>
         </div>
       </section>
 
       <section class="panel">
-        <h2>Current Stage and Planned MVP Capabilities</h2>
+        <h2>Current MVP Capabilities</h2>
         <div class="capability-grid">
           <article class="capability">
             <span class="stage">Input</span>
@@ -438,7 +440,7 @@
           <article class="capability">
             <span class="stage">Render</span>
             <h3>Use one consistent visual system</h3>
-            <p>Deterministically populated HTML uses one local database theme pack and reliable mobile dimensions.</p>
+            <p>Constrained fragments bind into one fixed local database shell at reliable mobile dimensions.</p>
           </article>
           <article class="capability">
             <span class="stage">Export</span>
@@ -457,20 +459,20 @@
           </article>
         </div>
         <p class="callout">
-          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code> and <code>carousel-layout.json</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>; initial content and each review-requested candidate get up to three writer attempts, while up to three validated, versioned reviews may trigger two candidate content revisions, each promoted only after validation. Apollo has no shell CLI or direct LLM API runtime.
+          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code> and <code>carousel-layout.json</code>, <code>slide-bodies/</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>; initial content and each review-requested candidate get up to three writer attempts, while up to three validated, versioned reviews may trigger two candidate content revisions, each promoted only after validation. Apollo has no shell CLI or direct LLM API runtime.
         </p>
       </section>
 
       <section class="panel">
-        <h2>Current and Planned Run Artifacts</h2>
+        <h2>Current Run Artifacts</h2>
         <div class="artifact-grid">
           <article class="artifact">
             <h3>Available: adaptive content</h3>
             <p><code>request.json</code> records the topic; <code>carousel-content.json</code> preserves the 7–10-slide narrative.</p>
           </article>
           <article class="artifact">
-            <h3>Available: render and images</h3>
-            <p><code>index.html</code>, <code>slides/</code>, and <code>render-manifest.json</code> preserve the rendered carousel.</p>
+            <h3>Available: fragments, render, and images</h3>
+            <p><code>slide-bodies/</code>, <code>index.html</code>, <code>slides/</code>, and <code>render-manifest.json</code> preserve the rendered carousel.</p>
           </article>
           <article class="artifact">
             <h3>Available: art direction</h3>
@@ -491,7 +493,7 @@
     <section class="footer">
       <h2>Scope Note</h2>
       <p>
-        Keep this map aligned with Apollo's actual user-facing capability. Promote planned work to current capability only after it is implemented and verified.
+        Keep this map aligned with Apollo's actual user-facing capability. Add future capability only after it is implemented and verified.
       </p>
     </section>
   </main>

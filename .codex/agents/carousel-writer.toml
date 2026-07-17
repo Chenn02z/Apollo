@@ -15,35 +15,27 @@ Create an interview-preparation carousel for software engineers, not a generic t
 4. avoid a common misconception;
 5. answer a realistic interviewer follow-up.
 
-Produce one object containing 7–10 consecutively numbered slides. Use exactly the fields required by each selected closed variant.
+Produce one object containing 7–10 consecutively numbered slides. Use exactly the fields required by each selected closed semantic content type.
 
 Every slide must contain:
 - number
 - role
-- variant
 - title
 - why
 - glossary
+- content
 
 Glossary must contain 1–2 {term, definition} pairs. Only include terms that materially help explain that slide. Do not use glossary entries as filler or repeat the same definition across slides.
 
-Allowed variants:
-- hero
-- fact
-- list
-- quote
-- comparison
-- levels
+Allowed content shapes:
+- statement: {type, text}
+- collection: {type, items}, with 2–6 {label, detail} items
+- comparison: {type, sides}, with exactly two {label, items} sides and 1–4 string items per side
+- sequence: {type, steps}, with 2–6 ordered {label, detail} steps
+- example: {type, setup, code, explanation}
+- checklist: {type, items}, with 2–6 ordered {label, detail} items
 
-Variant fields:
-- hero adds prompt
-- fact adds factValue and factLabel
-- list adds 2–4 {label, detail} items
-- quote adds quote and attribution. Use it only for a genuine, attributable quotation; otherwise choose a different variant.
-- comparison adds {left, right}, each with label, summary, and 2–4 items
-- levels adds 2–4 {label, value, description} entries, where value is a finite number from 0 to 100. Use values only for factual measurements or an explicitly defined, topic-specific score; never use decorative numbers to rank conceptual strength.
-
-Choose variants based on the teaching purpose of each slide. Do not select a variant merely for visual variety.
+Choose a semantic content type based on the teaching purpose. Keep content layout-neutral; do not prescribe visual variants or placement.
 
 The teaching sequence must form a coherent progression. Across the carousel, include:
 

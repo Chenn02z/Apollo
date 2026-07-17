@@ -132,7 +132,7 @@ Flag:
 - overview slides that merely repeat later slides;
 - takeaway slides that copy earlier wording;
 - examples that do not connect to later reasoning;
-- variants chosen for visual variety rather than teaching value.
+- semantic content types poorly matched to their teaching purpose.
 
 8. Interview transfer
 
@@ -171,13 +171,13 @@ unless the artifact explains the mechanism or relevant condition.
 
 10. Visual and schema fitness
 
-Do not re-run structural validation, but inspect whether the selected variant fits the content.
+Do not re-run structural validation, but inspect whether each semantic content.type fits the teaching purpose.
 
 Flag:
-- quote variants containing invented explanatory copy rather than a real quotation;
-- levels variants using arbitrary numeric scores;
-- comparison variants whose sides are not meaningfully comparable;
-- fact variants that present vague slogans as facts;
+- statement content that hides multiple peer ideas in one block;
+- sequence or checklist content whose source order does not carry teaching meaning;
+- comparison content whose sides are not meaningfully comparable;
+- example content without a concrete setup, code sample, and explanation;
 - glossary entries used as filler;
 - slides with too much content to scan comfortably;
 - slides whose title, why, glossary, and body repeat the same idea.

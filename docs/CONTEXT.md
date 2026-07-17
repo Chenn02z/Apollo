@@ -7,15 +7,15 @@
 - **Codex-native stage:** a bounded workflow stage entered through a Codex
   skill and performed by a Codex custom agent or deterministic local tool.
 - **run:** one generated output directory containing `request.json`,
-  `carousel-content.json`, `carousel-layout.json`, `index.html`, `slides/`, and `render-manifest.json`
-  as its stages complete; it may also contain preserved content artifacts and
-  versioned best-effort review artifacts.
+  `carousel-content.json`, `carousel-layout.json`, `slide-bodies/`, `index.html`,
+  `slides/`, and `render-manifest.json` as its stages complete; it may also
+  contain preserved content artifacts and versioned best-effort review artifacts.
 - **content artifact:** `carousel-content.json`, bounded plain-text teaching
   content whose 7–10 slides determine the rendered slide count. It is the
   verified authoring/review boundary. Initial generation gets up to three
-  writer attempts; validation removes an invalid selected artifact. Current
-  content retains its closed `variant` fields until the composition milestone
-  replaces that renderer contract.
+  writer attempts; validation removes an invalid selected artifact. Each slide
+  has layout-neutral semantic content from a closed content vocabulary; legacy
+  visual `variant` fields are rejected.
 - **content archives:** `carousel-content.initial.json` preserves the initial
   validated content before revision 1; `carousel-content.before-revision-2.json`
   preserves the next validated content before revision 2. Neither is overwritten.
@@ -29,12 +29,13 @@
   three reviews; a missing or invalid review is non-blocking and ends that loop.
 - **renderer stage:** `apollo-render` validates content, prepares an external
   snapshot of the protected boundary, delegates once to `carousel-art-director`,
-  validates the layout plan and boundary, then `scripts/populate-carousel.mjs`
-  deterministically expands the unchanged fixed local shell with escaped slots
-  before overflow checks, PNG export, and manifest creation.
-- **fixed-shell renderer:** the current implemented renderer: one local
-  `database` shell with six closed variants, fixed header/footer chrome, and
-  deterministic HTML, browser-layout, export, and publication checks.
+  validates the layout plan and boundary, then delegates once to
+  `carousel-composer` to write `slide-bodies/`. Deterministic code binds escaped
+  content into one fixed shell before browser containment checks, PNG export,
+  and atomic publication with the manifest last.
+- **fixed-shell renderer:** one local `database` shell with fixed
+  header/footer chrome and deterministic HTML, browser-layout, export, and
+  publication checks.
 - **carousel art director:** an LLM stage that reads validated content and the
   available template contract, records the v1 fixed `database-blueprint`
   template and `blueprint` motif, and writes only `carousel-layout.json` exactly
@@ -47,16 +48,17 @@
   `flow`, or `focus`; density is `sparse`, `standard`, or `dense`; visual anchor
   is `headline`, `statement`, `diagram`, `sequence`, `contrast`, or
   `collection`; direction is `centered`, `top-down`, `left-right`, or `radial`.
-  Motifs are closed values defined by the selected template contract.
-- **carousel composer (planned):** an LLM stage that turns validated content,
-  an approved layout plan, and a template contract into one safe slide-body
-  HTML fragment per slide. It cannot alter the shared shell, templates,
+  Motifs are closed values defined by the selected template contract. An
+  optional `repeatJustification` documents repeated dominant compositions beyond
+  the preferred limit; it produces a deterministic warning/review signal, not
+  a render rejection.
+- **carousel composer:** the runtime writer that turns validated content, an
+  approved layout plan, and a template contract into one closed-vocabulary
+  slide-body fragment per slide. It cannot alter the shared shell, templates,
   content claims, scripts, or external resources.
 - **template contract:** a repository-owned closed layout-capability contract
   for a named template: its fixed motif and accepted composition, density,
-  visual-anchor, and reading-direction vocabulary. Body tags, classes, SVG,
-  and visual primitives are reserved for `0004`'s constrained composition
-  contract.
+  visual-anchor, reading-direction, and fragment vocabulary.
 - **database theme pack:** the sole local 1080×1350 MVP visual system, derived
   from `docs/reference/html/index.html` and stored as canonical
   repository-owned assets and templates. The `database-blueprint` archive
@@ -81,8 +83,8 @@
 - The workflow produces a validated 7–10-slide content artifact, HTML, PNGs,
   and a manifest. Deterministic checks validate structural limits, dimensions,
   slide count, and rendered capacity before publication.
-- Template archive/art direction is current; constrained composition remains
-  the only planned milestone, not a current capability. Formal citations, visual review/repair,
+- Template archive, art direction, and constrained composition are current
+  capabilities. Formal citations, visual review/repair,
   and publishing/scheduling are deferred roadmap ideas.
   Generated imagery, an AI theme, theme taxonomy or plugins, unbounded retry
   or repair loops, analytics, web UI, and authentication remain out of scope.
@@ -91,14 +93,14 @@
 
 ## Maturity Gaps
 
-- `0003-template-archive-and-carousel-art-direction` is Verified and
-  `0004-constrained-slide-composition` remains Draft. The current art-direction
-  seam does not move shell, safety, or screenshot ownership out of deterministic code.
+- `0003-template-archive-and-carousel-art-direction` and
+  `0004-constrained-slide-composition` are Verified. The closed composition
+  boundary does not move shell, safety, or screenshot ownership out of
+  deterministic code.
 
 ## Workflow Boundaries
 
-- `0001-adaptive-carousel-content`, `0002`, and `0003` are Verified; `0004` is
-  Draft.
+- `0001-adaptive-carousel-content`, `0002`, `0003`, and `0004` are Verified.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries; this file owns durable
   terminology.

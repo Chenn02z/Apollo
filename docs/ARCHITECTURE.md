@@ -16,28 +16,28 @@ standalone LLM API client or runtime API key.
 ## Current Flow
 
 ```text
-topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → content validation → external snapshot preparation → carousel-art-director (once) → layout/boundary validation → populate-carousel → HTML/validated PNG/manifest
+topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → content validation → external snapshot preparation → carousel-art-director (once) → layout/boundary validation → carousel-composer → slide-bodies/ → deterministic binding/fixed shell → reserved-body validation → Playwright PNG export → atomic four-member publication (manifest last)
 ```
 
 ## Current Boundaries
 
 - **Run artifact boundary:** a run directory contains `request.json`,
-  `carousel-content.json`, `carousel-layout.json`, `index.html`, `slides/`, and `render-manifest.json`
-  as stages complete; it may also contain `carousel-content.initial.json`,
-  `carousel-content.before-revision-2.json`, and versioned
+  `carousel-content.json`, `carousel-layout.json`, `slide-bodies/`, `index.html`,
+  `slides/`, and `render-manifest.json` as stages complete; it may also contain
+  `carousel-content.initial.json`, `carousel-content.before-revision-2.json`, and versioned
   `carousel-review-1.json` through `carousel-review-3.json` artifacts.
-  Export stages PNGs before
-  atomically replacing the complete renderer artifact set only after every
-  content-derived screenshot succeeds. A failure preserves the prior complete
-  set, or leaves no success manifest.
+  The renderer atomically publishes `slide-bodies/`, `index.html`, `slides/`,
+  and `render-manifest.json` only after every content-derived screenshot
+  succeeds, with the manifest last. A failure preserves the prior complete set,
+  or leaves no success manifest.
 - **Content/layout/HTML boundary:** `carousel-content.json` holds plain-text,
   layout-ready 7–10-slide copy. Its slide array is the sole slide-count source
   for validation, HTML, PNG export, and manifest creation. `apollo-render`
   validates content, prepares an external protected-boundary snapshot, invokes
   `carousel-art-director` once to write only `carousel-layout.json`, validates
-  the plan and boundary, then runs `scripts/populate-carousel.mjs`, which
-  deterministically expands the unchanged fixed local shell into one HTML page
-  with escaped content slots.
+  the plan and boundary, then invokes `carousel-composer` to write only exact
+  `slide-bodies/` fragments. Deterministic code binds escaped content into one
+  fixed local shell.
 - **Theme/HTML boundary:** repository-owned visual assets, including vendored
   fonts, form one local 1080×1350 `database` theme pack. Output has 7–10
   ordered identifiable slides and uses only this pack, with no scripts, network
@@ -58,19 +58,15 @@ topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → 
   review is non-blocking and stops this loop; this stage does not render slides
   or replace deterministic validation.
 
-## Visual-Composition Seams
+## Closed Visual-Composition Boundaries
 
-`0003-template-archive-and-carousel-art-direction` is Verified. It adds the
-repository-owned `database-blueprint` archive and plans visual direction before
-the existing renderer; `0004-constrained-slide-composition` remains Draft.
+`0003-template-archive-and-carousel-art-direction` and
+`0004-constrained-slide-composition` are Verified. The closed flow is:
 
 ```text
-0003: carousel-content.json → content validation → external snapshot preparation
-      → carousel-art-director (once) → plan/boundary validation
-      → unchanged fixed-variant population/export → PNG/manifest
-
-0004: validated layout plan → carousel-composer → slide-bodies/<nn>.html
-      → fixed shell assembly → validation → Playwright PNG export
+validated semantic content + validated layout plan → carousel-composer
+→ slide-bodies/<nn>.html → deterministic escaped binding into one fixed shell
+→ reserved-body containment → Playwright export → atomic publication
 ```
 
 - `0003` records the sole `database-blueprint` template, a closed
@@ -85,14 +81,16 @@ the existing renderer; `0004-constrained-slide-composition` remains Draft.
   snapshot. An invalid or missing plan emits diagnostics, does not retry,
   stops before population/export, and preserves prior complete renderer
   artifacts.
-- `0004` introduces the composer. It creates only body fragments from the
-  selected template contract and validated layout plan. It may use approved
-  local SVG primitives; it cannot alter the header, footer, shell, CSS, scripts,
-  external resources, or validated teaching claims.
+- The composer creates only body fragments from the
+  selected template contract and validated layout plan, binding a closed
+  layout-neutral semantic payload rather than legacy `variant` fields. It may
+  use approved local SVG primitives; it cannot alter the header, footer, shell,
+  CSS, scripts, external resources, or validated teaching claims. Preferred
+  composition-repetition limits emit review warnings; a `repeatJustification`
+  records allowed repetitions beyond the limit without rejecting a safe render.
 
-Current closed variants remain until `0004` is verified, then the fixed-variant
-path is removed. The `0004` implementation spec must define the exact safe
-DOM/SVG policy and reserved-body measurement.
+The fixed-variant path is removed. The closed fragment vocabulary and
+reserved-body measurement remain owned by deterministic renderer code.
 
 ## Deferred Architecture
 
