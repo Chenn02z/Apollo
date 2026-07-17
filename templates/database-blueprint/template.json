@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "id": "database-blueprint",
+  "theme": "database",
+  "themeAssets": {
+    "css": "../../assets/database/theme.css",
+    "shell": "../../assets/database/carousel-shell.html"
+  },
+  "motifs": ["blueprint"],
+  "capabilities": {
+    "compositions": ["minimal", "editorial", "split", "grid", "flow", "focus"],
+    "densities": ["sparse", "standard", "dense"],
+    "visualAnchors": ["headline", "statement", "diagram", "sequence", "contrast", "collection"],
+    "directions": ["centered", "top-down", "left-right", "radial"]
+  }
+}

@@ -45,7 +45,7 @@ changes:
 Current milestone status: `0001-adaptive-carousel-content` is Verified,
 including bounded content review and revision;
 `0002-deterministic-fixed-shell-rendering-baseline` is Verified; and
-`0003-template-archive-and-carousel-art-direction` is Accepted; and
+`0003-template-archive-and-carousel-art-direction` is Verified; and
 `0004-constrained-slide-composition` remains Draft.
 
 Small documentation or cleanup tasks may skip a formal spec when the user makes

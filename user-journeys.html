@@ -348,8 +348,23 @@
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>3. Compose constrained themed HTML</h3>
-                <p>Deterministic local tooling expands validated content into the repository-owned database shell.</p>
+                <h3>3. Direct the carousel</h3>
+                <p>A bounded art director creates one validated visual plan before the fixed shell is populated.</p>
+              </div>
+              <span class="status status-ready">Available</span>
+            </div>
+            <ul>
+              <li>The current <code>database-blueprint</code> archive supplies the sole template contract and motif vocabulary.</li>
+              <li><code>carousel-art-director</code> writes only <code>carousel-layout.json</code>, exactly once, with no retry or repair.</li>
+              <li>Apollo validates content, prepares an external boundary snapshot, then validates the plan and boundary before population.</li>
+            </ul>
+          </article>
+
+          <article class="journey">
+            <div class="journey-head">
+              <div>
+                <h3>4. Compose constrained themed HTML</h3>
+                <p>Unchanged deterministic local tooling expands validated content into the repository-owned database shell.</p>
               </div>
               <span class="status status-ready">Available</span>
             </div>
@@ -363,7 +378,7 @@
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>4. Export shareable PNG slides</h3>
+                <h3>5. Export shareable PNG slides</h3>
                 <p>Browser rendering captures each slide exactly, without a per-pixel image-generation cost.</p>
               </div>
               <span class="status status-ready">Available</span>
@@ -378,7 +393,7 @@
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>5. Trust the basic checks</h3>
+                <h3>6. Trust the basic checks</h3>
                 <p>The MVP catches mechanical failures before presenting the carousel as complete.</p>
               </div>
               <span class="status status-ready">Available</span>
@@ -393,15 +408,15 @@
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>6. Grow visual composition after the baseline</h3>
-                <p>Content authoring, review, and fixed-shell rendering are verified; visual planning and constrained composition are next.</p>
+                <h3>7. Grow body composition after art direction</h3>
+                <p>Content authoring, fixed-shell rendering, and art direction are verified; only constrained body-fragment composition remains planned.</p>
               </div>
-              <span class="status status-growing">0001 and 0002 Verified</span>
+              <span class="status status-growing">0001–0003 Verified</span>
             </div>
             <ul>
               <li><code>0001-adaptive-carousel-content</code>: verified writer, reviewer, bounded revision, and validated 7–10-slide content.</li>
               <li><code>0002-deterministic-fixed-shell-rendering-baseline</code>: verified six-variant rendering and PNG export.</li>
-              <li><code>0003-template-archive-and-carousel-art-direction</code>: Accepted visual-planning stage; <code>0004-constrained-slide-composition</code> remains Draft.</li>
+              <li><code>0003-template-archive-and-carousel-art-direction</code>: verified <code>database-blueprint</code> archive and closed layout plans; <code>0004-constrained-slide-composition</code> remains Draft.</li>
             </ul>
           </article>
         </div>
@@ -442,7 +457,7 @@
           </article>
         </div>
         <p class="callout">
-          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>; initial content and each review-requested candidate get up to three writer attempts, while up to three validated, versioned reviews may trigger two candidate content revisions, each promoted only after validation. Apollo has no shell CLI or direct LLM API runtime.
+          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code> and <code>carousel-layout.json</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>; initial content and each review-requested candidate get up to three writer attempts, while up to three validated, versioned reviews may trigger two candidate content revisions, each promoted only after validation. Apollo has no shell CLI or direct LLM API runtime.
         </p>
       </section>
 
@@ -456,6 +471,10 @@
           <article class="artifact">
             <h3>Available: render and images</h3>
             <p><code>index.html</code>, <code>slides/</code>, and <code>render-manifest.json</code> preserve the rendered carousel.</p>
+          </article>
+          <article class="artifact">
+            <h3>Available: art direction</h3>
+            <p><code>carousel-layout.json</code> records the closed, validated plan from the current <code>database-blueprint</code> archive.</p>
           </article>
           <article class="artifact">
             <h3>Available: validation</h3>

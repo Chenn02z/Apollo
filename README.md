@@ -11,6 +11,7 @@ Use `apollo-generate` to create and review structured content, then
 
 - `request.json`
 - `carousel-content.json`
+- `carousel-layout.json`
 - optionally, `carousel-content.initial.json` and `carousel-content.before-revision-2.json`
 - `carousel-review-1.json` through `carousel-review-3.json` for completed content reviews
 - `index.html`
@@ -36,8 +37,11 @@ Apollo is for creators making concise technical interview-preparation
 carousels. The first proof set is ACID properties, indexes, caching, REST vs
 GraphQL, and embeddings.
 
-The next stages split visual planning from composition: a template archive and
-`carousel-art-director`, then constrained `carousel-composer` body fragments.
+The current render stage validates content, prepares an external boundary
+snapshot, invokes `carousel-art-director` once to create `carousel-layout.json`,
+validates the plan and boundary, then uses the unchanged fixed-shell population
+and export path. Only constrained `carousel-composer` body fragments remain
+planned.
 Research/citations, visual-review repair loops, publishing, scheduling,
 analytics, web UI, and authentication are deferred roadmap ideas. Generated
 imagery, an AI theme, and a theme taxonomy or plugin system remain out of
@@ -49,7 +53,8 @@ scope.
 writer/reviewer/revision loop, and ends at validated `carousel-content.json`.
 `0002-deterministic-fixed-shell-rendering-baseline` is user-Verified: it is
 the current six-variant render/export baseline.
-`0003-template-archive-and-carousel-art-direction` is Accepted;
+`0003-template-archive-and-carousel-art-direction` is user-Verified: the
+`database-blueprint` archive and closed art-direction plan are current.
 `0004-constrained-slide-composition` remains Draft. Content still carries
 current variant fields until `0004` is verified.
 

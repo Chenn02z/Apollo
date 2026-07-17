@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -12,8 +12,8 @@ deterministic shell or teaching content.
 ## Proposed Deliverable
 
 - Add one initial repository-owned `database-blueprint` template archive with
-  a machine-readable contract, local theme assets, composition examples, and a
-  static preview.
+  a machine-readable contract, references to canonical local theme assets,
+  composition examples, and a static preview.
 - Add `carousel-art-director`, invoked by `apollo-render`, to write only
   `runs/<run-id>/carousel-layout.json`.
 - Record one template and motif for the carousel, plus exactly one composition,
@@ -53,8 +53,8 @@ multi-template selection, generated assets, visual repair/retry loops, and the
 ## Archive Shape
 
 `templates/database-blueprint/` contains a machine-readable template contract,
-local theme assets, composition examples (visual references rather than closed
-HTML layouts), and a static preview.
+references to canonical local theme assets, composition examples (visual
+references rather than closed HTML layouts), and a static preview.
 
 ## Render-Failure and Artifact Policy
 

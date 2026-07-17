@@ -16,13 +16,13 @@ standalone LLM API client or runtime API key.
 ## Current Flow
 
 ```text
-topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → populate-carousel → HTML/validated PNG/manifest
+topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → content validation → external snapshot preparation → carousel-art-director (once) → layout/boundary validation → populate-carousel → HTML/validated PNG/manifest
 ```
 
 ## Current Boundaries
 
 - **Run artifact boundary:** a run directory contains `request.json`,
-  `carousel-content.json`, `index.html`, `slides/`, and `render-manifest.json`
+  `carousel-content.json`, `carousel-layout.json`, `index.html`, `slides/`, and `render-manifest.json`
   as stages complete; it may also contain `carousel-content.initial.json`,
   `carousel-content.before-revision-2.json`, and versioned
   `carousel-review-1.json` through `carousel-review-3.json` artifacts.
@@ -30,11 +30,14 @@ topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → 
   atomically replacing the complete renderer artifact set only after every
   content-derived screenshot succeeds. A failure preserves the prior complete
   set, or leaves no success manifest.
-- **Content/HTML boundary:** `carousel-content.json` holds plain-text,
+- **Content/layout/HTML boundary:** `carousel-content.json` holds plain-text,
   layout-ready 7–10-slide copy. Its slide array is the sole slide-count source
   for validation, HTML, PNG export, and manifest creation. `apollo-render`
-  runs `scripts/populate-carousel.mjs`, which deterministically expands the
-  fixed local shell into one HTML page with escaped content slots.
+  validates content, prepares an external protected-boundary snapshot, invokes
+  `carousel-art-director` once to write only `carousel-layout.json`, validates
+  the plan and boundary, then runs `scripts/populate-carousel.mjs`, which
+  deterministically expands the unchanged fixed local shell into one HTML page
+  with escaped content slots.
 - **Theme/HTML boundary:** repository-owned visual assets, including vendored
   fonts, form one local 1080×1350 `database` theme pack. Output has 7–10
   ordered identifiable slides and uses only this pack, with no scripts, network
@@ -57,14 +60,14 @@ topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → 
 
 ## Visual-Composition Seams
 
-`0003-template-archive-and-carousel-art-direction` is Accepted for
-specification. Its implementation will add a repository-owned
-`database-blueprint` archive and plan visual direction before the existing
-renderer; `0004-constrained-slide-composition` remains Draft.
+`0003-template-archive-and-carousel-art-direction` is Verified. It adds the
+repository-owned `database-blueprint` archive and plans visual direction before
+the existing renderer; `0004-constrained-slide-composition` remains Draft.
 
 ```text
-0003: carousel-content.json → carousel-art-director → carousel-layout.json
-      → plan validation → current fixed-variant rendering → PNG/manifest
+0003: carousel-content.json → content validation → external snapshot preparation
+      → carousel-art-director (once) → plan/boundary validation
+      → unchanged fixed-variant population/export → PNG/manifest
 
 0004: validated layout plan → carousel-composer → slide-bodies/<nn>.html
       → fixed shell assembly → validation → Playwright PNG export
@@ -74,10 +77,12 @@ renderer; `0004-constrained-slide-composition` remains Draft.
   template-specific motif, and one spatial composition, density, visual anchor,
   reading direction, and direction note per content slide. The archive wraps
   the existing `database` theme rather than adding another visual theme. The
-  director creates no HTML and cannot alter content.
+  director creates no HTML, cannot alter content, has `carousel-layout.json` as
+  its sole write, and is never retried or repaired.
 - `0003` validation deterministically rejects unknown template, motif,
   vocabulary, or capability values and missing, extra, duplicate, or mismatched
-  slide plans. An invalid or missing plan emits diagnostics, does not retry,
+  slide plans, and validates the protected boundary against its external
+  snapshot. An invalid or missing plan emits diagnostics, does not retry,
   stops before population/export, and preserves prior complete renderer
   artifacts.
 - `0004` introduces the composer. It creates only body fragments from the

@@ -39,9 +39,9 @@ main workflow calls for it.
 - `carousel-reviewer`: writes only its delegated
   `runs/<run-id>/carousel-review-<n>.json` artifact after `apollo-generate`
   validates content, where `<n>` is 1 through 3.
-- `carousel-art-director` (planned): writes only its delegated
-  `runs/<run-id>/carousel-layout.json` artifact; it does not write HTML or
-  change content.
+- `carousel-art-director`: writes only its delegated
+  `runs/<run-id>/carousel-layout.json` artifact, exactly once; it does not
+  write HTML, change content, retry, or repair.
 - `carousel-composer` (planned): writes only delegated
   `runs/<run-id>/slide-bodies/<nn>.html` body fragments; it does not change
   content, templates, shell chrome, CSS, or export artifacts.
