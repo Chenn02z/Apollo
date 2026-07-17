@@ -49,9 +49,9 @@ scope.
 writer/reviewer/revision loop, and ends at validated `carousel-content.json`.
 `0002-deterministic-fixed-shell-rendering-baseline` is user-Verified: it is
 the current six-variant render/export baseline.
-`0003-template-archive-and-carousel-art-direction` and
-`0004-constrained-slide-composition` are Draft. Content still carries current
-variant fields until `0004` is verified.
+`0003-template-archive-and-carousel-art-direction` is Accepted;
+`0004-constrained-slide-composition` remains Draft. Content still carries
+current variant fields until `0004` is verified.
 
 Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
 playwright install chromium`. The renderer's targeted checks are `npm run

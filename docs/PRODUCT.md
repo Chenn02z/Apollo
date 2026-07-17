@@ -76,8 +76,9 @@ dimensions with no deterministic overflow failures and no manual HTML editing.
 2. `0002-deterministic-fixed-shell-rendering-baseline` — Verified: current
    six-variant shell, deterministic validation, PNG export, and atomic
    publication.
-3. `0003-template-archive-and-carousel-art-direction` — Draft: one initial
-   `database-blueprint` template, template contracts, and `carousel-layout.json`.
+3. `0003-template-archive-and-carousel-art-direction` — Accepted contract for
+   one initial `database-blueprint` archive, spatial art direction, and
+   validated `carousel-layout.json` plans.
 4. `0004-constrained-slide-composition` — Draft: validated body fragments,
    locked deterministic shell assembly, and export integration.
 

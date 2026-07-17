@@ -34,10 +34,21 @@
 - **fixed-shell renderer:** the current implemented renderer: one local
   `database` shell with six closed variants, fixed header/footer chrome, and
   deterministic HTML, browser-layout, export, and publication checks.
-- **carousel art director (planned):** an LLM stage that reads validated
+- **carousel art director (accepted, not implemented):** an LLM stage that will
+  read validated
   content and available template contracts, selects the initial
-  `database-blueprint` template and carousel motif, and writes
-  `carousel-layout.json`; it does not create HTML or alter teaching content.
+  `database-blueprint` template and one template-specific carousel motif, and
+  writes only `carousel-layout.json`; it does not create HTML or alter teaching
+  content.
+- **layout plan:** `carousel-layout.json`, the validated art-direction artifact
+  specified for `0003`. It records one template and motif per carousel plus exactly one
+  per-content-slide plan with `composition`, `density`, `visualAnchor`,
+  `direction`, and non-empty `directionNote`. Composition is spatial planning,
+  not a semantic content variant: `minimal`, `editorial`, `split`, `grid`,
+  `flow`, or `focus`; density is `sparse`, `standard`, or `dense`; visual anchor
+  is `headline`, `statement`, `diagram`, `sequence`, `contrast`, or
+  `collection`; direction is `centered`, `top-down`, `left-right`, or `radial`.
+  Motifs are closed values defined by the selected template contract.
 - **carousel composer (planned):** an LLM stage that turns validated content,
   an approved layout plan, and a template contract into one safe slide-body
   HTML fragment per slide. It cannot alter the shared shell, templates,
@@ -47,7 +58,8 @@
   template.
 - **database theme pack:** the sole local 1080×1350 MVP visual system, derived
   from `docs/reference/html/index.html` and stored as repository-owned assets
-  and templates.
+  and templates. The `database-blueprint` archive wraps or reorganizes this
+  theme; it is not a second visual theme.
 - **constrained HTML contract:** 7–10 ordered identifiable 1080×1350 slides
   using approved local theme assets only, with no scripts, network access, or
   external assets.
@@ -68,8 +80,8 @@
 - The workflow produces a validated 7–10-slide content artifact, HTML, PNGs,
   and a manifest. Deterministic checks validate structural limits, dimensions,
   slide count, and rendered capacity before publication.
-- Template archive/art direction and constrained composition are planned
-  milestones, not current capabilities. Formal citations, visual review/repair,
+- Template archive/art direction is an Accepted milestone; constrained
+  composition remains a planned milestone, not a current capability. Formal citations, visual review/repair,
   and publishing/scheduling are deferred roadmap ideas.
   Generated imagery, an AI theme, theme taxonomy or plugins, unbounded retry
   or repair loops, analytics, web UI, and authentication remain out of scope.
@@ -78,14 +90,15 @@
 
 ## Maturity Gaps
 
-- `0003-template-archive-and-carousel-art-direction` and
-  `0004-constrained-slide-composition` open the next seams without moving
-  shell, safety, or screenshot ownership out of deterministic code.
+- `0003-template-archive-and-carousel-art-direction` is Accepted and
+  `0004-constrained-slide-composition` remains Draft; they open the next seams
+  without moving shell, safety, or screenshot ownership out of deterministic
+  code.
 
 ## Workflow Boundaries
 
-- `0001-adaptive-carousel-content` and `0002` are Verified; `0003` and `0004`
-  are Draft.
+- `0001-adaptive-carousel-content` and `0002` are Verified; `0003` is Accepted
+  and `0004` is Draft.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries; this file owns durable
   terminology.

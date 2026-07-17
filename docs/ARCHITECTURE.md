@@ -55,37 +55,39 @@ topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → 
   review is non-blocking and stops this loop; this stage does not render slides
   or replace deterministic validation.
 
-## Planned Visual-Composition Seams
+## Visual-Composition Seams
 
-Milestones `0003-template-archive-and-carousel-art-direction` and
-`0004-constrained-slide-composition` add two LLM stages between validated
-content and deterministic assembly:
+`0003-template-archive-and-carousel-art-direction` is Accepted for
+specification. Its implementation will add a repository-owned
+`database-blueprint` archive and plan visual direction before the existing
+renderer; `0004-constrained-slide-composition` remains Draft.
 
 ```text
-carousel-content.json → carousel-art-director → carousel-layout.json
-→ carousel-composer → slide-bodies/<nn>.html → fixed shell assembly
-→ validation → Playwright PNG export
+0003: carousel-content.json → carousel-art-director → carousel-layout.json
+      → plan validation → current fixed-variant rendering → PNG/manifest
+
+0004: validated layout plan → carousel-composer → slide-bodies/<nn>.html
+      → fixed shell assembly → validation → Playwright PNG export
 ```
 
-- `0003` introduces one repository-owned `database-blueprint` template archive,
-  its contract, and the art director. The art director selects that template,
-  a shared motif, per-slide composition, density, and visual anchor; it creates
-  no HTML and cannot alter content. Plan validation rejects unknown templates,
-  unsupported capabilities, and missing or extra slide plans.
-- `0004` introduces the composer. It creates only body fragments from the selected template contract
-  and the approved layout plan. It may use approved local SVG primitives; it
-  cannot alter the header, footer, shell, CSS, scripts, external resources, or
-  validated teaching claims.
-- Deterministic code validates the layout plan and body fragments, reserves the
-  body region between fixed header/footer chrome, assembles the shell, enforces
-  HTML/SVG safety and browser layout, and exports PNGs atomically.
+- `0003` records the sole `database-blueprint` template, a closed
+  template-specific motif, and one spatial composition, density, visual anchor,
+  reading direction, and direction note per content slide. The archive wraps
+  the existing `database` theme rather than adding another visual theme. The
+  director creates no HTML and cannot alter content.
+- `0003` validation deterministically rejects unknown template, motif,
+  vocabulary, or capability values and missing, extra, duplicate, or mismatched
+  slide plans. An invalid or missing plan emits diagnostics, does not retry,
+  stops before population/export, and preserves prior complete renderer
+  artifacts.
+- `0004` introduces the composer. It creates only body fragments from the
+  selected template contract and validated layout plan. It may use approved
+  local SVG primitives; it cannot alter the header, footer, shell, CSS, scripts,
+  external resources, or validated teaching claims.
 
-The initial template choice is recorded for reproducibility even though only
-one template ships first. Current closed variants remain until `0004` is
-verified, then the fixed-variant path is removed. Invalid plan or composer
-output fails with diagnostics; neither stage has an automatic retry/repair
-loop. The implementation spec must define the exact safe DOM/SVG policy and
-reserved-body measurement.
+Current closed variants remain until `0004` is verified, then the fixed-variant
+path is removed. The `0004` implementation spec must define the exact safe
+DOM/SVG policy and reserved-body measurement.
 
 ## Deferred Architecture
 
