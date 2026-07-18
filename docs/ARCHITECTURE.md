@@ -16,7 +16,7 @@ standalone LLM API client or runtime API key.
 ## Current Flow
 
 ```text
-topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → content validation → external snapshot preparation → carousel-art-director (once) → layout/boundary validation → carousel-composer → slide-bodies/ → deterministic binding/fixed shell → reserved-body validation → Playwright PNG export → atomic four-member publication (manifest last)
+topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → content validation → external snapshot preparation → carousel-art-director (once) → layout/boundary validation → carousel-composer → slide-bodies/ → safe-fragment validation/fixed shell → reserved-body validation → Playwright PNG export → atomic four-member publication (manifest last)
 ```
 
 ## Current Boundaries
@@ -31,20 +31,22 @@ topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → 
   succeeds, with the manifest last. A failure preserves the prior complete set,
   or leaves no success manifest.
 - **Content/layout/HTML boundary:** `carousel-content.json` holds plain-text,
-  layout-ready 7–10-slide copy. Its slide array is the sole slide-count source
-  for validation, HTML, PNG export, and manifest creation. `apollo-render`
-  validates content, prepares an external protected-boundary snapshot, invokes
-  `carousel-art-director` once to write only `carousel-layout.json`, validates
-  the plan and boundary, then invokes `carousel-composer` to write only exact
-  `slide-bodies/` fragments. Deterministic code binds escaped content into one
-  fixed local shell.
+  layout-ready 7–10-slide copy. Its slide array is the sole source of slide
+  count, order, and shell-owned topic, number, role, title, why, and glossary
+  fields. During composition, `slide.content` is a creative brief.
+  `apollo-render` validates content, prepares an external protected-boundary
+  snapshot, invokes `carousel-art-director` once to write validated creative
+  direction in `carousel-layout.json`, validates the plan and boundary, then
+  invokes `carousel-composer` to author body copy and arrangement in only the
+  exact `slide-bodies/` fragments. Deterministic code safely validates and
+  inserts those fragments into one fixed local shell.
 - **Theme/HTML boundary:** repository-owned visual assets, including vendored
   fonts, form one local 1080×1350 `database` theme pack. Output has 7–10
   ordered identifiable slides and uses only this pack, with no scripts, network
   access, or external assets.
-- **HTML/export boundary:** the renderer stage uses Playwright with network
-  routes aborted to deterministically screenshot each constrained slide to PNG;
-  it does not make visual or content decisions.
+- **HTML/export boundary:** the Playwright export step uses aborted network
+  routes to deterministically screenshot each assembled slide to PNG; that
+  export step does not make visual or content decisions.
 - **Validation boundary:** validation reports deterministic dimensions,
   content-derived slide count, and overflow failures independently from content
   generation; it validates structural limits, not semantic concreteness.
@@ -58,39 +60,36 @@ topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → 
   review is non-blocking and stops this loop; this stage does not render slides
   or replace deterministic validation.
 
-## Closed Visual-Composition Boundaries
+## Free-Flow Visual-Composition Boundary
 
 `0003-template-archive-and-carousel-art-direction` and
-`0004-constrained-slide-composition` are Verified. The closed flow is:
+`0004-constrained-slide-composition` remain historical Verified milestones.
+`0005-free-flow-slide-bodies` is Verified and defines the live flow:
 
 ```text
-validated semantic content + validated layout plan → carousel-composer
-→ slide-bodies/<nn>.html → deterministic escaped binding into one fixed shell
+validated content brief + validated layout direction → carousel-composer
+→ slide-bodies/<nn>.html → safe-fragment validation and fixed-shell assembly
 → reserved-body containment → Playwright export → atomic publication
 ```
 
-- `0003` records the sole `database-blueprint` template, a closed
-  template-specific motif, and one spatial composition, density, visual anchor,
-  reading direction, and direction note per content slide. The archive wraps
-  the existing `database` theme rather than adding another visual theme. The
-  director creates no HTML, cannot alter content, has `carousel-layout.json` as
-  its sole write, and is never retried or repaired.
-- `0003` validation deterministically rejects unknown template, motif,
-  vocabulary, or capability values and missing, extra, duplicate, or mismatched
-  slide plans, and validates the protected boundary against its external
-  snapshot. An invalid or missing plan emits diagnostics, does not retry,
-  stops before population/export, and preserves prior complete renderer
-  artifacts.
-- The composer creates only body fragments from the
-  selected template contract and validated layout plan, binding a closed
-  layout-neutral semantic payload rather than legacy `variant` fields. It may
-  use approved local SVG primitives; it cannot alter the header, footer, shell,
-  CSS, scripts, external resources, or validated teaching claims. Preferred
-  composition-repetition limits emit review warnings; a `repeatJustification`
-  records allowed repetitions beyond the limit without rejecting a safe render.
+- The sole `database-blueprint` template contract is version 2. It retains the
+  template identity, theme assets, motif, and layout-capability vocabulary and
+  has no `fragmentVocabulary`.
+- The art director creates no HTML, cannot alter content, has
+  `carousel-layout.json` as its sole write, and is never retried or repaired.
+  Deterministic validation still rejects invalid plans and protected-boundary
+  writes; a valid plan is creative direction rather than a DOM contract.
+- The composer authors final body copy and arrangement only in the exact
+  `slide-bodies/<nn>.html` set. Those files are the sole final rendered-body-copy
+  artifact. Their safe HTML/SVG may use arbitrary validated nesting, classes,
+  and inline layouts without binding, closed-vocabulary, claim-fidelity,
+  plan-to-DOM, or arrangement-warning requirements.
+- Deterministic code still owns exact shell fields, safe fragment acceptance and
+  insertion, the unchanged shell and chrome, visible body containment, network
+  abortion, 1080×1350 export, rollback, and manifest-last publication.
 
-The fixed-variant path is removed. The closed fragment vocabulary and
-reserved-body measurement remain owned by deterministic renderer code.
+`0005` opens only body-copy and arrangement authorship. No deterministic
+safety or shell seam opened or closed; no architecture seam closed.
 
 ## Deferred Architecture
 

@@ -42,9 +42,11 @@ main workflow calls for it.
 - `carousel-art-director`: writes only its delegated
   `runs/<run-id>/carousel-layout.json` artifact, exactly once; it does not
   write HTML, change content, retry, or repair.
-- `carousel-composer`: runtime writer for exactly its delegated
-  `runs/<run-id>/slide-bodies/<nn>.html` body fragments; it does not change
-  content, templates, shell chrome, CSS, or export artifacts.
+- `carousel-composer`: runtime writer that authors final body copy and
+  arrangement in exactly its delegated
+  `runs/<run-id>/slide-bodies/<nn>.html` fragments; it does not mutate the
+  content artifact, shell-owned fields, templates, canonical shell or theme
+  CSS, or export artifacts.
 
 Write-capable subagents must have disjoint file ownership. Use one
 `implementer` at a time unless an Accepted spec explicitly decomposes disjoint

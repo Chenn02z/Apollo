@@ -35,7 +35,7 @@ teaching meaning from carousel-content.json.
 
 Template and motif
 
-For version 1:
+For version 2:
 - template must be "database-blueprint";
 - motif must be "blueprint".
 
@@ -45,7 +45,7 @@ Visual vocabulary
 
 Use only values declared by template.json.
 
-Version-1 vocabulary is:
+Version-2 vocabulary is:
 
 composition:
 - minimal

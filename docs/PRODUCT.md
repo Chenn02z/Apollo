@@ -27,11 +27,12 @@ or invalid review ends that loop without blocking the run.
 `apollo-render` validates content, prepares an external protected-boundary
 snapshot, invokes `carousel-art-director` exactly once to create
 `carousel-layout.json`, validates the plan and boundary, then invokes
-`carousel-composer` to write exact `slide-bodies/` fragments. Deterministic
-code binds escaped content into one fixed database shell, verifies reserved-body
-containment in Playwright, and atomically publishes fragments, `index.html`,
-one 1080×1350 PNG per content slide in `slides/`, and `render-manifest.json`
-last.
+`carousel-composer` to author free-flow body copy and arrangement in exact
+`slide-bodies/` fragments. Deterministic code safely validates and inserts the
+fragments into one fixed database shell, preserves exact shell-owned fields,
+verifies reserved-body containment in Playwright, and atomically publishes
+fragments, `index.html`, one 1080×1350 PNG per content slide in `slides/`, and
+`render-manifest.json` last.
 
 The validated content artifact alone selects 7–10 slides. The workflow uses a
 custom-agent content pass with at most two review-driven rewrites, followed by
@@ -49,8 +50,9 @@ runtime API key.
   bounded work; Playwright owns deterministic image production.
 - **Meaning before pixels.** A writer and reviewer create validated structured
   content; the art director produces a validated carousel-wide layout plan;
-  the composer writes constrained fragments; deterministic local tooling binds
-  layout-neutral semantic units without changing their teaching content.
+  the composer treats content as a creative brief and layout as creative
+  direction while authoring free-flow bodies; deterministic local tooling
+  validates them and preserves the fixed shell.
 - **One idea per slide.** Keep technical explanations concise, diagram-led,
   and suitable for a phone screen.
 - **One visual identity first.** The reference-derived `database` theme pack
@@ -87,6 +89,9 @@ dimensions with no deterministic overflow failures and no manual HTML editing.
 4. `0004-constrained-slide-composition` — Verified: layout-neutral semantic
    content, validated constrained body fragments, locked deterministic shell
    assembly, and export integration.
+5. `0005-free-flow-slide-bodies` — Verified: composer-authored body copy and
+   arrangement, validated safe fragments, and unchanged fixed-shell, export,
+   rollback, and publication behavior.
 
 Research/citations, visual review/repair, and publishing/scheduling are
 deferred roadmap ideas, not active milestones.

@@ -15,8 +15,8 @@ const manifestFor = (runId, count) => ({ runId, width:1080, height:1350, slideCo
 const exactly = (value, keys) => value !== null && typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
 
 export function scanHtml(html, count) {
-  const css = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map(match => match[1]).join("\n").replace(/\\([0-9a-f]{1,6})\s?/gi, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16)));
-  if (/<\/?(?:script|link|base|meta|template)\b/i.test(html) || /\s(?:src|href|xlink:href|style|on[a-z]+|action|formaction|poster|data|cite|background|longdesc|usemap)\s*=/i.test(html) || /@import\b|url\s*\(|(?:overflow|overflow-x|overflow-y)\s*:\s*(?:hidden|clip)\b/i.test(css)) fail("ASSEMBLY_OUTPUT", "prohibited assembled HTML");
+  const css = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map(match => match[1]).join("\n").replace(/\\([0-9a-f]{1,6})\s?/gi, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16))), inlineStyles = [...html.matchAll(/\sstyle="([^"]*)"/gi)].map(match => match[1]).join("\n");
+  if (/<\/?(?:script|link|base|meta|template|form|input|button|select|textarea|iframe|frame)\b/i.test(html) || /\s(?:src|href|xlink:href|on[a-z]+|action|formaction|poster|data|cite|background|longdesc|usemap)\s*=/i.test(html) || /@import\b|url\s*\(|(?:overflow|overflow-x|overflow-y)\s*:\s*(?:hidden|clip)\b|javascript|vbscript|data:|expression|-moz-binding/i.test(css) || /url\s*\(|javascript|vbscript|data:|@import|expression|-moz-binding/i.test(inlineStyles)) fail("ASSEMBLY_OUTPUT", "prohibited assembled HTML");
   const stack = [], roots = []; let carousel = 0, dataSlides = 0, bodies = 0;
   for (const match of html.matchAll(/<\/?[A-Za-z][^>]*>/g)) {
     const tag = match[0]; if (tag.startsWith("</")) { stack.pop(); continue; }
@@ -47,11 +47,20 @@ async function inspectPage(page, html, count) {
       const number = index + 1, rootRect = root.getBoundingClientRect(), hosts = root.querySelectorAll(".slide-body"); if (hosts.length !== 1) { violations.push(`BODY_OVERFLOW slide ${number} /body: expected one reserved body`); return; }
       const host = hosts[0], hostRect = host.getBoundingClientRect(), hostOverflow = host.scrollWidth > host.clientWidth || host.scrollHeight > host.clientHeight; if (hostRect.width <= 0 || hostRect.height <= 0) violations.push(`BODY_OVERFLOW slide ${number} /body: reserved body has no positive area`);
       [host, ...host.querySelectorAll("*")].forEach(node => {
-        const style = getComputedStyle(node), svg = node instanceof SVGElement, path = node.getAttribute("data-binding") ?? (node === host ? "/body" : elementPath(host, node));
+        const style = getComputedStyle(node), svg = node instanceof SVGElement, path = node === host ? "/body" : elementPath(host, node);
         if (!svg) for (const property of ["overflow", "overflowX", "overflowY"]) if (["hidden", "clip"].includes(style[property])) violations.push(`BODY_OVERFLOW slide ${number} ${path}: prohibited ${property}`);
-        if (node === host || style.display === "none" || style.visibility === "hidden") return;
+        if (["fixed", "sticky"].includes(style.position) || style.display === "none" || ["hidden", "collapse"].includes(style.visibility) || style.contentVisibility === "hidden" || Number(style.opacity) === 0 || style.clipPath !== "none" || style.maskImage !== "none" || style.filter !== "none") violations.push(`BODY_OVERFLOW slide ${number} ${path}: hidden, clipped, or escaped content`);
+        if (node === host) return;
         for (const rect of node.getClientRects()) for (const [edge, actual, bound, low] of [["left",rect.left,hostRect.left,true],["top",rect.top,hostRect.top,true],["right",rect.right,hostRect.right,false],["bottom",rect.bottom,hostRect.bottom,false]]) if (low ? actual < bound - .5 : actual > bound + .5) violations.push(`BODY_OVERFLOW slide ${number} ${path}: crossed ${edge}`);
       });
+      const walker = document.createTreeWalker(host, NodeFilter.SHOW_TEXT); let textNode; const textIndexes = new Map();
+      while ((textNode = walker.nextNode())) if (/\S/u.test(textNode.nodeValue)) {
+        const parent = textNode.parentElement, index = textIndexes.get(parent) ?? 0, path = `${elementPath(host, parent)}:text(${index})`; textIndexes.set(parent, index + 1);
+        const range = document.createRange(); range.selectNodeContents(textNode); const rects = [...range.getClientRects()].filter(rect => rect.width > 0 && rect.height > 0), style = getComputedStyle(parent), color = style.color.match(/[\d.]+/g)?.map(Number) ?? [];
+        if (!rects.length || Number.parseFloat(style.fontSize) === 0 || Number.parseFloat(style.lineHeight) === 0 || color.length === 4 && color[3] === 0) violations.push(`BODY_OVERFLOW slide ${number} ${path}: invisible text`);
+        for (const rect of rects) for (const [edge, actual, bound, low] of [["left",rect.left,hostRect.left,true],["top",rect.top,hostRect.top,true],["right",rect.right,hostRect.right,false],["bottom",rect.bottom,hostRect.bottom,false]]) if (low ? actual < bound - .5 : actual > bound + .5) violations.push(`BODY_OVERFLOW slide ${number} ${path}: crossed ${edge}`);
+      }
+      host.querySelectorAll("line,polyline,polygon,rect,circle,ellipse").forEach(node => { const box = node.getBBox(), style = getComputedStyle(node), fill = style.fill !== "none" && Number(style.fillOpacity) * Number(style.opacity) > 0, stroke = style.stroke !== "none" && Number(style.strokeOpacity) * Number(style.opacity) > 0 && Number.parseFloat(style.strokeWidth) > 0; if (!(box.width > 0 || box.height > 0) || !fill && !stroke) violations.push(`BODY_OVERFLOW slide ${number} ${elementPath(host, node)}: invisible SVG geometry`); });
       if (hostOverflow) violations.push(`BODY_OVERFLOW slide ${number} /body: reserved body overflow`);
       [root, ...root.querySelectorAll("*")].forEach(node => { const style = getComputedStyle(node), rect = node.getBoundingClientRect(), path = node === root ? "/slide" : elementPath(root, node).replace("/body", "/slide"); if (node.scrollWidth > Math.ceil(rect.width) || node.scrollHeight > Math.ceil(rect.height)) violations.push(`RENDER_EXPORT slide ${number} ${path}: ${node.tagName.toLowerCase()} overflowed (${node.scrollWidth}x${node.scrollHeight} > ${Math.ceil(rect.width)}x${Math.ceil(rect.height)})`); if (node !== root && style.display !== "none" && style.visibility !== "hidden") for (const [actual,bound,low] of [[rect.left,rootRect.left,true],[rect.top,rootRect.top,true],[rect.right,rootRect.right,false],[rect.bottom,rootRect.bottom,false]]) if (low ? actual < bound : actual > bound) violations.push(`RENDER_EXPORT slide ${number} ${path}: descendant escaped slide`); });
     });
@@ -70,7 +79,7 @@ export async function inspectDom(html, count, { chromium } = {}) {
 export function pngSize(path) { const bytes = readFileSync(path); if (bytes.length < 24 || bytes.toString("ascii", 1, 4) !== "PNG" || bytes.toString("ascii", 12, 16) !== "IHDR") fail("RENDER_EXPORT", "invalid PNG"); return { width:bytes.readUInt32BE(16), height:bytes.readUInt32BE(20) }; }
 
 export async function verifyExport(runDirectory, { chromium } = {}) {
-  const run = resolve(runDirectory), content = validateRun(run), layout = validateLayout(run, content), { fragments } = validateFragmentSet(run, content, layout), canonical = assembleHtml(content, layout, fragments), path = join(run, "index.html");
+  const run = resolve(runDirectory), content = validateRun(run); validateLayout(run, content); const { fragments } = validateFragmentSet(run, content), canonical = assembleHtml(content, fragments), path = join(run, "index.html");
   if (!isFile(path) || readFileSync(path, "utf8") !== canonical) fail("ASSEMBLY_FIDELITY", "index.html differs from canonical recomputation");
   scanHtml(canonical, content.slides.length); if (!validManifest(run, content.slides.length)) fail("RENDER_PUBLICATION", "invalid complete renderer set"); await inspectDom(canonical, content.slides.length, { chromium }); return content;
 }
@@ -78,14 +87,14 @@ export async function verifyExport(runDirectory, { chromium } = {}) {
 export async function exportRun(runDirectory, { chromium, stateFile } = {}) {
   const run = resolve(runDirectory), state = readCompositionState(run, stateFile), stage = mkdtempSync(join(tmpdir(), "apollo-render-stage-")); let browser, published = false;
   try {
-    const { content, html, warnings } = validateComposition(run, state), count = content.slides.length; warnings.forEach(warning => logDiagnostic(run, { run, stage:"composer", ...warning })); scanHtml(html, count);
+    const { content, html } = validateComposition(run, state), count = content.slides.length; scanHtml(html, count);
     if (!chromium) ({ chromium } = await import("playwright")); browser = await chromium.launch(); const page = await browser.newPage({ viewport:{ width:1080, height:1350 }, deviceScaleFactor:1 }); await inspectPage(page, html, count);
     const stagedSlides = join(stage, "slides"); mkdirSync(stagedSlides);
     for (let index = 0; index < count; index++) { const locator = page.locator(`#carousel > section.carousel-slide[data-slide="${index + 1}"]`), box = await locator.evaluate(element => { const { width,height } = element.getBoundingClientRect(); return { width,height }; }); if (box.width !== 1080 || box.height !== 1350) fail("RENDER_EXPORT", `slide ${index + 1} dimensions`); await locator.screenshot({ path:join(stagedSlides, `slide-${String(index + 1).padStart(2, "0")}.png`) }); }
     await browser.close(); browser = null; for (const name of paths(count)) { const size = pngSize(join(stage, name)); if (size.width !== 1080 || size.height !== 1350) fail("RENDER_EXPORT", "staged PNG dimensions"); }
     const stagedHtml = join(stage, "index.html"), stagedManifest = join(stage, "render-manifest.json"); writeFileSync(stagedHtml, html); writeFileSync(stagedManifest, `${JSON.stringify(manifestFor(basename(run), count), null, 2)}\n`);
     rmSync(join(run, "index.html"), { force:true }); rmSync(join(run, "slides"), { recursive:true, force:true }); renameSync(stagedHtml, join(run, "index.html")); renameSync(stagedSlides, join(run, "slides"));
-    if (readFileSync(join(run, "index.html"), "utf8") !== assembleHtml(content, validateLayout(run, content), validateFragmentSet(run, content, validateLayout(run, content)).fragments)) fail("ASSEMBLY_FIDELITY", "published HTML mismatch");
+    validateLayout(run, content); if (readFileSync(join(run, "index.html"), "utf8") !== assembleHtml(content, validateFragmentSet(run, content).fragments)) fail("ASSEMBLY_FIDELITY", "published HTML mismatch");
     renameSync(stagedManifest, join(run, "render-manifest.json")); published = true; finishComposition(state, stateFile); return content;
   } catch (error) { restoreRenderer(run, state); logDiagnostic(run, { run, stage:"render", diagnostic:error.message }); throw error; }
   finally { if (browser) await browser.close(); if (existsSync(stage)) rmSync(stage, { recursive:true, force:true }); if (!published && state.backup && existsSync(state.backup)) rmSync(state.backup, { recursive:true, force:true }); }

@@ -39,11 +39,13 @@ carousels. The first proof set is ACID properties, indexes, caching, REST vs
 GraphQL, and embeddings.
 
 The render stage validates semantic content, prepares an external boundary
-snapshot, invokes `carousel-art-director` once to create `carousel-layout.json`,
-then `carousel-composer` writes exact `slide-bodies/` fragments. Deterministic
-code binds escaped content into one fixed database shell, checks reserved-body
-containment in Playwright, and atomically publishes fragments, HTML, PNGs, and
-the manifest last.
+snapshot, invokes `carousel-art-director` once to create validated creative
+direction in `carousel-layout.json`, then `carousel-composer` authors free-flow
+body copy and arrangement in exact `slide-bodies/` fragments. Deterministic
+code safely validates and inserts those fragments into the unchanged database
+shell, preserves shell-owned copy, checks reserved-body containment in
+Playwright, and atomically publishes fragments, HTML, PNGs, and the manifest
+last.
 Research/citations, visual-review repair loops, publishing, scheduling,
 analytics, web UI, and authentication are deferred roadmap ideas. Generated
 imagery, an AI theme, and a theme taxonomy or plugin system remain out of
@@ -57,9 +59,12 @@ writer/reviewer/revision loop, and ends at validated `carousel-content.json`.
 historical six-variant render/export baseline preceded the fixed-shell migration.
 `0003-template-archive-and-carousel-art-direction` is user-Verified: the
 `database-blueprint` archive and closed art-direction plan are current.
-`0004-constrained-slide-composition` is Verified: layout-neutral semantic
-content, constrained body fragments, fixed-shell assembly, and atomic export
-publication are live.
+`0004-constrained-slide-composition` is historically Verified: it established
+layout-neutral semantic content, constrained body fragments, fixed-shell
+assembly, and atomic export publication.
+`0005-free-flow-slide-bodies` is Verified and defines the live body-composition
+seam: composer-authored copy and arrangement with the fixed shell and
+deterministic safety, export, rollback, and publication boundaries preserved.
 
 Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
 playwright install chromium`. The renderer's targeted checks are `npm run
