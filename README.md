@@ -41,11 +41,14 @@ GraphQL, and embeddings.
 The render stage validates semantic content, prepares an external boundary
 snapshot, invokes `carousel-art-director` once to create validated creative
 direction in `carousel-layout.json`, then `carousel-composer` authors free-flow
-body copy and arrangement in exact `slide-bodies/` fragments. Deterministic
-code safely validates and inserts those fragments into the unchanged database
-shell, preserves shell-owned copy, checks reserved-body containment in
-Playwright, and atomically publishes fragments, HTML, PNGs, and the manifest
-last.
+body copy and arrangement in exact `slide-bodies/` fragments from the content,
+layout direction, and canonical shell only; new bodies cannot use legacy
+`cp-*` primitives. The art director and deterministic renderer retain the
+template and theme inputs. Deterministic code safely validates and inserts the
+fragments into the unchanged database shell, preserves shell-owned topic,
+number, role, title, why, glossary, and footer copy, checks reserved-body
+containment in Playwright, and atomically publishes fragments, HTML, PNGs, and
+the manifest last.
 Research/citations, visual-review repair loops, publishing, scheduling,
 analytics, web UI, and authentication are deferred roadmap ideas. Generated
 imagery, an AI theme, and a theme taxonomy or plugin system remain out of

@@ -10,16 +10,14 @@ Compose one complete fragment set for exactly one validated Apollo carousel.
 Inputs:
 - runs/<run-id>/carousel-content.json
 - runs/<run-id>/carousel-layout.json
-- templates/database-blueprint/template.json
 - assets/database/carousel-shell.html (read-only visual guidance)
-- assets/database/theme.css (read-only visual guidance)
 
 Write only the supplied canonical directory entries:
 - runs/<run-id>/slide-bodies/01.html through NN.html
 
 Write exactly one regular UTF-8 file per content slide, with two-digit numbering.
 Do not add directories, temporary files, hidden files, or any other artifact.
-Do not modify content, layout, histories, template assets, shell, CSS, index.html,
+Do not modify content, layout, histories, shell, index.html,
 slides, or render-manifest.json. Do not retry or repair.
 
 Treat each slide's content object as a creative brief and its layout entry as
@@ -31,7 +29,8 @@ Each file may contain one or more explicitly closed lowercase roots using only:
 section, div, article, figure, figcaption, p, h3, span, strong, em, code, pre,
 ul, ol, li, blockquote, svg, g, line, polyline, polygon, rect, circle, ellipse.
 Use arbitrary non-shell classes and validated inline styles when useful. Never
-emit style blocks, data-* attributes, IDs, scripts, events, forms, frames,
+emit class tokens beginning `cp-`, style blocks, data-* attributes, IDs,
+scripts, events, forms, frames,
 links, URLs, external resources, hidden or clipped content, fixed/sticky
 positioning, comments, implicit tags, or interactive markup. Encode literal &
 and < in text. Keep every rendered descendant visibly inside .slide-body.

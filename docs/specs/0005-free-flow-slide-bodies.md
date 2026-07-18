@@ -42,19 +42,19 @@ theme/HTML, HTML/export, validation, and publication boundaries.
 ## In Scope
 
 - Reprompt `carousel-composer` as a free-flow body implementer with read-only
-  visual guidance from the fixed shell and theme CSS and writes limited to the
-  exact run-local numbered body files.
+  access to the canonical shell and writes limited to the exact run-local
+  numbered body files. Do not provide the template contract or theme CSS.
 - Treat `slide.content` as a creative brief whose body copy may be rephrased,
   combined, omitted, or supplemented by the composer.
 - Treat `carousel-layout.json` as creative direction, not a DOM contract.
 - Bump the `database-blueprint` template contract to version 2 and remove its
   closed fragment vocabulary.
-- Accept arbitrary safe nesting, safe class names, agent-authored HTML text,
-  local SVG geometry, and validated inline styles.
+- Accept arbitrary safe nesting, non-reserved non-legacy class names,
+  agent-authored HTML text, local SVG geometry, and validated inline styles.
 - Retain exact-file, byte, UTF-8, symlink, protected-write, canonical-assembly,
   browser-containment, network-abort, export, rollback, and manifest-last
   checks.
-- Keep existing safe `cp-*` fragments valid under the open contract.
+- Reject `cp-*` classes from newly composed fragments.
 
 ## Out Of Scope
 
@@ -65,8 +65,10 @@ theme/HTML, HTML/export, validation, and publication boundaries.
 - Deterministic verification that composer-authored supporting claims reproduce
   or follow from `slide.content`.
 - A duplicate JSON artifact for final body copy or migration of completed runs.
-- Cleanup of now-unused `cp-*` theme CSS or changes to historical `0004`
-  milestone/spec records.
+- Cleanup of legacy `cp-*` CSS, which remains embedded in the canonical theme for
+  compatibility but is unreachable to newly validated slide bodies because
+  `cp-*` classes are rejected, or changes to historical `0004` milestone/spec
+  records.
 
 ## Architecture Seams
 
@@ -76,12 +78,13 @@ theme/HTML, HTML/export, validation, and publication boundaries.
 - **Layout handoff:** `carousel-layout.json` remains validated art direction.
   Its DOM arrangement is neither prescribed nor compared with a fragment.
 - **Composer boundary:** the composer receives validated content, validated
-  layout, and the version-2 template contract and writes only the exact
-  `slide-bodies/<nn>.html` set.
+  layout, and the canonical shell, but not the template contract or theme CSS,
+  and writes only the exact `slide-bodies/<nn>.html` set.
 - **Final body copy:** those HTML files are the sole final rendered-body-copy
   artifact. Deterministic assembly does not create a parallel copy artifact.
-- **Template/theme:** `database-blueprint`, the canonical shell, the `database`
-  theme assets, motif, and layout capabilities remain repository-owned.
+- **Template/theme:** `database-blueprint` and the `database` theme remain
+  art-director and deterministic-runtime inputs. The canonical shell is the
+  composer's only visual source.
 - **HTML/export:** deterministic code validates fragments, assembles the fixed
   shell, aborts browser network requests, measures visible containment, and
   exports PNGs.
@@ -121,15 +124,16 @@ not a compatibility branch for new renders.
 
 The composer prompt describes body authorship, the safe fragment boundary, and
 the ownership rules above. Its agent configuration grants read-only access to
-the canonical fixed shell and theme CSS for visual guidance. Its only runtime
-writes remain the delegated body files; it cannot change content, layout,
-history, template/archive, shell, theme, HTML, PNG, or manifest paths.
+the canonical fixed shell but not the template contract or theme CSS. Its only
+runtime writes remain the delegated body files; it cannot change content,
+layout, history, template/archive, shell, theme, HTML, PNG, or manifest paths.
 
 ### Invocation and exact output set
 
 The composer is invoked exactly once with the validated content path, validated
-layout path, version-2 template contract path, canonical shell/theme guidance,
-and delegated `slide-bodies/` path. There is no retry or repair.
+layout path, canonical shell path, and delegated `slide-bodies/` path. There is
+no retry or repair. The art director and deterministic runtime retain their
+version-2 template and theme inputs.
 
 For `N` slides its complete output is exactly:
 
@@ -203,17 +207,17 @@ event, resource, navigation, executable, form, frame, and unknown attribute is
 invalid.
 
 `class` is a nonempty ASCII-whitespace-separated list of unique tokens. Each
-token matches `[A-Za-z_][A-Za-z0-9_-]*`. Arbitrary matching tokens and existing
-`cp-*` tokens are allowed except these shell-reserved exact tokens:
+token matches `[A-Za-z_][A-Za-z0-9_-]*`. Arbitrary matching tokens are allowed
+except tokens beginning `cp-` and these shell-reserved exact tokens:
 
 ```text
 carousel-slide slide-content masthead brand section-label content tag
 why why-label slide-body glossary glossary-term glossary-definition footer
 ```
 
-Fragments cannot use reserved classes to impersonate or target fixed chrome.
-There is no required root class, semantic wrapper, `cp-*` vocabulary, class-to-
-element mapping, or plan-derived class.
+Fragments cannot use legacy `cp-*` primitives or reserved classes to impersonate
+or target fixed chrome. There is no required root class, semantic wrapper,
+class-to-element mapping, or plan-derived class.
 
 ### Safe SVG
 
@@ -343,10 +347,12 @@ stroke.
 
 ### Canonical assembly and browser safety
 
-The canonical shell and theme CSS are unchanged. Deterministic code escapes and
-inserts shell-owned content, then inserts each validated fragment only as
-children of its matching `.slide-body`. A fragment cannot wrap or replace the
-host. Assembly proves:
+The canonical shell and theme CSS are unchanged. Legacy `cp-*` CSS remains
+embedded in the canonical theme for compatibility but is unreachable to newly
+validated slide bodies because `cp-*` classes are rejected. Deterministic code
+escapes and inserts shell-owned content, then inserts each validated fragment
+only as children of its matching `.slide-body`. A fragment cannot wrap or replace
+the host. Assembly proves:
 
 - HTML slide count/order equals validated content.
 - Every shell-owned value and chrome node equals the canonical source.
@@ -444,8 +450,8 @@ ascending-slide browser checks, export, and publication.
 
 - Invalid content or layout still fails before composer invocation.
 - Missing, extra, nested, symlinked, oversized, invalid-UTF-8, malformed, unsafe,
-  resource-loading, hidden, clipped, or shell-impersonating fragments fail
-  before assembly or browser export as applicable.
+  resource-loading, hidden, clipped, legacy-class, or shell-impersonating
+  fragments fail before assembly or browser export as applicable.
 - A composer protected-write mutation fails before any fragment is trusted.
 - Browser repair, namespace change, body overflow, invisible content, network
   attempt, screenshot/dimension mismatch, canonical assembly mismatch, manifest
@@ -459,15 +465,16 @@ ascending-slide browser checks, export, and publication.
 
 ## Acceptance Criteria
 
-- Novel safe body nesting, arbitrary non-reserved class names, safe existing
-  `cp-*` fragments, local SVG, inline grid/flex/absolute layouts, and agent-
-  authored copy absent from content leaves all validate and render.
-- No `data-bind`, semantic wrapper, `cp-*` vocabulary, closed hierarchy,
-  plan-to-DOM, arrangement warning, or claim-fidelity requirement remains.
+- Novel safe body nesting, arbitrary non-reserved non-legacy class names, local
+  SVG, inline grid/flex/absolute layouts, and agent-authored copy absent from
+  content leaves all validate and render; `cp-*` classes fail validation.
+- No `data-bind`, semantic wrapper, closed hierarchy, plan-to-DOM, arrangement
+  warning, or claim-fidelity requirement remains.
 - Valid 7- and 10-slide runs preserve exact shell-owned topic, number, role,
   title, why, glossary, and chrome and export one 1080×1350 PNG per slide.
 - The version-2 template retains identity, assets, motif, and layout capabilities
-  and omits `fragmentVocabulary`.
+  and omits `fragmentVocabulary`; the art director and deterministic runtime
+  retain it while the composer does not receive it or the theme CSS.
 - Malformed markup, extra files, scripts, executable attributes, forms, frames,
   URLs, external assets, unsafe styles, invisible content, and overflow are
   rejected before successful publication.
@@ -479,10 +486,11 @@ ascending-slide browser checks, export, and publication.
 
 ## Verification
 
-- Add positive fragment cases for multiple roots, novel nesting/classes, all
-  allowed text references, arbitrary body copy, old safe `cp-*`, safe SVG, and
-  inline grid, flex, relative/absolute, typography, box, border, and SVG-paint
-  declarations.
+- Adjust existing positive fragment cases to use non-legacy classes and existing
+  class-rejection cases to cover `cp-*`; add no dedicated legacy-class test.
+- Retain positive fragment cases for multiple roots, novel nesting/classes, all
+  allowed text references, arbitrary body copy, safe SVG, and inline grid, flex,
+  relative/absolute, typography, box, border, and SVG-paint declarations.
 - Add table-driven negative cases for top-level text, malformed/implicit tags,
   browser reparenting or namespace changes, comments, invalid entities,
   disallowed tags/attributes, reserved classes, `data-bind`, scripts, handlers,

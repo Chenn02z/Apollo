@@ -37,13 +37,19 @@ topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → 
   `apollo-render` validates content, prepares an external protected-boundary
   snapshot, invokes `carousel-art-director` once to write validated creative
   direction in `carousel-layout.json`, validates the plan and boundary, then
-  invokes `carousel-composer` to author body copy and arrangement in only the
-  exact `slide-bodies/` fragments. Deterministic code safely validates and
-  inserts those fragments into one fixed local shell.
+  invokes `carousel-composer` with content, layout direction, and the canonical
+  shell to author body copy and arrangement in only the exact `slide-bodies/`
+  fragments. The composer does not receive the template contract or theme CSS.
+  Deterministic code safely validates and inserts those fragments into one fixed
+  local shell whose topic, number, role, title, why, glossary, header, and footer
+  remain shell-owned.
 - **Theme/HTML boundary:** repository-owned visual assets, including vendored
   fonts, form one local 1080×1350 `database` theme pack. Output has 7–10
   ordered identifiable slides and uses only this pack, with no scripts, network
-  access, or external assets.
+  access, or external assets. The art director and deterministic runtime retain
+  the template and theme inputs. Legacy `cp-*` CSS remains embedded in the
+  canonical theme for compatibility but is unreachable to newly validated slide
+  bodies because `cp-*` classes are rejected.
 - **HTML/export boundary:** the Playwright export step uses aborted network
   routes to deterministically screenshot each assembled slide to PNG; that
   export step does not make visual or content decisions.
@@ -78,18 +84,22 @@ validated content brief + validated layout direction → carousel-composer
 - The art director creates no HTML, cannot alter content, has
   `carousel-layout.json` as its sole write, and is never retried or repaired.
   Deterministic validation still rejects invalid plans and protected-boundary
-  writes; a valid plan is creative direction rather than a DOM contract.
+  writes; a valid plan is creative direction rather than a DOM contract. It
+  continues to use the template contract and theme.
 - The composer authors final body copy and arrangement only in the exact
   `slide-bodies/<nn>.html` set. Those files are the sole final rendered-body-copy
-  artifact. Their safe HTML/SVG may use arbitrary validated nesting, classes,
-  and inline layouts without binding, closed-vocabulary, claim-fidelity,
-  plan-to-DOM, or arrangement-warning requirements.
+  artifact. Its source inputs are validated content, validated layout direction,
+  and the canonical shell only. New fragments may use arbitrary validated
+  nesting, non-legacy classes, and inline layouts without binding,
+  claim-fidelity, plan-to-DOM, or arrangement-warning requirements; `cp-*`
+  classes are rejected.
 - Deterministic code still owns exact shell fields, safe fragment acceptance and
   insertion, the unchanged shell and chrome, visible body containment, network
   abortion, 1080×1350 export, rollback, and manifest-last publication.
 
-`0005` opens only body-copy and arrangement authorship. No deterministic
-safety or shell seam opened or closed; no architecture seam closed.
+`0005` opens body-copy and arrangement authorship while closing new composition
+off from the legacy primitive vocabulary. Deterministic safety, shell, export,
+rollback, and publication seams remain unchanged.
 
 ## Deferred Architecture
 

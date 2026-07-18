@@ -160,7 +160,7 @@ function validateAttributes(node, path) {
 }
 
 function validateClasses(node, path) {
-  const source = node.attrs.class, tokens = classes(node); if (!source.trim() || new Set(tokens).size !== tokens.length || tokens.some(token => !/^[A-Za-z_][A-Za-z0-9_-]*$/.test(token) || reservedClasses.has(token))) fail("FRAGMENT_CLASS", path, "invalid, duplicate, or reserved class");
+  const source = node.attrs.class, tokens = classes(node); if (!source.trim() || new Set(tokens).size !== tokens.length || tokens.some(token => !/^[A-Za-z_][A-Za-z0-9_-]*$/.test(token) || token.startsWith("cp-") || reservedClasses.has(token))) fail("FRAGMENT_CLASS", path, "invalid, duplicate, legacy, or reserved class");
 }
 const integer = value => /^(?:0|[1-9]\d*)$/.test(value ?? "") ? Number(value) : NaN;
 function validateSvg(node, path) {
@@ -188,7 +188,7 @@ function validateFragment(roots, path) {
     validateParents(rootNode, path); walk(rootNode, node => {
       validateAttributes(node, path); if (svgTags.has(node.tag)) svgCount++;
       if (geometry.has(node.tag)) {
-        const inherited = property => { for (let value = node; value; value = value.parent) if (value.style?.[property] !== undefined) return value.style[property]; }, fill = inherited("fill"), stroke = inherited("stroke"), width = inherited("stroke-width"), tokens = classes(node), pointArea = () => { const points = node.attrs.points?.split(" ").map(pair => pair.split(",").map(Number)) ?? []; return points.length >= 3 && Math.abs(points.reduce((sum, [x, y], index) => { const [nextX, nextY] = points[(index + 1) % points.length]; return sum + x * nextY - nextX * y; }, 0)) > 0; }, fillVisible = node.tag !== "line" && fill !== "none" && (!["polyline", "polygon"].includes(node.tag) || pointArea()), strokeVisible = stroke && stroke !== "none" && (!width || positiveNumber(width) || positiveLength(width)) || tokens.some(value => ["cp-svg-line", "cp-svg-line-muted", "cp-svg-node", "cp-svg-accent"].includes(value));
+        const inherited = property => { for (let value = node; value; value = value.parent) if (value.style?.[property] !== undefined) return value.style[property]; }, fill = inherited("fill"), stroke = inherited("stroke"), width = inherited("stroke-width"), pointArea = () => { const points = node.attrs.points?.split(" ").map(pair => pair.split(",").map(Number)) ?? []; return points.length >= 3 && Math.abs(points.reduce((sum, [x, y], index) => { const [nextX, nextY] = points[(index + 1) % points.length]; return sum + x * nextY - nextX * y; }, 0)) > 0; }, fillVisible = node.tag !== "line" && fill !== "none" && (!["polyline", "polygon"].includes(node.tag) || pointArea()), strokeVisible = stroke && stroke !== "none" && (!width || positiveNumber(width) || positiveLength(width));
         if (fillVisible || strokeVisible) paintedGeometry = true;
       }
     }); validateSvg(rootNode, path);

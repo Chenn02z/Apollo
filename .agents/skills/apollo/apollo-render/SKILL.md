@@ -22,9 +22,8 @@ renderer set, creates the canonical empty `slide-bodies/`, and snapshots every
 protected path.
 
 Delegate exactly once to `carousel-composer` with the run path, validated
-content and layout paths, `templates/database-blueprint/template.json`, and the
-canonical shell/theme as read-only visual guidance, with `slide-bodies/` as its
-only write boundary. Do not retry or repair.
+content and layout paths, and the canonical shell as read-only visual guidance,
+with `slide-bodies/` as its only write boundary. Do not retry or repair.
 If delegation fails, run
 `node scripts/compose-carousel.mjs <run-dir> --restore --state-file <temporary-composition-state>`
 and stop.

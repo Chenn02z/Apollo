@@ -36,8 +36,8 @@
   shell-owned copy, and performs browser containment checks, PNG export, and
   atomic publication with the manifest last.
 - **fixed-shell renderer:** one local `database` shell with fixed
-  header/footer chrome and deterministic HTML, browser-layout, export, and
-  publication checks.
+  header, footer, title, why, and glossary regions plus deterministic HTML,
+  browser-layout, export, and publication checks.
 - **carousel art director:** an LLM stage that reads validated content and the
   available template contract, records the version-2 `database-blueprint`
   template and `blueprint` motif, and writes only `carousel-layout.json` exactly
@@ -57,8 +57,9 @@
 - **carousel composer:** the runtime writer that turns validated content as a
   creative brief and the approved layout plan as creative direction into
   free-flow final body copy and arrangement in one `slide-bodies/<nn>.html`
-  fragment per slide. It cannot alter the shared shell, templates, shell-owned
-  fields, scripts, or external resources.
+  fragment per slide. It receives the canonical shell, not template or theme
+  sources, and new bodies cannot use the legacy `cp-*` vocabulary. It cannot
+  alter the shared shell, shell-owned fields, scripts, or external resources.
 - **template contract:** the repository-owned version-2 layout-capability
   contract for a named template: its fixed motif and accepted composition,
   density, visual-anchor, and reading-direction vocabulary. It has no fragment
@@ -66,7 +67,10 @@
 - **database theme pack:** the sole local 1080×1350 MVP visual system, derived
   from `docs/reference/html/index.html` and stored as canonical
   repository-owned assets and templates. The `database-blueprint` archive
-  references this theme; it is not a second visual theme.
+  references this theme; it is not a second visual theme. The art director and
+  renderer retain it, while legacy `cp-*` CSS remains embedded in the canonical
+  theme for compatibility but is unreachable to newly validated slide bodies
+  because `cp-*` classes are rejected.
 - **safe HTML contract:** 7–10 ordered identifiable 1080×1350 slides with
   validated self-contained HTML/SVG bodies, approved local theme assets only,
   and no scripts, network access, or external assets.
