@@ -80,6 +80,10 @@
   `interview` is optional.
 - **overflow diagnostic:** a deterministic rendering failure that identifies
   slide content exceeding its rendered bounds.
+- **body-underfill diagnostic:** a pending `0006` deterministic rendering
+  failure for qualifying visible text rectangles and painted SVG geometry whose
+  vertical span is below 70% of the `.slide-body` CSS content-box height. It is
+  geometric and remains distinct from agent and manual review of semantic depth.
 - **reference HTML:** `docs/reference/html/index.html`; source material for the
   `database` theme pack, not raw production runtime output.
 
@@ -106,11 +110,16 @@
   Verified. `0005` opens body-copy and arrangement authorship to the composer;
   shell, safety, containment, export, rollback, and publication ownership stay
   in deterministic code.
+- `0006-increase-slide-body-utilization` is Accepted but not implemented. It
+  plans richer briefs and semantic review plus a deterministic 70% qualifying
+  vertical-span check without changing schemas or workflow stages.
 
 ## Workflow Boundaries
 
 - `0001-adaptive-carousel-content`, `0002`, `0003`, `0004`, and `0005` are
   Verified.
+- `0006-increase-slide-body-utilization` is Accepted; implementation remains
+  unauthorized until its spec is Accepted.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries; this file owns durable
   terminology.

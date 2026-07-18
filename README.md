@@ -68,6 +68,9 @@ assembly, and atomic export publication.
 `0005-free-flow-slide-bodies` is Verified and defines the live body-composition
 seam: composer-authored copy and arrangement with the fixed shell and
 deterministic safety, export, rollback, and publication boundaries preserved.
+`0006-increase-slide-body-utilization` is Accepted and pending implementation;
+it plans richer slide briefs plus a 70% qualifying body-span check, while
+`0005` remains the live contract.
 
 Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
 playwright install chromium`. The renderer's targeted checks are `npm run

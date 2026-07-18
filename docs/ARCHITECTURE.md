@@ -101,6 +101,24 @@ validated content brief + validated layout direction → carousel-composer
 off from the legacy primitive vocabulary. Deterministic safety, shell, export,
 rollback, and publication seams remain unchanged.
 
+## Accepted Body-Utilization Seam (Pending Implementation)
+
+`0005-free-flow-slide-bodies` remains the live Verified composition contract.
+Accepted milestone `0006-increase-slide-body-utilization` plans to strengthen
+that seam after its spec is Accepted and implemented:
+
+- Writer briefs will carry one concrete core idea plus two distinct,
+  nonredundant supports, and the existing reviewer will request revision when
+  that semantic minimum is missing.
+- The existing `sparse` density will mean fewer, larger elements distributed
+  through the body, while the composer preserves nonredundant teaching points
+  and distributes qualifying geometry through at least 70% of body height.
+- The composer's existing single correction opportunity and the fresh
+  prepublication check will use the same qualifying vertical-span measurement
+  against canonical staged HTML.
+- Existing schemas, agents, dependencies, correction count, fixed shell,
+  rollback boundary, and manifest-last publication remain unchanged.
+
 ## Deferred Architecture
 
 - Research/citation, visual review/repair, and publishing/scheduling are

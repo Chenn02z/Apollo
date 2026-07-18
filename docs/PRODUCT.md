@@ -92,6 +92,10 @@ dimensions with no deterministic overflow failures and no manual HTML editing.
 5. `0005-free-flow-slide-bodies` — Verified: composer-authored body copy and
    arrangement, validated safe fragments, and unchanged fixed-shell, export,
    rollback, and publication behavior.
+6. `0006-increase-slide-body-utilization` — Accepted, pending implementation:
+   every slide brief will contain one concrete core idea plus two distinct,
+   nonredundant supports, and qualifying visible body geometry will span at
+   least 70% of body height.
 
 Research/citations, visual review/repair, and publishing/scheduling are
 deferred roadmap ideas, not active milestones.

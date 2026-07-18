@@ -48,6 +48,8 @@ including bounded content review and revision;
 `0003-template-archive-and-carousel-art-direction` is Verified; and
 `0004-constrained-slide-composition` is Verified; and
 `0005-free-flow-slide-bodies` is Verified.
+`0006-increase-slide-body-utilization` is Accepted; spec authoring is
+authorized, but implementation remains unauthorized until the spec is Accepted.
 
 Small documentation or cleanup tasks may skip a formal spec when the user makes
 that explicit or when the change is obviously local and reversible.
