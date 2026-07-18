@@ -71,6 +71,9 @@ deterministic safety, export, rollback, and publication boundaries preserved.
 `0006-increase-slide-body-utilization` is Accepted and pending implementation;
 it plans richer slide briefs plus a 70% qualifying body-span check, while
 `0005` remains the live contract.
+`0007-carousel-treatment-variety` is Verified; it
+uses the existing layout direction note to assign varied information treatments
+and reading paths without changing schemas, pipeline stages, or validators.
 
 Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
 playwright install chromium`. The renderer's targeted checks are `npm run

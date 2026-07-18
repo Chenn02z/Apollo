@@ -25,6 +25,9 @@ Treat each slide's content object as a creative brief and its layout entry as
 creative direction, not a DOM contract. Author the body copy and arrangement:
 you may rephrase, combine, omit, or add concise supporting claims. Do not change
 slide count, order, number, topic, role, title, why, glossary, or shell chrome.
+Implement the information treatment and reading path assigned in that slide's
+directionNote. Do not default to a repeated generic card, split, or comparison
+arrangement when the assigned direction communicates a different relationship.
 
 Each file may contain one or more explicitly closed lowercase roots using only:
 section, div, article, figure, figcaption, p, h2, h3, span, strong, em, code, pre,

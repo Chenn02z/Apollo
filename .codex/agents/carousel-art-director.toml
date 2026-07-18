@@ -88,6 +88,16 @@ Carousel-level planning
 
 Plan the carousel as one visual sequence, not as isolated slides.
 
+Before writing per-slide direction, assign each slide an information treatment
+and reading path that fit its teaching relationship. Treatments may include a
+causal sequence, annotated rule, decision path, before-and-after
+transformation, trade-off matrix, layered model, timeline, or side-by-side
+contrast; these are examples, not new vocabulary values or layout fields.
+Prefer a different treatment when it improves the slide's semantic
+relationship, not as forced novelty. A treatment may repeat only when that
+slide's directionNote explains the semantic need or deliberate carousel rhythm;
+repeatJustification does not convey or justify this treatment decision.
+
 Create visual rhythm by:
 - avoiding the same composition on adjacent slides unless strongly justified;
 - avoiding one composition on more than two slides where practical;
@@ -175,9 +185,11 @@ Supporting ideas surround one central concept.
 Direction note
 
 For every slide, write one concise directionNote that tells the composer:
+- the assigned information treatment;
 - what should dominate visually;
 - how the supplied content should be grouped;
-- what reading path or relationship should be communicated.
+- the reading path or relationship to communicate;
+- when repeating a treatment, the semantic need or deliberate carousel rhythm.
 
 The note must:
 - be specific to that slide;

@@ -51,14 +51,18 @@
   is `headline`, `statement`, `diagram`, `sequence`, `contrast`, or
   `collection`; direction is `centered`, `top-down`, `left-right`, or `radial`.
   Motifs are closed values defined by the selected template contract. The plan
-  is validated creative direction, not a DOM arrangement contract. An optional
+  is validated creative direction, not a DOM arrangement contract. `0007` uses
+  `directionNote` to assign each slide's information treatment and
+  reading path across the carousel, with justified repetition allowed. An optional
   valid `repeatJustification` is accepted and ignored after plan validation;
   repeated body arrangements produce no deterministic warning.
 - **carousel composer:** the runtime writer that turns validated content as a
   creative brief and the approved layout plan as creative direction into
   free-flow final body copy and arrangement in one `slide-bodies/<nn>.html`
   fragment per slide. It receives the canonical shell, not template or theme
-  sources, and new bodies cannot use the legacy `cp-*` vocabulary. It cannot
+  sources, and new bodies cannot use the legacy `cp-*` vocabulary. `0007`
+  directs it to implement the assigned treatment and reading path rather
+  than default to a minimum repeated body structure. It cannot
   alter the shared shell, shell-owned fields, scripts, or external resources.
 - **template contract:** the repository-owned version-2 layout-capability
   contract for a named template: its fixed motif and accepted composition,
@@ -113,6 +117,9 @@
 - `0006-increase-slide-body-utilization` is Accepted but not implemented. It
   plans richer briefs and semantic review plus a deterministic 70% qualifying
   vertical-span check without changing schemas or workflow stages.
+- `0007-carousel-treatment-variety` is Verified. It provides prompt-only
+  carousel-level treatment and reading-path variety through the
+  existing `directionNote`, without schema, pipeline, or validator changes.
 
 ## Workflow Boundaries
 
@@ -120,6 +127,7 @@
   Verified.
 - `0006-increase-slide-body-utilization` is Accepted; implementation remains
   unauthorized until its spec is Accepted.
+- `0007-carousel-treatment-variety` is Verified.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries; this file owns durable
   terminology.

@@ -119,6 +119,21 @@ that seam after its spec is Accepted and implemented:
 - Existing schemas, agents, dependencies, correction count, fixed shell,
   rollback boundary, and manifest-last publication remain unchanged.
 
+## Current Carousel-Treatment Variety Seam
+
+Verified milestone `0007-carousel-treatment-variety` is a prompt-only
+extension to the existing art-direction/composition seam:
+
+- The art director assigns carousel-level information treatments and
+  reading paths in each existing `directionNote`, avoiding accidental repeats
+  when slide semantics permit a distinct treatment.
+- The composer implements that direction rather than defaulting to a
+  minimum repeated body structure; justified semantic or rhythmic repetition
+  remains allowed.
+- Existing schemas, agents, pipeline order, validators, retry and correction
+  counts, fixed shell, export, rollback, and publication boundaries remain
+  unchanged; deterministic code will not judge visual novelty.
+
 ## Deferred Architecture
 
 - Research/citation, visual review/repair, and publishing/scheduling are

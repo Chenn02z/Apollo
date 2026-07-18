@@ -49,7 +49,8 @@ runtime API key.
 - **Codex-native stages.** Skills enter the workflow and custom agents perform
   bounded work; Playwright owns deterministic image production.
 - **Meaning before pixels.** A writer and reviewer create validated structured
-  content; the art director produces a validated carousel-wide layout plan;
+  content; the art director produces a validated carousel-wide layout plan and
+  varied information treatments and reading paths;
   the composer treats content as a creative brief and layout as creative
   direction while authoring free-flow bodies; deterministic local tooling
   validates them and preserves the fixed shell.
@@ -96,6 +97,10 @@ dimensions with no deterministic overflow failures and no manual HTML editing.
    every slide brief will contain one concrete core idea plus two distinct,
    nonredundant supports, and qualifying visible body geometry will span at
    least 70% of body height.
+7. `0007-carousel-treatment-variety` — Verified: existing layout direction
+   notes assign varied information treatments
+   and reading paths for the composer to implement, with no new schema or
+   deterministic novelty check.
 
 Research/citations, visual review/repair, and publishing/scheduling are
 deferred roadmap ideas, not active milestones.
