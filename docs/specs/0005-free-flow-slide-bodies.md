@@ -131,9 +131,12 @@ layout, history, template/archive, shell, theme, HTML, PNG, or manifest paths.
 ### Invocation and exact output set
 
 The composer is invoked exactly once with the validated content path, validated
-layout path, canonical shell path, and delegated `slide-bodies/` path. There is
-no retry or repair. The art director and deterministic runtime retain their
-version-2 template and theme inputs.
+layout path, canonical shell path, and delegated `slide-bodies/` path. Before
+yielding, it runs `node scripts/compose-carousel.mjs <run-dir> --check`. It may
+make one correction limited to those body files and run one final check; after
+two checks total it stops. There is no external retry or repair. The art
+director and deterministic runtime retain their version-2 template and theme
+inputs.
 
 For `N` slides its complete output is exactly:
 
@@ -172,9 +175,11 @@ tokens, and disallowed control characters are invalid.
 Allowed HTML tags are:
 
 ```text
-section div article figure figcaption p h3 span strong em code pre
+section div article figure figcaption p h2 h3 span strong em code pre
 ul ol li blockquote
 ```
+
+`br` is disallowed; body spacing is controlled by the fragment layout and CSS.
 
 Allowed SVG tags are:
 

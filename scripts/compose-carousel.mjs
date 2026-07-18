@@ -11,7 +11,7 @@ const stat = path => { try { return lstatSync(path); } catch { return null; } };
 const regular = path => { const value = stat(path); return value?.isFile() && !value.isSymbolicLink(); };
 const directory = path => { const value = stat(path); return value?.isDirectory() && !value.isSymbolicLink(); };
 const escape = value => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
-const htmlTags = new Set(["section", "div", "article", "figure", "figcaption", "p", "h3", "span", "strong", "em", "code", "pre", "ul", "ol", "li", "blockquote"]);
+const htmlTags = new Set(["section", "div", "article", "figure", "figcaption", "p", "h2", "h3", "span", "strong", "em", "code", "pre", "ul", "ol", "li", "blockquote"]);
 const svgTags = new Set(["svg", "g", "line", "polyline", "polygon", "rect", "circle", "ellipse"]);
 const geometry = new Set(["line", "polyline", "polygon", "rect", "circle", "ellipse"]);
 const reservedClasses = new Set(["carousel-slide", "slide-content", "masthead", "brand", "section-label", "content", "tag", "why", "why-label", "slide-body", "glossary", "glossary-term", "glossary-definition", "footer"]);
@@ -132,7 +132,8 @@ function decoded(source) { return source.replace(/&(?:amp|lt|gt|quot|apos|nbsp|#
 function walk(node, visit) { if (node.tag) visit(node); node.children?.forEach(child => walk(child, visit)); }
 const elementChildren = node => node.children.filter(child => child.tag);
 const classes = node => node.attrs.class?.trim().split(/[\t\n\r ]+/) ?? [];
-const pClosers = new Set(["section", "div", "article", "figure", "figcaption", "blockquote", "p", "h3", "pre", "ul", "ol", "li"]);
+const pClosers = new Set(["section", "div", "article", "figure", "figcaption", "blockquote", "p", "h2", "h3", "pre", "ul", "ol", "li"]);
+const headings = new Set(["h2", "h3"]);
 function validateParents(node, path, ancestors = []) {
   const parent = node.parent?.tag;
   if (node.tag === "svg") { if (parent && !htmlTags.has(parent)) fail("FRAGMENT_TAG", path, "svg must be top-level or inside HTML"); }
@@ -140,7 +141,7 @@ function validateParents(node, path, ancestors = []) {
   else if (geometry.has(node.tag)) { if (!["svg", "g"].includes(parent)) fail("FRAGMENT_TAG", path, "geometry must be inside svg or g"); }
   else if (svgTags.has(parent)) fail("FRAGMENT_TAG", path, "HTML cannot be inside SVG");
   if (geometry.has(node.tag) && elementChildren(node).length) fail("FRAGMENT_TAG", path, "geometry must be empty");
-  if (ancestors.includes("p") && pClosers.has(node.tag) || node.tag === "h3" && ancestors.includes("h3") || node.tag === "li" && ancestors.includes("li")) fail("FRAGMENT_SYNTAX", path, "browser would repair nesting");
+  if (ancestors.includes("p") && pClosers.has(node.tag) || headings.has(node.tag) && ancestors.some(tag => headings.has(tag)) || node.tag === "li" && ancestors.includes("li")) fail("FRAGMENT_SYNTAX", path, "browser would repair nesting");
   for (const child of elementChildren(node)) {
     if (node.tag === "svg" && child.tag !== "g" && !geometry.has(child.tag) || node.tag === "g" && !geometry.has(child.tag)) fail("FRAGMENT_TAG", path, `${child.tag} cannot be inside ${node.tag}`);
     validateParents(child, path, [...ancestors, node.tag]);
@@ -255,14 +256,18 @@ export function validateComposition(runDirectory, state) {
   const run = assertRunDirectory(runDirectory), after = filteredBoundary(run); if (snapshotChanged(state.boundary, after)) fail("COMPOSER_PROTECTED_MUTATION", run);
   const content = validateRun(run), layout = validateLayout(run, content), result = validateFragmentSet(run, content); return { content, layout, ...result, html:assembleHtml(content, result.fragments) };
 }
+export function checkComposition(runDirectory) {
+  const run = assertRunDirectory(runDirectory), content = validateRun(run); validateLayout(run, content); validateFragmentSet(run, content);
+}
 export function finishComposition(state, file) { if (state.backup) rmSync(state.backup, { recursive:true, force:true }); if (file) rmSync(file, { force:true }); }
 export function logDiagnostic(run, record) { try { appendFileSync(join(dirname(dirname(resolve(run))), "proof-log.jsonl"), `${JSON.stringify(record)}\n`); } catch {} }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [, , run, mode, flag, file] = process.argv;
   try {
-    if (mode === "--prepare" && flag === "--state-file" && file) prepareComposition(run, file);
+    if (mode === "--check" && flag === undefined) checkComposition(run);
+    else if (mode === "--prepare" && flag === "--state-file" && file) prepareComposition(run, file);
     else if (mode === "--restore" && flag === "--state-file" && file) { const state = readCompositionState(run, file); restoreRenderer(resolve(run), state); finishComposition(state, file); }
     else throw Error("COMPOSER_RUN_OR_TEMPLATE arguments");
-  } catch (error) { logDiagnostic(run, { run:resolve(run ?? ""), stage:"composer", diagnostic:error.message }); console.error(error.message); process.exitCode = 1; }
+  } catch (error) { if (mode !== "--check") logDiagnostic(run, { run:resolve(run ?? ""), stage:"composer", diagnostic:error.message }); console.error(error.message); process.exitCode = 1; }
 }

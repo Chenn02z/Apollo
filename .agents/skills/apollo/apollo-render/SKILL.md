@@ -23,7 +23,10 @@ protected path.
 
 Delegate exactly once to `carousel-composer` with the run path, validated
 content and layout paths, and the canonical shell as read-only visual guidance,
-with `slide-bodies/` as its only write boundary. Do not retry or repair.
+with `slide-bodies/` as its only write boundary. Before yielding, it must run
+`node scripts/compose-carousel.mjs <run-dir> --check`; it may make one
+fragment-only correction and run one final check, for at most two checks total.
+This remains one delegation; do not retry or repair outside that composer boundary.
 If delegation fails, run
 `node scripts/compose-carousel.mjs <run-dir> --restore --state-file <temporary-composition-state>`
 and stop.
