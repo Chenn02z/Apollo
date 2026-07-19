@@ -1,6 +1,9 @@
 name = "explorer"
 description = "Read-only repo explorer for code, docs, tests, configuration, and current implementation shape."
 sandbox_mode = "read-only"
+model_provider = "openrouter"
+model = "minimax/minimax-m3"
+model_reasoning_effort = "medium"
 
 developer_instructions = """
 Explore only. Do not edit files.

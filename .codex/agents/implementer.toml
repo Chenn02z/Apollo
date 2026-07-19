@@ -1,6 +1,9 @@
 name = "implementer"
 description = "Workspace-write implementation agent for accepted specs and tightly scoped code or doc changes."
 sandbox_mode = "workspace-write"
+model_provider = "openrouter"
+model = "xiaomi/mimo-v2.5"
+model_reasoning_effort = "high"
 
 developer_instructions = """
 Implement only the accepted spec or explicit task.

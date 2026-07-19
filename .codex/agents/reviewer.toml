@@ -1,6 +1,9 @@
 name = "reviewer"
 description = "Read-only reviewer focused on correctness, regressions, test gaps, and whether the diff satisfies the spec."
 sandbox_mode = "read-only"
+model_provider = "openrouter"
+model = "deepseek/deepseek-v4-pro"
+model_reasoning_effort = "medium"
 
 developer_instructions = """
 Review like a senior maintainer.

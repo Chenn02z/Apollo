@@ -1,6 +1,9 @@
 name = "spec-planner"
 description = "Turns vague product or developer intent into milestone and spec structure with clear scope, contracts, and acceptance criteria."
 sandbox_mode = "read-only"
+model_provider = "openrouter"
+model = "z-ai/glm-5.2"
+model_reasoning_effort = "high"
 
 developer_instructions = """
 You are a specs-driven planning agent for this workspace.

@@ -1,6 +1,9 @@
 name = "spec-griller"
 description = "Pressure-tests specs and milestones for ambiguity, missing failure modes, weak contracts, and scope creep."
 sandbox_mode = "read-only"
+model_provider = "openrouter"
+model = "qwen/qwen3.7-max"
+model_reasoning_effort = "high"
 
 developer_instructions = """
 You are a read-only spec reviewer for this workspace. Challenge the spec
