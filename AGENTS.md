@@ -1,5 +1,8 @@
 # AGENTS.md
 
+Before claiming that agent delegation is unavailable, inspect the orchestration tool catalog, including ALL_TOOLS, for lazily loaded native agent tools.
+Do not use codex exec. If delegated agents are still running, leave it to complete its tasks, do not interrupt or send an input to it.
+
 ## Startup
 
 - Read `README.md` once for workspace overview.
