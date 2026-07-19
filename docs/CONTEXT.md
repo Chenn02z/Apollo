@@ -10,6 +10,15 @@
   `carousel-content.json`, `carousel-layout.json`, `slide-bodies/`, `index.html`,
   `slides/`, and `render-manifest.json` as its stages complete; it may also
   contain preserved content artifacts and versioned best-effort review artifacts.
+- **recovery record:** a sanitized, append-only diagnostic event the workflow
+  appends to a run's `recovery-log.jsonl` when a post-run failure is recorded;
+  `recovery-history.jsonl` is workspace-local, untracked, untrusted diagnostic
+  memory used to recognize prior failures. Neither is a prompt instruction or
+  publication artifact.
+- **bounded recovery:** up to two `carousel-recovery` delegations per
+  top-level invocation for recoverable generate or render failures. A repeated
+  signature or exhausted budget stops; unbounded retry and vision repair remain
+  out of scope.
 - **content artifact:** `carousel-content.json`, bounded plain-text teaching
   content whose 7–10 slides determine the rendered slide count. It is the
   verified authoring/review boundary. Initial generation gets up to three
@@ -38,6 +47,11 @@
 - **fixed-shell renderer:** one local `database` shell with fixed
   header, footer, title, why, and glossary regions plus deterministic HTML,
   browser-layout, export, and publication checks.
+- **carousel recovery:** a narrowly scoped runtime repair role. It may repair a
+  generate candidate from a valid checkpoint, or a non-protected layout or
+  exact canonical body fragments during render. Initial-content, review, state,
+  protected-boundary, integrity, browser, export, and publication errors are
+  terminal; it does not rerun art direction or composition.
 - **carousel art director:** an LLM stage that reads validated content and the
   available template contract, records the version-2 `database-blueprint`
   template and `blueprint` motif, and writes only `carousel-layout.json` exactly
@@ -100,8 +114,8 @@
   and a manifest. Deterministic checks validate structural limits, dimensions,
   slide count, and rendered capacity before publication.
 - Template archive, validated creative direction, and free-flow slide-body
-  composition are current capabilities. Formal citations, visual review/repair,
-  and publishing/scheduling are deferred roadmap ideas.
+  composition and bounded recovery are current capabilities. Formal citations,
+  vision repair, and publishing/scheduling are deferred roadmap ideas.
   Generated imagery, an AI theme, theme taxonomy or plugins, unbounded retry
   or repair loops, analytics, web UI, and authentication remain out of scope.
 - The proof topics are ACID properties, indexes, caching, REST vs GraphQL, and

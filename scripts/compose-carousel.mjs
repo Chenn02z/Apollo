@@ -253,6 +253,16 @@ export function prepareComposition(runDirectory, file) {
     const state = { backup, boundary:filteredBoundary(run) }; writeFileSync(stateFile, JSON.stringify(state)); return state;
   } catch (error) { const state = { backup, boundary:[] }; restoreRenderer(run, state); if (backup) rmSync(backup, { recursive:true, force:true }); throw error; }
 }
+export function prepareRecoveredComposition(runDirectory, file) {
+  const run = assertRunDirectory(runDirectory), stateFile = statePath(run, file), content = validateRun(run); validateLayout(run, content); loadArchive();
+  const body = join(run, "slide-bodies"), bodyStat = stat(body); if (!bodyStat || bodyStat.isSymbolicLink() || !bodyStat.isDirectory()) fail("COMPOSER_STALE_OUTPUT", body, "missing safe recovered body path");
+  const prior = regular(stateFile) ? readCompositionState(run, stateFile) : null, backup = prior?.backup ?? (completeRenderer(run) ? mkdtempSync(join(tmpdir(), "apollo-render-backup-")) : null);
+  try {
+    if (!prior && backup) for (const name of ["slide-bodies", "index.html", "slides", "render-manifest.json"]) cpSync(join(run, name), join(backup, name), { recursive:true });
+    rmSync(join(run, "render-manifest.json"), { force:true });
+    const state = prior ?? { backup, boundary:filteredBoundary(run) }; writeFileSync(stateFile, JSON.stringify(state)); return state;
+  } catch (error) { const state = prior ?? { backup, boundary:[] }; restoreRenderer(run, state); finishComposition(state, stateFile); throw error; }
+}
 export function validateComposition(runDirectory, state) {
   const run = assertRunDirectory(runDirectory), after = filteredBoundary(run); if (snapshotChanged(state.boundary, after)) fail("COMPOSER_PROTECTED_MUTATION", run);
   const content = validateRun(run), layout = validateLayout(run, content), result = validateFragmentSet(run, content); return { content, layout, ...result, html:assembleHtml(content, result.fragments) };
@@ -264,11 +274,12 @@ export function finishComposition(state, file) { if (state.backup) rmSync(state.
 export function logDiagnostic(run, record) { try { appendFileSync(join(dirname(dirname(resolve(run))), "proof-log.jsonl"), `${JSON.stringify(record)}\n`); } catch {} }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const [, , run, mode, flag, file] = process.argv;
+  const [, , run, mode, flag, file, option] = process.argv;
   try {
     if (mode === "--check" && flag === undefined) await checkComposition(run);
     else if (mode === "--prepare" && flag === "--state-file" && file) prepareComposition(run, file);
-    else if (mode === "--restore" && flag === "--state-file" && file) { const state = readCompositionState(run, file); restoreRenderer(resolve(run), state); finishComposition(state, file); }
+    else if (mode === "--restore" && flag === "--state-file" && file) { const state = readCompositionState(run, file); restoreRenderer(resolve(run), state); if (option !== "--preserve-state") finishComposition(state, file); }
+    else if (mode === "--recover" && flag === "--state-file" && file) prepareRecoveredComposition(run, file);
     else throw Error("COMPOSER_RUN_OR_TEMPLATE arguments");
   } catch (error) { if (mode !== "--check") logDiagnostic(run, { run:resolve(run ?? ""), stage:"composer", diagnostic:error.message }); console.error(error.message); process.exitCode = 1; }
 }

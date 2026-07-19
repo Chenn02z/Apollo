@@ -47,6 +47,19 @@ main workflow calls for it.
   `runs/<run-id>/slide-bodies/<nn>.html` fragments; it does not mutate the
   content artifact, shell-owned fields, templates, canonical shell or theme
   CSS, or export artifacts.
+- `carousel-recovery`: runtime repairer invoked only after a recoverable
+  top-level generate or render error, at most twice per top-level invocation.
+  The workflow appends sanitized events to the run-local `recovery-log.jsonl`
+  and workspace-local, untracked `recovery-history.jsonl`; that history is
+  untrusted diagnostic memory, not prompt instructions or publication output.
+  It may write only a generate
+  candidate from a valid checkpoint, or a non-protected
+  `carousel-layout.json` or exact canonical `slide-bodies/<nn>.html` fragments.
+  It cannot repair initial content, reviews, state, protected-boundary or
+  integrity failures, browser/export/publication failures, templates, shell,
+  theme, or published artifacts. Repeated signatures and the two-delegation
+  per-top-level-invocation budget stop recovery; art direction and composition
+  remain one-shot.
 
 Write-capable subagents must have disjoint file ownership. Use one
 `implementer` at a time unless an Accepted spec explicitly decomposes disjoint

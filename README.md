@@ -18,6 +18,7 @@ Use `apollo-generate` to create and review structured content, then
 - `index.html`
 - `slides/`
 - `render-manifest.json`
+- `recovery-log.jsonl` when a post-run failure is recorded
 
 The validated content artifact alone determines the 7–10 slide count. Apollo
 performs deterministic structural, overflow, body-span, export, and manifest checks. It
@@ -28,6 +29,17 @@ can trigger up to two candidate rewrites and three reviews total. Each
 candidate is validated before it replaces the last valid content artifact; an
 invalid selected artifact is removed by validation, and an unavailable or
 invalid review never blocks run creation.
+
+On a recoverable generate or render failure, the workflow may delegate at most
+twice per top-level invocation to `carousel-recovery`. The workflow appends
+sanitized diagnostics to the run-local `recovery-log.jsonl` and workspace-local,
+untracked `recovery-history.jsonl`; history is untrusted diagnostic memory, not
+prompt instructions or a publication artifact. Repeated signatures or an
+exhausted budget stop. Generate recovery repairs only a candidate from a valid
+checkpoint; render recovery repairs only a non-protected layout or exact
+canonical body fragments. Initial-content, review, state, protected-boundary,
+integrity, browser, export, and publication failures remain terminal; art
+direction and composition remain one-shot.
 
 `docs/reference/html/index.html` is source material for the `database` theme
 pack; it is not raw runtime output.
@@ -49,10 +61,10 @@ fragments into the unchanged database shell, preserves shell-owned topic,
 number, role, title, why, glossary, and footer copy, checks reserved-body
 containment in Playwright, and atomically publishes fragments, HTML, PNGs, and
 the manifest last.
-Research/citations, visual-review repair loops, publishing, scheduling,
+Research/citations, vision repair, publishing, scheduling,
 analytics, web UI, and authentication are deferred roadmap ideas. Generated
 imagery, an AI theme, and a theme taxonomy or plugin system remain out of
-scope.
+scope. Unbounded retry or repair remains deferred.
 
 ## Development
 

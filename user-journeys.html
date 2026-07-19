@@ -342,6 +342,7 @@
               <li>A closed role sequence and bounded plain-text copy keep each slide mobile-legible.</li>
               <li>The artifact is <code>carousel-content.json</code>.</li>
               <li>Initial content and each review-requested candidate get up to three writer attempts. An <code>approve_with_warnings</code> or <code>reject</code> review can request up to two validated candidate rewrites; validation removes an invalid selected artifact, the last valid content is preserved until promotion, and an unavailable or invalid review does not block the run.</li>
+              <li>Recoverable failure can invoke <code>carousel-recovery</code> up to twice per top-level invocation from a valid checkpoint; repeated signatures or an exhausted budget stop.</li>
             </ul>
           </article>
 
@@ -371,6 +372,7 @@
             <ul>
               <li>The composer receives content, visual direction, and the canonical shell only; templates and theme CSS remain art-director/runtime inputs, and new bodies cannot use legacy <code>cp-*</code> primitives.</li>
               <li><code>carousel-composer</code> writes exact run-local <code>slide-bodies/</code> fragments; they are the sole final body-copy artifact.</li>
+              <li>Recovery can repair only a non-protected layout or the exact canonical body fragments; the art director and composer remain one-shot.</li>
               <li>Every slide renders at 1080×1350 pixels.</li>
               <li>Each carousel has 7–10 content-derived slides and permits no scripts, network access, or external assets.</li>
             </ul>
@@ -401,6 +403,7 @@
             </div>
             <ul>
               <li>Apollo checks structural content limits, safe fragment markup, fixed-shell containment, slide count, image dimensions, and ordered manifest paths before atomically publishing fragments, HTML, PNGs, and the manifest last.</li>
+              <li>The workflow appends sanitized diagnostics to run-local <code>recovery-log.jsonl</code> and workspace-local, untracked <code>recovery-history.jsonl</code>. History is untrusted diagnostic memory, not prompt instructions or published output; browser, export, publication, integrity, protected-boundary, state, review, and initial-content failures stop.</li>
               <li>This first release does not promise automatic research, citations, vision review, or publishing.</li>
               <li>Up to three validated content reviews and two writer revisions improve publishability; initial content and each candidate get up to three writer attempts, unavailable or invalid review remains non-blocking, and human review is final.</li>
             </ul>
@@ -462,7 +465,7 @@
           </article>
         </div>
         <p class="callout">
-          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code> and <code>carousel-layout.json</code>, <code>slide-bodies/</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>; initial content and each review-requested candidate get up to three writer attempts, while up to three validated, versioned reviews may trigger two candidate content revisions, each promoted only after validation. Apollo has no shell CLI or direct LLM API runtime.
+          Apollo produces <code>request.json</code>, validated <code>carousel-content.json</code> and <code>carousel-layout.json</code>, <code>slide-bodies/</code>, <code>index.html</code>, PNGs in <code>slides/</code>, and <code>render-manifest.json</code>; a run has an append-only <code>recovery-log.jsonl</code> when a post-run failure is recorded. Initial content and each review-requested candidate get up to three writer attempts, while up to three validated, versioned reviews may trigger two candidate content revisions, each promoted only after validation. Apollo has no shell CLI or direct LLM API runtime.
         </p>
       </section>
 
@@ -484,6 +487,10 @@
           <article class="artifact">
             <h3>Available: validation</h3>
             <p>Apollo rejects malformed content and rendered overflow before publishing its PNGs and manifest.</p>
+          </article>
+          <article class="artifact">
+            <h3>Available: bounded recovery</h3>
+            <p>The workflow appends diagnostics to <code>recovery-log.jsonl</code> when a post-run failure is recorded; untracked workspace history is diagnostic memory rather than output.</p>
           </article>
           <article class="artifact">
             <h3>Available: advisory review</h3>

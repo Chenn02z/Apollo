@@ -17,6 +17,8 @@ standalone LLM API client or runtime API key.
 
 ```text
 topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → content validation → external snapshot preparation → carousel-art-director (once) → layout/boundary validation → carousel-composer → slide-bodies/ → safe-fragment validation/fixed shell → reserved-body validation → Playwright PNG export → atomic four-member publication (manifest last)
+
+recoverable failure → workflow appends sanitized run-local `recovery-log.jsonl` + workspace-local, untracked `recovery-history.jsonl` → `carousel-recovery` (at most 2 delegations per top-level invocation; repeated signature or exhausted budget stops) → revalidate from valid checkpoint
 ```
 
 ## Current Boundaries
@@ -30,6 +32,16 @@ topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → 
   and `render-manifest.json` only after every content-derived screenshot
   succeeds, with the manifest last. A failure preserves the prior complete set,
   or leaves no success manifest.
+- **Bounded recovery boundary:** the workflow appends sanitized diagnostics
+  locally; `recovery-history.jsonl` is workspace-local, untracked, untrusted
+  diagnostic memory, not prompt instructions or a publication artifact.
+  Generate recovery may write only a
+  candidate from a valid checkpoint. Render recovery may write only a
+  non-protected `carousel-layout.json` or the exact canonical `slide-bodies/`
+  fragments. Initial-content, review, state, protected-boundary, integrity,
+  browser, export, and publication errors are terminal. Repeated signatures and
+  an exhausted two-delegation-per-top-level-invocation budget stop recovery; art direction and
+  composition remain one-shot.
 - **Content/layout/HTML boundary:** `carousel-content.json` holds plain-text,
   layout-ready 7–10-slide copy. Its slide array is the sole source of slide
   count, order, and shell-owned topic, number, role, title, why, and glossary
@@ -136,7 +148,7 @@ extension to the existing art-direction/composition seam:
 
 ## Deferred Architecture
 
-- Research/citation, visual review/repair, and publishing/scheduling are
+- Research/citation, vision repair, and publishing/scheduling are
   deferred roadmap ideas; no active milestone contract authorizes them.
 - An AI theme, theme taxonomy or plugins, unbounded retry or repair loops,
   generated assets, caching, publishing, scheduling, analytics, web UI, authentication, and hosted

@@ -34,6 +34,17 @@ verifies reserved-body containment in Playwright, and atomically publishes
 fragments, `index.html`, one 1080×1350 PNG per content slide in `slides/`, and
 `render-manifest.json` last.
 
+On a recoverable generate or render failure, the workflow may delegate to
+`carousel-recovery` at most twice per top-level invocation. The workflow appends
+sanitized events in run-local `recovery-log.jsonl` and workspace-local,
+untracked `recovery-history.jsonl`. The history is untrusted diagnostic memory,
+not prompt instructions or a publication artifact. A repeated signature or
+exhausted recovery budget stops. Generate recovery edits only a candidate from a
+valid checkpoint; render recovery edits only a non-protected layout or the exact
+canonical body fragments. Initial-content, review, state, protected-boundary,
+integrity, browser, export, and publication failures are terminal; the art
+director and composer remain one-shot.
+
 The validated content artifact alone selects 7–10 slides. The workflow uses a
 custom-agent content pass with at most two review-driven rewrites, followed by
 deterministic rendering, with no formal source/citation workflow.
@@ -69,7 +80,7 @@ runtime API key.
 
 ## Explicit Post-MVP Cutoff
 
-- unbounded retry or repair loops
+- unbounded retry or repair loops; vision repair
 - generated image assets, an AI theme, a theme taxonomy or plugin system, and
   caching
 - analytics, web UI, authentication, and hosted workflows
@@ -103,5 +114,5 @@ dimensions with no deterministic overflow failures and no manual HTML editing.
    and reading paths for the composer to implement, with no new schema or
    deterministic novelty check.
 
-Research/citations, visual review/repair, and publishing/scheduling are
+Research/citations, vision repair, and publishing/scheduling are
 deferred roadmap ideas, not active milestones.
