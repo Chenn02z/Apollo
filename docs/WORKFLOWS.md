@@ -38,13 +38,12 @@ changes:
 5. Grill the spec for ambiguity and missing failure modes.
 6. Mark the spec Accepted before implementation.
 7. Implement only what the spec requires, respecting architecture seams.
+7. Implement only what the spec requires, respecting architecture seams.
 8. Verify and review against the spec.
 9. When a phase ships, run `plan-next` to propose the next increment.
 10. Update docs and spec status when decisions settle.
-
-Current MVP milestone status: `0001-carousel-contract-and-content` is
-Verified; `0002-fixed-carousel-renderer` is Verified;
-`0003-adaptive-carousel-content` is Verified; `0004` remains Draft.
+9. When a phase ships, run `plan-next` to propose the next increment.
+10. Update docs and spec status when decisions settle.
 
 Small documentation or cleanup tasks may skip a formal spec when the user makes
 that explicit or when the change is obviously local and reversible.

@@ -1,5 +1,7 @@
 name = "spec-planner"
 description = "Turns vague product or developer intent into milestone and spec structure with clear scope, contracts, and acceptance criteria."
+model = "gpt-5.5"
+model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 
 developer_instructions = """

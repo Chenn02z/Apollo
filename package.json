@@ -1,8 +1,0 @@
-{
-  "name": "apollo",
-  "private": true,
-  "type": "module",
-  "engines": { "node": ">=22" },
-  "scripts": { "test:renderer": "node --test test/render-carousel.test.mjs", "render": "node scripts/export-carousel.mjs" },
-  "devDependencies": { "playwright": "^1.54.0" }
-}

@@ -1,5 +1,7 @@
 name = "test-runner"
 description = "Runs targeted verification, summarizes failures, and recommends the smallest next debugging step."
+model = "gpt-5.4-mini"
+model_reasoning_effort = "low"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """

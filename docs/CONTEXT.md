@@ -1,62 +1,136 @@
-# Apollo Context
+# Workspace Context
+
+Canonical terminology and workflow boundaries. Keep implementation details out.
 
 ## Canonical Terms
 
-- **Apollo:** the Codex-native technical-carousel workflow in this workspace.
-- **topic:** the user-supplied technical subject passed to `apollo-generate`,
-  or to `apollo-generate-v2` for the separate adaptive v2 path.
-- **Codex-native stage:** a bounded workflow stage entered through a Codex
-  skill and performed by a Codex custom agent or deterministic local tool.
-- **run:** one generated output directory containing artifacts completed so
-  far. V1 uses `request.json`, `carousel-content.json`, `index.html`, PNGs,
-  and a manifest; the parallel v2 path uses `request-v2.json`,
-  `carousel-content-v2.json`, `index-v2.html`, `slides-v2/`, and
-  `render-manifest-v2.json`.
-- **content artifact:** `carousel-content.json`, the bounded seven-slide copy
-  consumed by the v1 renderer. A v2 content artifact uses 6–10 slides selected
-  from its teaching beats; it is a parallel versioned path.
-- **renderer stage:** `apollo-render` is the unchanged v1 default. The separate
-  `apollo-render-v2` validates a v2 artifact, delegates once to
-  `carousel-renderer-v2` for HTML, then uses deterministic local tools for
-  overflow checks, PNG export, and the manifest.
-- **database theme pack:** the sole local 1080×1350 MVP visual system, derived
-  from `docs/reference/html/index.html` and stored as repository-owned assets
-  and templates.
-- **constrained HTML contract:** v1 has seven ordered identifiable 1080×1350
-  slides; v2 has 6–10. Both use approved local theme assets only, with no
-  scripts, network access, or external assets.
-- **overflow diagnostic:** a deterministic rendering failure that identifies
-  slide content exceeding its rendered bounds.
-- **v2 roles:** the closed set `hook`, `overview`, `concept`, `example`,
-  `deep-dive`, `interview`, and `takeaway`; `hook` is first, exactly one
-  `overview` is second, and `takeaway` is last. Intermediate roles may repeat;
-  `interview` is optional.
-- **reference HTML:** `docs/reference/html/index.html`; source material for the
-  `database` theme pack, not raw production runtime output.
+- `workspace`: this repo and its docs, skills, specs, and agent presets.
+- `developer`: the human using this repo for specs-driven agentic work.
+- `main agent`: the Codex thread owning judgment, delegation, reconciliation,
+  user interaction, and final reporting.
+- `subagent`: a delegated Codex development agent with a narrow role, model,
+  reasoning, and permission profile.
+- `skill`: a reusable workflow under `.agents/skills/`.
+- `agent preset`: a `.codex/agents/*.toml` role/model/permission default.
+- `requirements packet`: pre-spec output of `$requirements` with resolved
+- `requirements packet`: pre-spec output of `$requirements` with resolved
+  workflow, proposed spec path, scope, scenarios, criteria, and blockers.
+- `Accepted milestone`: a `docs/milestones/` contract with all blocking
+  questions resolved. Eligible for `$spec`; does not authorize implementation
+  questions resolved. Eligible for `$spec`; does not authorize implementation
+  without an Accepted child spec.
+- `handoff artifact`: explicit producer-to-consumer artifact naming the
+  producing skill, intended consumer, path, status, decisions, blockers, and
+  agent routing log.
+- `spec`: executable contract under `docs/specs/` with goal, scope, contracts,
+  failure modes, acceptance criteria, verification, and open questions.
+- `milestone`: larger deliverable slice under `docs/milestones/`.
+- `phase`: a group of related milestones delivered together as a coherent
+  increment. `plan-next` runs at phase boundaries.
+- `MVP boundary`: the line between what ships in the first real product loop
+  and what is post-MVP. Drives architecture seams.
+- `MVP milestone ladder`: the ordered set of milestones needed to reach the
+  MVP boundary, from first user-visible deliverable to MVP-complete.
+- `MVP deliverable`: concrete user-visible outcome a milestone produces.
+- `architecture doc`: `docs/ARCHITECTURE.md` — current structure, approved
+  seams, and deferred architecture.
+- `approved seam`: a lightweight boundary in the code (interface, hook, config
+  entry point) that exists now so a future feature can be added without
+  rewrites. Listed in ARCHITECTURE.md.
+- `deferred architecture`: features or structural changes intentionally left
+  for later milestones, with an optional seam left open.
+- `plan-next`: phase-level replanning skill triggered manually after a phase
+  ships.
+- `phase`: a group of related milestones delivered together as a coherent
+  increment. `plan-next` runs at phase boundaries.
+- `MVP boundary`: the line between what ships in the first real product loop
+  and what is post-MVP. Drives architecture seams.
+- `MVP milestone ladder`: the ordered set of milestones needed to reach the
+  MVP boundary, from first user-visible deliverable to MVP-complete.
+- `MVP deliverable`: concrete user-visible outcome a milestone produces.
+- `architecture doc`: `docs/ARCHITECTURE.md` — current structure, approved
+  seams, and deferred architecture.
+- `approved seam`: a lightweight boundary in the code (interface, hook, config
+  entry point) that exists now so a future feature can be added without
+  rewrites. Listed in ARCHITECTURE.md.
+- `deferred architecture`: features or structural changes intentionally left
+  for later milestones, with an optional seam left open.
+- `plan-next`: phase-level replanning skill triggered manually after a phase
+  ships.
+- `requirement gathering`: vague intent to requirements packet or Accepted
+  milestone.
+- `bootstrap`: first-run workflow that interrogates the developer, derives
+  architecture seams from the MVP boundary, tailors `README.md` into a
+  project-specific public overview, and requires explicit developer
+  confirmation before durable bootstrap writes. The detailed confirmation
+  contract lives in `docs/WORKFLOWS.md`.
+- `spec grilling`: adversarial review before implementation.
+- `dev loop`: Accepted spec to verified, reviewed diff.
+- `context maintenance`: keeping docs, specs, skills, and agents aligned after
+  decisions settle. Auto-triggered by AGENTS.md after settled decisions.
+  decisions settle. Auto-triggered by AGENTS.md after settled decisions.
+- `trace`: workflow evidence under `.agent-trace/<workflow-id>/`.
 
-## Product Boundaries
+## Reference Documents
 
-- The MVP is a local Codex-native staged workflow. `apollo-generate` is its
-  content-stage entry skill; there is no shell CLI, standalone LLM API client,
-  or runtime API key.
-- The verified v1 workflow produces `request.json`, validated
-  `carousel-content.json`, HTML, PNGs, and a manifest. The separate verified
-  v2 workflow validates its 6–10-slide artifact and rendered capacity before
-  publishing its v2 PNGs and manifest.
-- Formal citations, an AI theme, theme taxonomy or plugins, retries,
-  visual-spec artifacts, vision repair, generated imagery, publishing,
-  scheduling, analytics, web UI, and authentication are post-MVP.
-- The proof topics are ACID properties, indexes, caching, REST vs GraphQL, and
-  embeddings; review of their factual quality is manual in the MVP.
-
-## Maturity Gaps
-
-- The broader five-topic proof remains future work.
+- `AGENTS.md`: Codex orientation and operating contract.
+- `docs/PRODUCT.md`: product intent, scope, principles, and roadmap.
+- `docs/ARCHITECTURE.md`: current structure, approved seams, and deferred
+  architecture.
+- `docs/ARCHITECTURE.md`: current structure, approved seams, and deferred
+  architecture.
+- `docs/WORKFLOWS.md`: handoff interface and status contract.
+- `docs/AGENT_ROLES.md`: subagent roles, permissions, and routing principles.
+- `docs/DOCS_POLICY.md`: documentation destinations and status rules.
 
 ## Workflow Boundaries
 
-- Milestones `0001`, `0002`, and `0003` are Verified. `0004` remains Draft and must go through
-  `$requirements` before `$spec` or implementation.
-- `docs/PRODUCT.md` owns product intent and scope;
-  `docs/ARCHITECTURE.md` owns implementation boundaries;
-  this file owns durable terminology.
+- Bootstrap: first serious workflow after forking when the repo still reflects
+  the harness template. It sets the MVP boundary, initial seams, and startup
+  docs, with explicit confirmation required before durable bootstrap writes.
+  The detailed bootstrap contract remains canonical in `docs/WORKFLOWS.md`.
+- Plan-next: triggered manually when a phase ships. Proposes the next phase
+  with recommended milestone count and Draft milestones. Hands to
+  `$requirements` only.
+- Requirements: accepts Draft milestones from bootstrap or plan-next. Produces
+  Accepted milestone contracts and requirements packets. References
+  `docs/ARCHITECTURE.md`.
+- Specs: produces executable contracts under `docs/specs/` from Accepted
+  milestones only. References `docs/ARCHITECTURE.md` for seam compliance.
+- Dev loop: implements from Accepted spec only. Checks architecture seams
+  before implementation. MVP-path planning belongs to bootstrap and
+  requirements, not dev-loop.
+  milestones only. References `docs/ARCHITECTURE.md` for seam compliance.
+- Dev loop: implements from Accepted spec only. Checks architecture seams
+  before implementation. MVP-path planning belongs to bootstrap and
+  requirements, not dev-loop.
+- Review: compares the diff to the spec; it is not open-ended redesign.
+- Context maintenance: auto-triggered by AGENTS.md after settled decisions.
+  Also invoked by skill handoffs.
+- `grill-with-docs`: pressure-tests against docs including ARCHITECTURE.md.
+- Context maintenance: auto-triggered by AGENTS.md after settled decisions.
+  Also invoked by skill handoffs.
+- `grill-with-docs`: pressure-tests against docs including ARCHITECTURE.md.
+- Read-only subagents may run in parallel if independent. Write-capable
+  subagents need disjoint file ownership.
+- Bash scripts may run repeatable checks, not own agent routing.
+
+## Idle Triage
+
+When no explicit developer task is active and the workspace has Accepted
+milestones without child specs, or Draft milestones that are unblocked, the
+main agent should ask which milestone or spec should advance next and surface
+the next-action candidates with their status and blockers.
+
+When a phase is complete (all its milestones are completed), the main agent
+should suggest running `plan-next`.
+
+When a phase is complete (all its milestones are completed), the main agent
+should suggest running `plan-next`.
+
+Accepted milestones with no spec are the highest-priority idle candidates.
+Draft milestones with resolved dependencies follow.
+
+## Open Questions
+
+- What trace retention policy is appropriate for this repo?

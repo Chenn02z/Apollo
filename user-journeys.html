@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apollo User Journeys</title>
+  <title>AI Harness User Journeys</title>
   <style>
     :root {
       --bg: #f3ede2;
@@ -288,25 +288,25 @@
     <section class="hero">
       <div class="hero-grid">
         <div class="hero-copy">
-          <span class="eyebrow">Apollo · Content Stage Available</span>
-          <h1>Turn one technical topic into a clear carousel.</h1>
+          <span class="eyebrow">AI Harness</span>
+          <h1>Build the right thing, one phase at a time.</h1>
           <p>
-            Apollo's verified paths turn a topic into either a fixed seven-slide
-            v1 carousel or an adaptive 6–10-slide v2 carousel, with themed,
-            legible 1080×1350 PNG slides and no manual HTML editing.
+            A multi-agent, specs-driven workspace template for indie developers
+            who want explicit gates, repeatable workflows, and incremental
+            delivery without speculative overbuild.
           </p>
           <div class="meta">
-            <span class="chip">Codex skill</span>
-            <span class="chip">V1: seven slides</span>
-            <span class="chip">V2: 6–10 slides</span>
-            <span class="chip">Constrained HTML</span>
-            <span class="chip">PNG output</span>
+            <span class="chip">Bootstrap</span>
+            <span class="chip">Milestones</span>
+            <span class="chip">Specs</span>
+            <span class="chip">Dev Loop</span>
+            <span class="chip">Phase Replanning</span>
           </div>
         </div>
         <div class="hero-side">
           <div class="score">
-            <strong>Topic → skill → agents → JSON → HTML → PNG</strong>
-            <span>V1 and adaptive v2 generation, rendering, export, and deterministic validation are available.</span>
+            <strong>Bootstrap → Ship → Replan</strong>
+            <span>The loop that turns template scaffolding into shipped product increments.</span>
           </div>
         </div>
       </div>
@@ -314,167 +314,199 @@
 
     <div class="layout">
       <section class="panel">
-        <h2>Intended User Journey</h2>
+        <h2>Developer Journeys</h2>
         <div class="journey-grid">
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>1. Give Apollo a topic</h3>
-                <p>A technical-content creator starts locally with one clear subject.</p>
+                <h3>1. Start from the template and bootstrap a real product</h3>
+                <p>The developer has just forked and needs to turn generic harness docs into a product backbone.</p>
               </div>
-              <span class="status status-ready">Available</span>
+              <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li>Invoke <code>apollo-generate</code> for fixed v1 or <code>apollo-generate-v2</code> for adaptive v2 content, for example <code>ACID properties in databases</code>.</li>
-              <li>Each generation entry point accepts exactly one required topic.</li>
-              <li>The reference style is concise, technical, diagram-led, and interview-oriented.</li>
+              <li>Run <code>$bootstrap</code> to go through an adversarial founder interview.</li>
+              <li>Answer the grilling until <code>docs/PRODUCT.md</code>, <code>docs/CONTEXT.md</code>, and <code>docs/ARCHITECTURE.md</code> reflect the real product.</li>
+              <li>Determine the MVP boundary — what ships first, what's post-MVP.</li>
+              <li>Derive architecture seams from that boundary, not from upfront speculation.</li>
+              <li>End with an MVP milestone ladder and bare future milestones.</li>
             </ul>
           </article>
 
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>2. Get structured carousel content</h3>
-                <p>A Codex custom agent compresses the topic into a teachable carousel before any pixels are rendered.</p>
+                <h3>2. Turn a fuzzy request into a durable milestone</h3>
+                <p>The developer has a product direction but the scope isn't decided yet.</p>
               </div>
-              <span class="status status-ready">Available</span>
+              <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li>V1 has its fixed seven-slide story; v2 selects 6–10 slides from teaching beats.</li>
-              <li>V2 uses a closed role sequence and bounded plain-text copy so each slide remains mobile-legible.</li>
-              <li>The artifacts are <code>carousel-content.json</code> for v1 and <code>carousel-content-v2.json</code> for v2.</li>
+              <li>Use <code>$requirements</code> to turn vague intent into an Accepted milestone contract.</li>
+              <li>Reference <code>docs/ARCHITECTURE.md</code> to respect seams and deferred work.</li>
+              <li>Every milestone includes an <code>## MVP Deliverable</code> — what the user sees or does when it ships.</li>
             </ul>
           </article>
 
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>3. Compose constrained themed HTML</h3>
-                <p>A Codex custom renderer creates HTML within the repository-owned database theme assets and templates.</p>
+                <h3>3. Write a spec that fits into the architecture</h3>
+                <p>The developer needs an executable spec that preserves the long-term architecture without overbuilding.</p>
               </div>
-              <span class="status status-ready">Available</span>
+              <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li>The local database theme pack is derived from the reference style and provides the approved visual assets and templates.</li>
-              <li>Every slide renders at 1080×1350 pixels.</li>
-              <li>V1 has exactly seven sequential slides; v2 has 6–10 content-derived slides. Neither permits scripts, network access, or external assets.</li>
+              <li>Use <code>$spec</code> to convert an Accepted milestone into implementation contracts.</li>
+              <li>Every spec declares its <code>## Architecture Reference</code> and <code>## Architecture Seams</code>.</li>
+              <li>The spec IS the MVP path — no version churn, just what's needed now.</li>
             </ul>
           </article>
 
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>4. Export shareable PNG slides</h3>
-                <p>Browser rendering captures each slide exactly, without a per-pixel image-generation cost.</p>
+                <h3>4. Implement with role-separated agents</h3>
+                <p>The workflow must delegate exploration, implementation, verification, and review to distinct agents.</p>
               </div>
-              <span class="status status-ready">Available</span>
+              <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li>Playwright screenshots each v1 or v2 slide independently.</li>
-              <li>V1 outputs <code>slide-01.png</code> through <code>slide-07.png</code>; v2 outputs the ordered files in <code>slides-v2/</code>.</li>
-              <li>All run artifacts stay in a local, inspectable run directory.</li>
+              <li>Use <code>$dev-loop</code> to orchestrate <code>explorer</code> → <code>implementer</code> → <code>$test</code> → <code>reviewer</code>.</li>
+              <li>Before implementation, surface architecture seams — what boundaries must be built to extend cleanly later.</li>
+              <li>Keep the main agent as coordinator and reconciler, not the silent do-everything worker.</li>
+              <li>Missing project-specific commands should be documented as maturity gaps, not hidden.</li>
             </ul>
           </article>
 
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>5. Trust the basic checks</h3>
-                <p>The MVP catches mechanical failures before presenting the carousel as complete.</p>
+                <h3>5. Replan after a phase ships</h3>
+                <p>The developer has completed all milestones in a phase and wants to shape the next increment based on what actually shipped.</p>
               </div>
-              <span class="status status-ready">Available for v2</span>
+              <span class="status status-growing">Growing</span>
             </div>
             <ul>
-              <li>V2 checks structural content limits, slide count, image dimensions, ordered manifest paths, and browser overflow before publication.</li>
-              <li>This first release does not promise automatic research, citations, vision review, or publishing.</li>
-              <li>Accuracy review remains a human responsibility during the MVP.</li>
+              <li>Manually trigger <code>plan-next</code> when a phase is complete.</li>
+              <li><code>plan-next</code> reads completed milestones, product direction, architecture seams, and bare future milestones.</li>
+              <li>Proposes the next phase — how many milestones and at what granularity — and produces Draft milestones.</li>
+              <li>Hands Draft milestones to <code>$requirements</code> only; may reshape or discard bare future milestones.</li>
             </ul>
           </article>
 
           <article class="journey">
             <div class="journey-head">
               <div>
-                <h3>6. Grow only after the baseline works</h3>
-                <p>V1 and v2 are verified; 0004 remains the next Draft milestone.</p>
+                <h3>6. Keep docs, skills, and agents aligned as the project evolves</h3>
+                <p>The developer needs durable terminology and workflow updates after real decisions settle.</p>
               </div>
-              <span class="status status-growing">0001/0002/0003 Verified; 0004 Draft</span>
+              <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li><code>0001</code>: verified carousel contract and content.</li>
-              <li><code>0002-fixed-carousel-renderer</code>: verified constrained HTML generation and PNG output.</li>
-              <li><code>0003-adaptive-carousel-content</code>: verified v2 content, validation, rendering, and export for 6–10 slides selected from teaching beats.</li>
-              <li><code>0004</code>: validation and proof across five topics.</li>
+              <li><code>$context</code> auto-triggers after settled decisions — milestones completed, specs Verified, seams opened or closed.</li>
+              <li>Updates <code>docs/ARCHITECTURE.md</code> when seams open or close.</li>
+              <li>Updates <code>user-journeys.html</code> and <code>README.md</code> when workflow paths or skill names change.</li>
+              <li>Prefer surgical doc updates over sprawling rewrites.</li>
+              <li>Keep implementation details out of <code>docs/CONTEXT.md</code>.</li>
+            </ul>
+          </article>
+
+          <article class="journey">
+            <div class="journey-head">
+              <div>
+                <h3>7. Audit what happened and show evidence</h3>
+                <p>The developer wants proof of process, not only final prose summaries.</p>
+              </div>
+              <span class="status status-growing">Growing</span>
+            </div>
+            <ul>
+              <li>Use <code>$codex-agent-tracer</code> for non-trivial work.</li>
+              <li>Treat <code>.agent-trace/</code> as local evidence and durable handoffs as the compact summary.</li>
+              <li>Use review artifacts like the product evaluation HTML to improve the next product-facing path.</li>
             </ul>
           </article>
         </div>
       </section>
 
       <section class="panel">
-        <h2>Current Stage and Planned MVP Capabilities</h2>
+        <h2>What Users Can Do</h2>
         <div class="capability-grid">
           <article class="capability">
-            <span class="stage">Input</span>
-            <h3>Start with one topic</h3>
-            <p>Use the <code>apollo-generate</code> Codex skill with one topic. Extra options are deferred until defaults prove insufficient.</p>
+            <span class="stage">Founding</span>
+            <h3>Interrogate a product idea</h3>
+            <p>Use <code>$bootstrap</code> to force a founder-quality answer set before normal planning begins. Derives architecture seams from the MVP boundary.</p>
           </article>
           <article class="capability">
-            <span class="stage">Content</span>
-            <h3>Make a fixed or adaptive carousel</h3>
-            <p>Generate concise structured copy for a fixed seven-slide v1 or adaptive 6–10-slide v2 carousel.</p>
+            <span class="stage">Planning</span>
+            <h3>Create durable milestone contracts</h3>
+            <p>Use <code>$requirements</code> to turn fuzzy goals into scoped milestones with MVP deliverables, blockers, and acceptance criteria.</p>
           </article>
           <article class="capability">
-            <span class="stage">Render</span>
-            <h3>Use one consistent visual system</h3>
-            <p>Constrained agent-authored HTML uses one local database theme pack and reliable mobile dimensions.</p>
+            <span class="stage">Architecture</span>
+            <h3>Document current structure and seams</h3>
+            <p>Use <code>docs/ARCHITECTURE.md</code> to track approved seams and deferred architecture — lightweight boundaries, never speculative frameworks.</p>
           </article>
           <article class="capability">
-            <span class="stage">Export</span>
-            <h3>Save individual PNGs</h3>
-            <p>Browser screenshots create one 1080×1350 image per slide in a local run folder.</p>
+            <span class="stage">Specification</span>
+            <h3>Write implementation-grade specs</h3>
+            <p>Use <code>$spec</code> to convert Accepted milestones into executable contracts that reference architecture seams.</p>
           </article>
           <article class="capability">
-            <span class="stage">Validate</span>
-            <h3>Reject broken layouts</h3>
-            <p>V2 verifies structural limits, dimensions, content-derived slide count, manifest paths, and text or page overflow before completing a run.</p>
+            <span class="stage">Implementation</span>
+            <h3>Run a role-separated dev loop</h3>
+            <p>Use <code>$dev-loop</code> plus the project agents to explore, edit, verify, and review — respecting architecture seams without overbuilding.</p>
           </article>
           <article class="capability">
-            <span class="stage">Scope</span>
-            <h3>Stay local for now</h3>
-            <p>An AI theme, theme plugins, retries, automatic citations, generated assets, and vision repair are post-MVP.</p>
+            <span class="stage">Delivery</span>
+            <h3>Replan the next phase from shipped work</h3>
+            <p>Use <code>plan-next</code> after a phase ships to propose Draft milestones for the next increment based on what actually shipped.</p>
+          </article>
+          <article class="capability">
+            <span class="stage">Governance</span>
+            <h3>Pressure-test plans and terminology</h3>
+            <p>Use <code>$grill-with-docs</code> when ambiguity, scope creep, or naming drift threatens trust in the docs — including architecture seams.</p>
+          </article>
+          <article class="capability">
+            <span class="stage">Alignment</span>
+            <h3>Keep context synchronized</h3>
+            <p>Use <code>$context</code> to keep docs, skills, agent rules, README, and user-journeys.html coherent after decisions settle.</p>
           </article>
         </div>
         <p class="callout">
-          V1 produces <code>request.json</code>, validated <code>carousel-content.json</code>, HTML, PNGs, and a manifest. V2 separately produces <code>request-v2.json</code>, <code>carousel-content-v2.json</code>, <code>index-v2.html</code>, <code>slides-v2/</code>, and <code>render-manifest-v2.json</code>. Apollo has no shell CLI or direct LLM API runtime.
+          The harness is strongest when it is used as a strict workflow spine — not as a replacement for the actual product codebase.
+          Bootstrap determines the MVP boundary; architecture seams keep future work clean; plan-next reshapes the next increment from real results.
         </p>
       </section>
 
       <section class="panel">
-        <h2>Current and Planned Run Artifacts</h2>
+        <h2>Key Artifacts</h2>
         <div class="artifact-grid">
           <article class="artifact">
-            <h3>Available: fixed v1 content</h3>
-            <p><code>request.json</code> records the topic; <code>carousel-content.json</code> preserves the seven-slide narrative.</p>
+            <h3>Startup contract</h3>
+            <p><code>AGENTS.md</code> defines non-negotiable operating rules, auto-triggers <code>$context</code> after settled decisions, and is where project-specific command gaps should be recorded.</p>
           </article>
           <article class="artifact">
-            <h3>Available: adaptive v2 content</h3>
-            <p><code>request-v2.json</code> and <code>carousel-content-v2.json</code> preserve the validated 6–10-slide narrative.</p>
+            <h3>Product backbone</h3>
+            <p><code>docs/PRODUCT.md</code> and <code>docs/CONTEXT.md</code> become product-specific during bootstrap and stay durable afterward.</p>
           </article>
           <article class="artifact">
-            <h3>Available: render and images</h3>
-            <p>V1 uses <code>index.html</code> and seven PNGs; v2 uses <code>index-v2.html</code>, <code>slides-v2/</code>, and <code>render-manifest-v2.json</code>.</p>
+            <h3>Architecture seams</h3>
+            <p><code>docs/ARCHITECTURE.md</code> documents current structure, approved seams, and deferred architecture. Lightweight — updated by <code>$context</code> when seams open or close.</p>
           </article>
           <article class="artifact">
-            <h3>Available: v2 validation</h3>
-            <p>V2 rejects malformed content and rendered overflow before publishing its PNGs and manifest.</p>
+            <h3>Execution evidence</h3>
+            <p><code>.agent-trace/</code> holds local traces, while specs, milestones, and reviews preserve the durable summary.</p>
           </article>
         </div>
       </section>
     </div>
 
     <section class="footer">
-      <h2>Scope Note</h2>
+      <h2>Maintenance Note</h2>
       <p>
-        Keep this map aligned with Apollo's actual user-facing capability. Promote planned work to current capability only after it is implemented and verified.
+        Keep this file updated when the repo gains a new user-facing workflow, when a current journey changes its first step,
+        or when the capability surface moves enough that the visible product story should change with it.
       </p>
     </section>
   </main>

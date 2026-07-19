@@ -1,5 +1,7 @@
 name = "spec-griller"
 description = "Pressure-tests specs and milestones for ambiguity, missing failure modes, weak contracts, and scope creep."
+model = "gpt-5.4"
+model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 
 developer_instructions = """

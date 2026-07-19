@@ -1,46 +1,91 @@
-# Apollo
+# AI Harness
 
-Apollo is a Codex-native staged workflow for turning a technical topic into an
-interview-oriented carousel. Its shipped v1 creates a fixed seven-slide
-carousel; its verified v2 path creates an adaptive 6–10-slide carousel.
+> A specs-driven agent workspace template for indie developers.
 
-## MVP
+AI Harness is a reusable starter repo for building software with a strict
+multi-agent development loop and incremental MVP delivery. It gives you:
 
-Use `apollo-generate` and `apollo-render` for the fixed v1 path, or
-`apollo-generate-v2` and `apollo-render-v2` for adaptive v2 content such as
-`ACID properties in databases`.
+- a repo operating contract in `AGENTS.md`
+- reusable workflow skills under `.agents/skills/`
+- reusable agent presets under `.codex/agents/`
+- docs and templates for milestones, specs, architecture, handoffs, and context alignment
+- a first-run bootstrap path for turning the template into a real product repo
+- phase-based replanning to ship the next increment based on what actually shipped
 
-The v1 path produces:
+This repo is the harness, not your product runtime. Bring your own app, domain,
+and codebase. The harness exists to keep planning, implementation, review, and
+documentation aligned as your project grows.
 
-- `request.json`
-- `carousel-content.json`
+## Who It Is For
 
-The v2 path uses separate artifacts: `request-v2.json`,
-`carousel-content-v2.json`, `index-v2.html`, `slides-v2/`, and
-`render-manifest-v2.json`. Its 6–10 slide count comes only from the validated
-content artifact and it performs deterministic structural, overflow, export,
-and manifest checks. Apollo is local-only and Codex-native. Both paths produce
-structured copy, constrained HTML, PNG slides, and a manifest.
-Apollo does not run a standalone LLM API client or require a runtime API key.
-V2 adds depth without changing the shipped v1 contract.
+Solo and indie developers who want:
 
-`docs/reference/html/index.html` is source material for the `database` theme
-pack; it is not raw runtime output.
+- explicit milestone and spec gates
+- incremental, phase-based delivery (ship something real, then replan)
+- repeatable multi-agent workflows
+- stable repo terminology
+- architecture seams that keep future work clean without speculative overbuild
+- traceable handoffs between planning, implementation, testing, and docs
 
-## Scope
+## Workflow Backbone
 
-Apollo is for creators making concise technical interview-preparation
-carousels. The first proof set is ACID properties, indexes, caching, REST vs
-GraphQL, and embeddings.
+1. Run `$bootstrap` immediately after forking to determine the MVP boundary,
+   derive architecture seams, build an MVP milestone ladder, and replace this
+   harness-template README with a project-specific public overview.
+2. Shape the first milestone with `$requirements`.
+3. Accept a milestone in `docs/milestones/` when scope is settled.
+4. Draft an implementation spec with `$spec`, referencing architecture seams.
+5. Pressure-test the spec before implementation.
+6. Implement through `$dev-loop`, which respects architecture seams and includes
+   verification by delegating to `$test`.
+7. Invoke `$test` directly for standalone or ad hoc verification when you do
+   not need the full dev loop.
+8. When a phase ships (all its milestones are complete), trigger `plan-next`
+   to propose the next phase's Draft milestones based on what shipped.
+9. Realign docs, skills, `user-journeys.html`, and agent rules through
+   `$context` when decisions settle (auto-triggered by `AGENTS.md`).
 
-Source-backed research, citations, visual-review repair loops, an AI theme,
-theme taxonomy or plugins, generated imagery, publishing, scheduling,
-analytics, web UI, and authentication are post-MVP.
+## Repository Layout
 
-## Development
+```text
+.
+├── AGENTS.md
+├── user-journeys.html
+├── .agents/skills/
+├── .codex/agents/
+└── docs/
+    ├── adr/
+    ├── ARCHITECTURE.md
+    ├── PRODUCT.md
+    ├── CONTEXT.md
+    ├── WORKFLOWS.md
+    ├── AGENT_ROLES.md
+    ├── DOCS_POLICY.md
+    ├── milestones/
+    ├── specs/
+    └── techdebt/
+```
 
-Milestones 0001, 0002, and 0003 are Verified. Milestone 0004 remains Draft.
+## How To Use
 
-Renderer development uses Node 22 LTS. Run `npm ci`, then once run `npx
-playwright install chromium`. The renderer's targeted checks are `npm run
-test:renderer`.
+1. Start from this repo as a template.
+2. Run `$bootstrap` as the first real task after the fork.
+3. Answer the grilling session until the product backbone is coherent, then
+   explicitly confirm the concrete bootstrap summary: MVP boundary, ordered
+   MVP milestone ladder, and explicit post-MVP cutoff.
+4. Let bootstrap tailor `README.md` into a project-specific public overview
+   while keeping deeper product detail in `docs/PRODUCT.md`.
+5. Shape and implement milestones one phase at a time. Run `plan-next` after
+   each phase to propose the next increment.
+6. Use `user-journeys.html` at the repo root as the visual map of what the
+   harness supports and what the intended developer paths are.
+7. Keep the workflow docs and agent presets strict unless you intentionally
+   change the harness rules.
+8. Add your application code beside this harness structure.
+
+## Non-Goals
+
+- application runtime code
+- framework-specific scaffolding
+- domain-specific examples
+- historical traces, accepted milestones, or completed specs from another repo

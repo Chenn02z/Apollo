@@ -1,5 +1,7 @@
 name = "explorer"
 description = "Read-only repo explorer for code, docs, tests, configuration, and current implementation shape."
+model = "gpt-5.4-mini"
+model_reasoning_effort = "low"
 sandbox_mode = "read-only"
 
 developer_instructions = """

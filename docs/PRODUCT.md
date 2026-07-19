@@ -1,81 +1,77 @@
-# Apollo Product
+# Product Backbone
 
 ## Product Intent
 
-Apollo is a Codex-native staged workflow that turns a technical topic into a
-fixed seven-slide v1 or adaptive 6–10-slide v2, interview-oriented PNG
-carousel. It gives a technical-content creator a repeatable way to produce
-clear, consistently themed educational slides without manually editing HTML.
+This repository is a reusable AI harness for indie developers. The harness
+gives a software project durable workflow structure through specs, explicit
+handovers, role-specific subagents, and stable repo terminology.
 
-## Target User And Pain
+It is not an app runtime and it is not tied to one domain. Your product code,
+framework choices, and runtime architecture should live alongside this harness,
+not inside its core rules.
 
-The initial user is a creator producing technical interview-preparation
-content. They need concise, accurate-enough-for-manual-review slides with
-consistent visual presentation; composing each carousel by hand is slow and
-visually inconsistent.
+## Current Scope
 
-## MVP Boundary
+- first-run bootstrap onboarding for a newly forked product repo
+- repo operating instructions and workflow skills
+- milestone and spec structure
+- Codex agent presets for planning, grilling, exploration, implementation,
+  verification, review, and documentation
+- context docs that prevent terminology drift
+- generic templates for specs and milestones
+- architecture documentation and incremental phase planning
 
-The verified v1 workflow lets the `apollo-generate` Codex skill receive a topic
-and create:
+## Non-Goals For Now
 
-- `request.json` and `carousel-content.json`
-- one constrained, agent-authored `index.html`
-- seven 1080×1350 PNG slides using the local `database` theme pack
-- `render-manifest.json`
-
-It uses one custom-agent content pass followed by one custom-agent HTML/render
-pass, with no formal source/citation workflow. Apollo has no standalone LLM API
-client or runtime API key. The HTML pass may use only the approved local
-`database` theme assets and templates, and must output exactly seven sequential
-identifiable slides with no scripts, network access, or external assets.
-Playwright screenshots those slides deterministically. V1 overflow diagnostics
-and the five-topic proof remain future work.
-
-The separate verified v2 workflow uses `apollo-generate-v2` and
-`apollo-render-v2`. It writes `request-v2.json`, `carousel-content-v2.json`,
-`index-v2.html`, `slides-v2/`, and `render-manifest-v2.json`; the validated v2
-content artifact alone selects 6–10 slides. V2 performs deterministic
-structural, overflow, export, and manifest validation before publication.
+- runtime application code
+- deployment scaffolding
+- framework-specific project generators
+- domain-specific examples or sample products
+- team collaboration workflows beyond a single main agent coordinating subagents
 
 ## Product Principles
 
-- **Codex-native stages.** Skills enter the workflow and custom agents perform
-  bounded work; Playwright owns deterministic image production.
-- **Meaning before pixels.** One agent creates structured content; a later
-  agent composes constrained HTML from approved local theme assets.
-- **One idea per slide.** Keep technical explanations concise, diagram-led,
-  and suitable for a phone screen.
-- **One visual identity first.** The reference-derived `database` theme pack
-  provides consistency before theme choice breadth.
-- **Inspectable local output.** Every run leaves its input, content, HTML,
-  images, and manifest together once the render stages ship.
-- **Reference-derived assets, not raw reuse.**
-  `docs/reference/html/index.html` informs the `database` theme pack but is not
-  raw runtime output.
+- **Start by interrogating the product**: a fresh fork should not proceed on
+  vague direction; bootstrap should force a usable product backbone first.
+- **Specs define truth**: implementation traces to accepted requirements.
+- **Skills define process**: repeatable workflows live in `.agents/skills/`.
+- **Agents execute roles**: model, reasoning, and permission presets live in
+  `.codex/agents/`.
+- **Main agent owns judgment**: subagents gather, challenge, implement, and
+  review; the main agent reconciles and reports.
+- **The harness is product-agnostic**: domain assumptions belong in your own
+  product docs and specs.
+- **Model routing follows risk**: ambiguous or high-impact work gets stronger
+  models; narrow exploration can use cheaper ones.
+- **Bash is not the orchestration brain**.
+- **Prioritize user-visible functionality over infrastructure completeness**:
+  MVP means the smallest real end-to-end product loop — reduce breadth, not
+  reality. Deliver a concrete, useful experience before filling in every seam.
 
-## Explicit Post-MVP Cutoff
+## Success Criteria
 
-- retries
-- source-backed research and citations
-- visual-spec artifacts, vision review, and automated repair loops
-- generated image assets
-- an AI theme, a theme taxonomy or plugin system, caching, or scheduling
-- publishing, analytics, web UI, authentication, and hosted workflows
+- a fresh fork can be turned into product-specific docs and an initial
+  milestone through a structured grilling session
+- the MVP boundary drives architectural seams, not the other way around
+- vague requests become clear milestones or specs
+- specs are grilled before implementation
+- implementation follows a consistent explorer -> implementer -> verifier ->
+  reviewer loop
+- docs, specs, skills, and agent presets remain aligned
+- developers can add any product domain without rewriting the harness itself
+- shipped milestones feed into phase-level replanning without upfront over-design
 
-## Success Metric
+## Roadmap Backbone
 
-All five proof topics render seven legible, consistently themed PNG slides at
-the required dimensions with no deterministic overflow failures and no manual
-HTML editing.
-
-## MVP Milestone Ladder
-
-1. `0001-carousel-contract-and-content` — Verified: `apollo-generate` skill,
-   request, and bounded seven-slide content artifact.
-2. `0002-fixed-carousel-renderer` — Verified: repository-owned visual
-   assets/templates, constrained HTML generation, and local PNG export.
-3. `0003-adaptive-carousel-content` — Verified: a versioned v2 path with
-   content-derived 6–10 slide carousels and concrete teaching content.
-4. `0004-render-validation-and-mvp-proof` — Draft: deterministic validation
-   and the five-topic manual proof set.
+1. First-run adoption: `$bootstrap` converts the template into a product
+   backbone with durable docs, an MVP milestone ladder, and architecture seams.
+2. Operating contract: `AGENTS.md`.
+3. Workflow foundation: requirements, spec, dev-loop, context, plan-next, and
+   test skills.
+4. Agent foundation: role/model/permission presets under `.codex/agents/`.
+5. Template foundation: milestone, spec, and architecture templates under
+   `docs/`.
+6. Incremental delivery: `plan-next` proposes the next phase after a phase
+   ships, using completed work to reshape future milestones.
+7. Domain adoption: each downstream product adds its own accepted milestones,
+   specs, code, and docs without changing the shared harness by default.
