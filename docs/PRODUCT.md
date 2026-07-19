@@ -2,76 +2,69 @@
 
 ## Product Intent
 
-This repository is a reusable AI harness for indie developers. The harness
-gives a software project durable workflow structure through specs, explicit
-handovers, role-specific subagents, and stable repo terminology.
+Apollo is a Codex-native workflow that turns a single software-engineering topic
+into a self-contained, interview-ready slide deck. The developer invokes Apollo
+with one topic; Codex's available model authors the content directly. Apollo has
+no external model, no API integration, and no runtime multi-agent orchestration.
 
-It is not an app runtime and it is not tied to one domain. Your product code,
-framework choices, and runtime architecture should live alongside this harness,
-not inside its core rules.
+The MVP endpoint is full delivery: exactly one standalone offline HTML deck,
+exactly ten coherent slides, and exactly ten 1080×1350 PNGs named
+`slide-01.png` through `slide-10.png`. Apollo fails rather than produce
+incomplete or invalid output.
 
-## Current Scope
+## Target User
 
-- first-run bootstrap onboarding for a newly forked product repo
-- repo operating instructions and workflow skills
-- milestone and spec structure
-- Codex agent presets for planning, grilling, exploration, implementation,
-  verification, review, and documentation
-- context docs that prevent terminology drift
-- generic templates for specs and milestones
-- architecture documentation and incremental phase planning
+Engineers preparing for technical interviews, and anyone who wants a concise,
+pedagogically ordered explainer on one software-engineering concept — produced
+entirely within a Codex session, with no extra tooling to install or run.
 
-## Non-Goals For Now
+## Scope (MVP)
 
-- runtime application code
-- deployment scaffolding
-- framework-specific project generators
-- domain-specific examples or sample products
-- team collaboration workflows beyond a single main agent coordinating subagents
+- Input: a single software-engineering topic supplied to the Apollo workflow.
+- Authoring surface: the Apollo workflow running in Codex; the available Codex
+  model writes the outline and the self-contained HTML directly.
+- Output: one standalone `deck.html` plus ten PNGs, `slide-01.png` to
+  `slide-10.png`, each 1080×1350 pixels.
+- Pedagogical order (fixed): hook, definition, mental model, mechanics, flow,
+  applied example, code/pseudocode, trade-off, misconception/failure, interviewer
+  follow-up. The ten-slide outline is a model-authored content-planning
+  artifact; the authoring agent realizes it as self-contained deck HTML with no
+  fixed template or layout engine.
+- Broad topics get an interview-relevant angle; narrow topics get deeper
+  treatment.
+- Validity contract: exactly 10 top-level slides; no external assets or network
+  dependencies; no interactivity or animation; each slide is 1080×1350 CSS px;
+  overflow is detected; exactly 10 correctly sized PNGs with predictable
+  numbering.
 
-## Product Principles
+## Principles
 
-- **Start by interrogating the product**: a fresh fork should not proceed on
-  vague direction; bootstrap should force a usable product backbone first.
-- **Specs define truth**: implementation traces to accepted requirements.
-- **Skills define process**: repeatable workflows live in `.agents/skills/`.
-- **Agents execute roles**: model, reasoning, and permission presets live in
-  `.codex/agents/`.
-- **Main agent owns judgment**: subagents gather, challenge, implement, and
-  review; the main agent reconciles and reports.
-- **The harness is product-agnostic**: domain assumptions belong in your own
-  product docs and specs.
-- **Model routing follows risk**: ambiguous or high-impact work gets stronger
-  models; narrow exploration can use cheaper ones.
-- **Bash is not the orchestration brain**.
-- **Prioritize user-visible functionality over infrastructure completeness**:
-  MVP means the smallest real end-to-end product loop — reduce breadth, not
-  reality. Deliver a concrete, useful experience before filling in every seam.
+- **Self-contained by default.** Output must open and render offline with no
+  network, no external fonts or scripts, and no interactivity.
+- **Deterministic shape.** Ten slides, fixed order, fixed dimensions, predictable
+  file names. The structure is the contract; the authoring agent freely chooses
+  visual style and per-slide layout within that contract — there is no fixed
+  deck template or layout engine.
+- **Fail clean.** Incomplete or invalid output is an error, not a deliverable.
+- **Codex is the engine.** No model/API layer to configure; the authoring model
+  is whatever Codex already provides.
 
-## Success Criteria
+## Roadmap (Post-MVP, Explicit)
 
-- a fresh fork can be turned into product-specific docs and an initial
-  milestone through a structured grilling session
-- the MVP boundary drives architectural seams, not the other way around
-- vague requests become clear milestones or specs
-- specs are grilled before implementation
-- implementation follows a consistent explorer -> implementer -> verifier ->
-  reviewer loop
-- docs, specs, skills, and agent presets remain aligned
-- developers can add any product domain without rewriting the harness itself
-- shipped milestones feed into phase-level replanning without upfront over-design
+These are explicitly deferred and out of MVP scope:
 
-## Roadmap Backbone
+- Web/editor UI.
+- API or local-model integrations.
+- Batching (multiple topics/decks at once).
+- Publishing and sharing.
+- Analytics.
+- Video/audio variants.
+- PDF export.
+- Accounts and cloud storage.
+- Automatic factual-review pipeline.
 
-1. First-run adoption: `$bootstrap` converts the template into a product
-   backbone with durable docs, an MVP milestone ladder, and architecture seams.
-2. Operating contract: `AGENTS.md`.
-3. Workflow foundation: requirements, spec, dev-loop, context, plan-next, and
-   test skills.
-4. Agent foundation: role/model/permission presets under `.codex/agents/`.
-5. Template foundation: milestone, spec, and architecture templates under
-   `docs/`.
-6. Incremental delivery: `plan-next` proposes the next phase after a phase
-   ships, using completed work to reshape future milestones.
-7. Domain adoption: each downstream product adds its own accepted milestones,
-   specs, code, and docs without changing the shared harness by default.
+## Reference Material
+
+The supplied reference HTML (`docs/reference/index.html`) is visual guidance only.
+It is intentionally untracked and preserved as-is. Apollo decks must not copy its
+external assets; the reference informs layout and tone, not dependencies.
