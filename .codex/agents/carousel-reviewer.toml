@@ -77,6 +77,14 @@ Strong content should include several of:
 
 Reject definition-only sequences.
 
+For every slide, including hooks and takeaways, verify one concrete core idea
+plus at least two distinct, nonredundant concrete supports. A restatement of the
+core, filler, or repetition does not count. Emit a slide-specific finding for
+every deficient slide and use reject or approve_with_warnings, never approve.
+For a slide with zero supports, one support, or only a rephrased core, name the
+slide and field evidence in an existing-schema finding; do not add fields or
+finding types.
+
 4. Concreteness
 
 Check whether the carousel contains at least one concrete technical example involving specific:

@@ -84,10 +84,10 @@
   `interview` is optional.
 - **overflow diagnostic:** a deterministic rendering failure that identifies
   slide content exceeding its rendered bounds.
-- **body-underfill diagnostic:** a pending `0006` deterministic rendering
-  failure for qualifying visible text rectangles and painted SVG geometry whose
-  vertical span is below 70% of the `.slide-body` CSS content-box height. It is
-  geometric and remains distinct from agent and manual review of semantic depth.
+- **body-underfill diagnostic:** a deterministic rendering failure when
+  qualifying visible text and painted SVG geometry span less than an unrounded
+  70% of the `.slide-body` CSS content-box height. It is geometric and remains
+  distinct from writer, reviewer, and manual review of semantic depth.
 - **reference HTML:** `docs/reference/html/index.html`; source material for the
   `database` theme pack, not raw production runtime output.
 
@@ -114,19 +114,18 @@
   Verified. `0005` opens body-copy and arrangement authorship to the composer;
   shell, safety, containment, export, rollback, and publication ownership stay
   in deterministic code.
-- `0006-increase-slide-body-utilization` is Accepted but not implemented. It
-  plans richer briefs and semantic review plus a deterministic 70% qualifying
-  vertical-span check without changing schemas or workflow stages.
+- `0006-increase-slide-body-utilization` is Verified. It requires richer
+  writer/reviewer slide briefs and a deterministic unrounded 70% qualifying
+  vertical-span check, without changing schemas, workflow stages, retries,
+  correction, shell, theme, rollback, or publication seams.
 - `0007-carousel-treatment-variety` is Verified. It provides prompt-only
   carousel-level treatment and reading-path variety through the
   existing `directionNote`, without schema, pipeline, or validator changes.
 
 ## Workflow Boundaries
 
-- `0001-adaptive-carousel-content`, `0002`, `0003`, `0004`, and `0005` are
-  Verified.
-- `0006-increase-slide-body-utilization` is Accepted; implementation remains
-  unauthorized until its spec is Accepted.
+- `0001-adaptive-carousel-content`, `0002`, `0003`, `0004`, `0005`, and
+  `0006-increase-slide-body-utilization` are Verified.
 - `0007-carousel-treatment-variety` is Verified.
 - `docs/PRODUCT.md` owns product intent and scope;
   `docs/ARCHITECTURE.md` owns implementation boundaries; this file owns durable

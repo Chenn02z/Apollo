@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { assertRunDirectory, loadArchive, snapshotBoundary, snapshotChanged, validateLayout } from "./validate-carousel-layout.mjs";
 import { validateRun } from "./validate-carousel-content.mjs";
+import { inspectDom } from "./measure-carousel.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const fail = (code, path, message = "validation failed") => { throw new Error(`${code} ${path}: ${message}`); };
@@ -256,8 +257,8 @@ export function validateComposition(runDirectory, state) {
   const run = assertRunDirectory(runDirectory), after = filteredBoundary(run); if (snapshotChanged(state.boundary, after)) fail("COMPOSER_PROTECTED_MUTATION", run);
   const content = validateRun(run), layout = validateLayout(run, content), result = validateFragmentSet(run, content); return { content, layout, ...result, html:assembleHtml(content, result.fragments) };
 }
-export function checkComposition(runDirectory) {
-  const run = assertRunDirectory(runDirectory), content = validateRun(run); validateLayout(run, content); validateFragmentSet(run, content);
+export async function checkComposition(runDirectory, { chromium } = {}) {
+  const run = assertRunDirectory(runDirectory), content = validateRun(run), { fragments } = validateFragmentSet(run, content); validateLayout(run, content); await inspectDom(assembleHtml(content, fragments), content.slides.length, { chromium });
 }
 export function finishComposition(state, file) { if (state.backup) rmSync(state.backup, { recursive:true, force:true }); if (file) rmSync(file, { force:true }); }
 export function logDiagnostic(run, record) { try { appendFileSync(join(dirname(dirname(resolve(run))), "proof-log.jsonl"), `${JSON.stringify(record)}\n`); } catch {} }
@@ -265,7 +266,7 @@ export function logDiagnostic(run, record) { try { appendFileSync(join(dirname(d
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [, , run, mode, flag, file] = process.argv;
   try {
-    if (mode === "--check" && flag === undefined) checkComposition(run);
+    if (mode === "--check" && flag === undefined) await checkComposition(run);
     else if (mode === "--prepare" && flag === "--state-file" && file) prepareComposition(run, file);
     else if (mode === "--restore" && flag === "--state-file" && file) { const state = readCompositionState(run, file); restoreRenderer(resolve(run), state); finishComposition(state, file); }
     else throw Error("COMPOSER_RUN_OR_TEMPLATE arguments");

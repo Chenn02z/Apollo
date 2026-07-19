@@ -20,7 +20,7 @@ Use `apollo-generate` to create and review structured content, then
 - `render-manifest.json`
 
 The validated content artifact alone determines the 7–10 slide count. Apollo
-performs deterministic structural, overflow, export, and manifest checks. It
+performs deterministic structural, overflow, body-span, export, and manifest checks. It
 is local-only and Codex-native: no standalone LLM API client or runtime API key
 is required. Initial content and each review-requested candidate get up to
 three writer attempts. A completed `approve_with_warnings` or `reject` review
@@ -68,9 +68,10 @@ assembly, and atomic export publication.
 `0005-free-flow-slide-bodies` is Verified and defines the live body-composition
 seam: composer-authored copy and arrangement with the fixed shell and
 deterministic safety, export, rollback, and publication boundaries preserved.
-`0006-increase-slide-body-utilization` is Accepted and pending implementation;
-it plans richer slide briefs plus a 70% qualifying body-span check, while
-`0005` remains the live contract.
+`0006-increase-slide-body-utilization` is Verified and extends the live
+composition contract with richer writer/reviewer slide briefs and an unrounded
+70% qualifying body-span check shared by composer and fresh prepublication
+validation, without changing schemas, stages, retries, or publication seams.
 `0007-carousel-treatment-variety` is Verified; it
 uses the existing layout direction note to assign varied information treatments
 and reading paths without changing schemas, pipeline stages, or validators.

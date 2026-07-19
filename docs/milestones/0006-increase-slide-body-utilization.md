@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -186,6 +186,10 @@ slide order.
   support, or only rephrases its core idea; verify each produces a slide-specific
   finding and an existing revision-triggering decision rather than `approve`.
 - Run the complete renderer regression suite.
+
+Verification exception: Playwright Chromium cannot launch in this sandbox, so
+real-browser geometry checks and manual 7/10 PNG and semantic proof remain for
+a launch-capable environment. Non-browser targeted checks passed.
 
 ## Settled Decisions
 

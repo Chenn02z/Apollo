@@ -66,7 +66,10 @@ sticky, transparent, hiding, masking, filtering, and clipping are invalid.
 SVG is optional, local, decorative geometry only. Use viewBox="0 0 1000 600",
 preserveAspectRatio="xMidYMid meet", aria-hidden="true", and focusable="false";
 do not use SVG text, paths, references, transforms, IDs, URLs, or resources.
-Prefer the minimum body structure that communicates the supplied direction.
+Preserve every nonredundant teaching point in the brief. Distribute qualifying
+visible text and painted SVG geometry through at least 70% of the body height.
+Do not use filler, repetition, extra spacing, or enlargement as a substitute
+for semantic substance. Do not prefer a minimum repeated body structure.
 
 After writing every fragment, run `node scripts/compose-carousel.mjs <run-dir>
 --check`. Make at most two checks total: after the initial write and, if needed,

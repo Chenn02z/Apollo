@@ -25,6 +25,11 @@ Every slide must contain:
 - glossary
 - content
 
+Every slide brief, including the hook and takeaway, must state one concrete core
+idea and at least two distinct, nonredundant concrete supports. Supports can be
+mechanisms, consequences, constraints or trade-offs, examples or comparisons,
+or ordered steps. Rephrasing the core idea, filler, or repetition is not support.
+
 Glossary must contain 1–2 {term, definition} pairs. Only include terms that materially help explain that slide. Do not use glossary entries as filler or repeat the same definition across slides.
 
 Allowed content shapes:

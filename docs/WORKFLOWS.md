@@ -47,9 +47,10 @@ including bounded content review and revision;
 `0002-deterministic-fixed-shell-rendering-baseline` is Verified; and
 `0003-template-archive-and-carousel-art-direction` is Verified; and
 `0004-constrained-slide-composition` is Verified; and
-`0005-free-flow-slide-bodies` is Verified.
-`0006-increase-slide-body-utilization` is Accepted; spec authoring is
-authorized, but implementation remains unauthorized until the spec is Accepted.
+`0005-free-flow-slide-bodies` and `0006-increase-slide-body-utilization` are
+Verified. `0006` strengthens writer/reviewer briefs and adds an unrounded 70%
+qualifying body-span check within existing composer and prepublication checks;
+it adds no schema, stage, retry, correction, or publication seam.
 `0007-carousel-treatment-variety` is Verified.
 
 Small documentation or cleanup tasks may skip a formal spec when the user makes

@@ -53,7 +53,9 @@ runtime API key.
   varied information treatments and reading paths;
   the composer treats content as a creative brief and layout as creative
   direction while authoring free-flow bodies; deterministic local tooling
-  validates them and preserves the fixed shell.
+  validates them and preserves the fixed shell. Every slide brief has a
+  concrete core idea and two distinct supports; deterministic validation also
+  requires qualifying visible body geometry to span at least 70% of body height.
 - **One idea per slide.** Keep technical explanations concise, diagram-led,
   and suitable for a phone screen.
 - **One visual identity first.** The reference-derived `database` theme pack
@@ -93,10 +95,9 @@ dimensions with no deterministic overflow failures and no manual HTML editing.
 5. `0005-free-flow-slide-bodies` — Verified: composer-authored body copy and
    arrangement, validated safe fragments, and unchanged fixed-shell, export,
    rollback, and publication behavior.
-6. `0006-increase-slide-body-utilization` — Accepted, pending implementation:
-   every slide brief will contain one concrete core idea plus two distinct,
-   nonredundant supports, and qualifying visible body geometry will span at
-   least 70% of body height.
+6. `0006-increase-slide-body-utilization` — Verified: every slide brief has
+   one concrete core idea plus two distinct, nonredundant supports, and
+   qualifying visible body geometry spans at least 70% of body height.
 7. `0007-carousel-treatment-variety` — Verified: existing layout direction
    notes assign varied information treatments
    and reading paths for the composer to implement, with no new schema or

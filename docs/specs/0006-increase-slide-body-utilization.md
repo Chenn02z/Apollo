@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -54,8 +54,8 @@ The following cases define the required behavior:
 
 ## Architecture Reference
 
-This spec changes only the live `0005-free-flow-slide-bodies` composition seam
-and the **Accepted Body-Utilization Seam (Pending Implementation)** recorded in
+This Verified spec extends the live `0005-free-flow-slide-bodies` composition
+contract through the **Current Body-Utilization Seam** recorded in
 [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md):
 
 ```text
@@ -69,10 +69,9 @@ validated content brief + validated layout direction
 → atomic four-member publication (manifest last)
 ```
 
-The Verified `0005` contract remains live until this spec is Accepted,
-implemented, and verified. This spec strengthens semantic briefs and adds one
-geometric invariant inside existing checks; it does not reopen the fixed shell,
-theme, export, rollback, publication, or exact composer-write boundaries.
+This spec strengthens semantic briefs and adds one geometric invariant inside
+existing checks; it does not reopen the fixed shell, theme, export, rollback,
+publication, or exact composer-write boundaries.
 
 ## In Scope
 
@@ -303,6 +302,11 @@ manifest exists. The manifest remains the last published member.
   support, or only rephrases its core idea; verify each produces a slide-specific
   finding and an existing revision-triggering decision rather than `approve`.
 - Run `npm run test:renderer` as the complete renderer regression suite.
+
+Verification exception: in this sandbox, Playwright Chromium cannot launch, so
+the real-browser text/SVG geometry checks and manual 7/10 PNG and semantic proof
+remain to run in a launch-capable environment. All non-browser targeted tests
+pass.
 
 ## Open Questions
 
