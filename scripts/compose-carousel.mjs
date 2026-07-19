@@ -234,41 +234,44 @@ export function assembleHtml(content, fragments, shell = readFileSync(new URL(".
 }
 
 function statePath(run, path) { const file = resolve(path ?? ""), outside = relative(resolve(run), file); if (!outside || (!outside.startsWith("..") && outside !== "..")) fail("COMPOSER_RUN_OR_TEMPLATE", file, "state must be outside run"); return file; }
-function rendererMembers(run) { return ["slide-bodies", "index.html", "slides", "render-manifest.json"].map(name => join(run, name)); }
-function completeRenderer(run) { const members = rendererMembers(run), manifest = stat(members[3]); if (!manifest) return false; if (manifest.isSymbolicLink() || !manifest.isFile() || !directory(members[0]) || !regular(members[1]) || !directory(members[2])) fail("COMPOSER_RUN_OR_TEMPLATE", run, "prior success marker has an incomplete renderer set"); return true; }
-function filteredBoundary(run) { const prefix = `${relative(root, join(run, "slide-bodies"))}/`; return snapshotBoundary(run).filter(entry => !entry[0].startsWith(prefix)); }
+function rendererMembers(run) { return ["composition.html", "index.html", "slides", "render-manifest.json"].map(name => join(run, name)); }
+function completeRenderer(run) { const members = rendererMembers(run), manifest = stat(members[3]); if (!manifest) return false; if (manifest.isSymbolicLink() || !manifest.isFile() || !regular(members[0]) || !regular(members[1]) || !directory(members[2])) fail("COMPOSER_RUN_OR_TEMPLATE", run, "prior success marker has an incomplete renderer set"); return true; }
+function filteredBoundary(run) { const prefix = `${relative(root, join(run, "composition.html"))}`; return snapshotBoundary(run).filter(entry => entry[0] !== prefix); }
 export function restoreRenderer(run, state) {
   for (const path of rendererMembers(run)) rmSync(path, { recursive:true, force:true });
-  if (state.backup) for (const name of ["slide-bodies", "index.html", "slides", "render-manifest.json"]) cpSync(join(state.backup, name), join(run, name), { recursive:true });
+  if (state.backup) for (const name of ["composition.html", "index.html", "slides", "render-manifest.json"]) cpSync(join(state.backup, name), join(run, name), { recursive:true });
 }
 export function readCompositionState(run, file) { const path = statePath(run, file); if (!regular(path)) fail("COMPOSER_RUN_OR_TEMPLATE", path, "missing state"); try { const value = JSON.parse(readFileSync(path, "utf8")); if (!Array.isArray(value.boundary) || (value.backup !== null && typeof value.backup !== "string")) throw Error(); return value; } catch { fail("COMPOSER_RUN_OR_TEMPLATE", path, "invalid state"); } }
 export function prepareComposition(runDirectory, file) {
-  const run = assertRunDirectory(runDirectory), stateFile = statePath(run, file), content = validateRun(run); validateLayout(run, content); loadArchive();
-  const shell = readFileSync(new URL("../assets/database/carousel-shell.html", import.meta.url), "utf8"); if (!shell.includes('<template data-shell="database-blueprint">') || (shell.match(/{{body}}/g) ?? []).length !== 1) fail("COMPOSER_RUN_OR_TEMPLATE", "carousel-shell.html", "invalid canonical shell");
-  const body = join(run, "slide-bodies"), bodyStat = stat(body); if (bodyStat?.isSymbolicLink() || (bodyStat && !bodyStat.isDirectory())) fail("COMPOSER_STALE_OUTPUT", body, "unsafe body path");
+  const run = assertRunDirectory(runDirectory), stateFile = statePath(run, file), content = validateRun(run); validateLayout(run, content);
   const backup = completeRenderer(run) ? mkdtempSync(join(tmpdir(), "apollo-render-backup-")) : null;
   try {
-    if (backup) for (const name of ["slide-bodies", "index.html", "slides", "render-manifest.json"]) cpSync(join(run, name), join(backup, name), { recursive:true });
-    rmSync(join(run, "render-manifest.json"), { force:true }); rmSync(body, { recursive:true, force:true }); mkdirSync(body);
+    if (backup) for (const name of ["composition.html", "index.html", "slides", "render-manifest.json"]) cpSync(join(run, name), join(backup, name), { recursive:true });
+    rmSync(join(run, "render-manifest.json"), { force:true }); rmSync(join(run, "composition.html"), { force:true });
     const state = { backup, boundary:filteredBoundary(run) }; writeFileSync(stateFile, JSON.stringify(state)); return state;
   } catch (error) { const state = { backup, boundary:[] }; restoreRenderer(run, state); if (backup) rmSync(backup, { recursive:true, force:true }); throw error; }
 }
 export function prepareRecoveredComposition(runDirectory, file) {
-  const run = assertRunDirectory(runDirectory), stateFile = statePath(run, file), content = validateRun(run); validateLayout(run, content); loadArchive();
-  const body = join(run, "slide-bodies"), bodyStat = stat(body); if (!bodyStat || bodyStat.isSymbolicLink() || !bodyStat.isDirectory()) fail("COMPOSER_STALE_OUTPUT", body, "missing safe recovered body path");
+  const run = assertRunDirectory(runDirectory), stateFile = statePath(run, file), content = validateRun(run); validateLayout(run, content);
   const prior = regular(stateFile) ? readCompositionState(run, stateFile) : null, backup = prior?.backup ?? (completeRenderer(run) ? mkdtempSync(join(tmpdir(), "apollo-render-backup-")) : null);
   try {
-    if (!prior && backup) for (const name of ["slide-bodies", "index.html", "slides", "render-manifest.json"]) cpSync(join(run, name), join(backup, name), { recursive:true });
+    if (!prior && backup) for (const name of ["composition.html", "index.html", "slides", "render-manifest.json"]) cpSync(join(run, name), join(backup, name), { recursive:true });
     rmSync(join(run, "render-manifest.json"), { force:true });
     const state = prior ?? { backup, boundary:filteredBoundary(run) }; writeFileSync(stateFile, JSON.stringify(state)); return state;
   } catch (error) { const state = prior ?? { backup, boundary:[] }; restoreRenderer(run, state); finishComposition(state, stateFile); throw error; }
 }
 export function validateComposition(runDirectory, state) {
   const run = assertRunDirectory(runDirectory), after = filteredBoundary(run); if (snapshotChanged(state.boundary, after)) fail("COMPOSER_PROTECTED_MUTATION", run);
-  const content = validateRun(run), layout = validateLayout(run, content), result = validateFragmentSet(run, content); return { content, layout, ...result, html:assembleHtml(content, result.fragments) };
+  const content = validateRun(run), layout = validateLayout(run, content), path = join(run, "composition.html");
+  if (!regular(path)) fail("COMPOSER_OUTPUT", path, "complete composition.html required");
+  return { content, layout, html:readFileSync(path, "utf8") };
 }
 export async function checkComposition(runDirectory, { chromium } = {}) {
-  const run = assertRunDirectory(runDirectory), content = validateRun(run), { fragments } = validateFragmentSet(run, content); validateLayout(run, content); await inspectDom(assembleHtml(content, fragments), content.slides.length, { chromium });
+  const run = assertRunDirectory(runDirectory), content = validateRun(run), path = join(run, "composition.html"); validateLayout(run, content);
+  if (!regular(path)) fail("COMPOSER_OUTPUT", path, "complete composition.html required");
+  const html = readFileSync(path, "utf8"), slides = [...html.matchAll(/<([a-z][a-z0-9]*)\b[^>]*data-slide="([0-9]+)"[^>]*>/gi)].map(match => match[2]);
+  if (slides.join() !== content.slides.map(slide => String(slide.number)).join()) fail("COMPOSER_OUTPUT", path, "ordered data-slide elements required");
+  if (chromium) await inspectDom(html, content.slides.length, { chromium });
 }
 export function finishComposition(state, file) { if (state.backup) rmSync(state.backup, { recursive:true, force:true }); if (file) rmSync(file, { force:true }); }
 export function logDiagnostic(run, record) { try { appendFileSync(join(dirname(dirname(resolve(run))), "proof-log.jsonl"), `${JSON.stringify(record)}\n`); } catch {} }

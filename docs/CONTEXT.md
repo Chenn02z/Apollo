@@ -7,7 +7,7 @@
 - **Codex-native stage:** a bounded workflow stage entered through a Codex
   skill and performed by a Codex custom agent or deterministic local tool.
 - **run:** one generated output directory containing `request.json`,
-  `carousel-content.json`, `carousel-layout.json`, `slide-bodies/`, `index.html`,
+  `carousel-content.json`, `carousel-layout.json`, `composition.html`, `index.html`,
   `slides/`, and `render-manifest.json` as its stages complete; it may also
   contain preserved content artifacts and versioned best-effort review artifacts.
 - **recovery record:** a sanitized, append-only diagnostic event the workflow
@@ -31,25 +31,24 @@
   preserves the next validated content before revision 2. Neither is overwritten.
 - **review artifact:** an evidence-backed, versioned
   `carousel-review-<n>.json` publishability review, where `<n>` is 1 through
-  3. `apollo-generate` validates each review before branching. An
+  2. `apollo-generate` validates each review before branching. An
   `approve_with_warnings` or `reject` decision may ask `carousel-writer` for a
   candidate revision, with up to three writer attempts for that candidate.
   Apollo validates it before promotion and preserves prior valid content when
   validation removes an invalid candidate. There are at most two revisions and
-  three reviews; a missing or invalid review is non-blocking and ends that loop.
+  two reviews; a missing or invalid review is non-blocking and ends that loop.
 - **renderer stage:** `apollo-render` validates content, prepares an external
   snapshot of the protected boundary, delegates once to `carousel-art-director`,
   validates the layout plan and boundary, then delegates once to
-  `carousel-composer` to author `slide-bodies/`. Deterministic code validates
-  and safely inserts those bodies into one fixed shell, supplies exact
-  shell-owned copy, and performs browser containment checks, PNG export, and
-  atomic publication with the manifest last.
+  `carousel-composer` to author `composition.html`. Deterministic code validates
+  its ordered slides, performs PNG export, and atomically publishes the
+  composition with the manifest last.
 - **fixed-shell renderer:** one local `database` shell with fixed
   header, footer, title, why, and glossary regions plus deterministic HTML,
   browser-layout, export, and publication checks.
 - **carousel recovery:** a narrowly scoped runtime repair role. It may repair a
   generate candidate from a valid checkpoint, or a non-protected layout or
-  exact canonical body fragments during render. Initial-content, review, state,
+  `composition.html` during render. Initial-content, review, state,
   protected-boundary, integrity, browser, export, and publication errors are
   terminal; it does not rerun art direction or composition.
 - **carousel art director:** an LLM stage that reads validated content and the
@@ -72,12 +71,11 @@
   repeated body arrangements produce no deterministic warning.
 - **carousel composer:** the runtime writer that turns validated content as a
   creative brief and the approved layout plan as creative direction into
-  free-flow final body copy and arrangement in one `slide-bodies/<nn>.html`
-  fragment per slide. It receives the canonical shell, not template or theme
-  sources, and new bodies cannot use the legacy `cp-*` vocabulary. `0007`
-  directs it to implement the assigned treatment and reading path rather
-  than default to a minimum repeated body structure. It cannot
-  alter the shared shell, shell-owned fields, scripts, or external resources.
+  complete `composition.html` document. It owns the document's HTML/CSS/SVG
+  treatments and cannot alter content, layout, source assets, or published
+  PNG/manifest artifacts. `0007` directs it to implement the assigned
+  treatment and reading path rather than default to a minimum repeated body
+  structure.
 - **template contract:** the repository-owned version-2 layout-capability
   contract for a named template: its fixed motif and accepted composition,
   density, visual-anchor, and reading-direction vocabulary. It has no fragment

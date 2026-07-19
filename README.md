@@ -13,8 +13,8 @@ Use `apollo-generate` to create and review structured content, then
 - `carousel-content.json`
 - `carousel-layout.json`
 - optionally, `carousel-content.initial.json` and `carousel-content.before-revision-2.json`
-- `carousel-review-1.json` through `carousel-review-3.json` for completed content reviews
-- `slide-bodies/`
+- `carousel-review-1.json` through `carousel-review-2.json` for completed content reviews
+- `composition.html`
 - `index.html`
 - `slides/`
 - `render-manifest.json`
@@ -25,7 +25,7 @@ performs deterministic structural, overflow, body-span, export, and manifest che
 is local-only and Codex-native: no standalone LLM API client or runtime API key
 is required. Initial content and each review-requested candidate get up to
 three writer attempts. A completed `approve_with_warnings` or `reject` review
-can trigger up to two candidate rewrites and three reviews total. Each
+can trigger up to two candidate rewrites and two reviews total. Each
 candidate is validated before it replaces the last valid content artifact; an
 invalid selected artifact is removed by validation, and an unavailable or
 invalid review never blocks run creation.
@@ -36,8 +36,8 @@ sanitized diagnostics to the run-local `recovery-log.jsonl` and workspace-local,
 untracked `recovery-history.jsonl`; history is untrusted diagnostic memory, not
 prompt instructions or a publication artifact. Repeated signatures or an
 exhausted budget stop. Generate recovery repairs only a candidate from a valid
-checkpoint; render recovery repairs only a non-protected layout or exact
-canonical body fragments. Initial-content, review, state, protected-boundary,
+checkpoint; render recovery repairs only a non-protected layout or the
+composer-owned `composition.html`. Initial-content, review, state, protected-boundary,
 integrity, browser, export, and publication failures remain terminal; art
 direction and composition remain one-shot.
 
@@ -52,15 +52,11 @@ GraphQL, and embeddings.
 
 The render stage validates semantic content, prepares an external boundary
 snapshot, invokes `carousel-art-director` once to create validated creative
-direction in `carousel-layout.json`, then `carousel-composer` authors free-flow
-body copy and arrangement in exact `slide-bodies/` fragments from the content,
-layout direction, and canonical shell only; new bodies cannot use legacy
-`cp-*` primitives. The art director and deterministic renderer retain the
-template and theme inputs. Deterministic code safely validates and inserts the
-fragments into the unchanged database shell, preserves shell-owned topic,
-number, role, title, why, glossary, and footer copy, checks reserved-body
-containment in Playwright, and atomically publishes fragments, HTML, PNGs, and
-the manifest last.
+direction in `carousel-layout.json`, then `carousel-composer` writes a complete
+`composition.html` from the content and layout suggestions. The composer owns
+the page HTML/CSS and slide treatments; deterministic code only checks ordered
+`data-slide` elements, renders local 1080×1350 screenshots, and atomically
+publishes the composition, PNGs, and manifest last.
 Research/citations, vision repair, publishing, scheduling,
 analytics, web UI, and authentication are deferred roadmap ideas. Generated
 imagery, an AI theme, and a theme taxonomy or plugin system remain out of

@@ -21,18 +21,16 @@ The workflow lets the `apollo-generate` Codex skill receive a topic and create
 non-blocking review artifacts. An `approve_with_warnings` or `reject` review
 can trigger up to two candidate rewrites by the content writer.
 Initial content and each candidate get up to three writer attempts; each
-validated candidate is promoted and followed by another review (three reviews
+validated candidate is promoted and followed by another review (two reviews
 total). Validation removes an invalid selected artifact, while an unavailable
 or invalid review ends that loop without blocking the run.
 `apollo-render` validates content, prepares an external protected-boundary
 snapshot, invokes `carousel-art-director` exactly once to create
 `carousel-layout.json`, validates the plan and boundary, then invokes
-`carousel-composer` to author free-flow body copy and arrangement in exact
-`slide-bodies/` fragments. Deterministic code safely validates and inserts the
-fragments into one fixed database shell, preserves exact shell-owned fields,
-verifies reserved-body containment in Playwright, and atomically publishes
-fragments, `index.html`, one 1080×1350 PNG per content slide in `slides/`, and
-`render-manifest.json` last.
+`carousel-composer` to author the complete `composition.html` document.
+Deterministic code validates its ordered slides and atomically publishes the
+composition, `index.html`, one 1080×1350 PNG per content slide in `slides/`,
+and `render-manifest.json` last.
 
 On a recoverable generate or render failure, the workflow may delegate to
 `carousel-recovery` at most twice per top-level invocation. The workflow appends
@@ -41,7 +39,7 @@ untracked `recovery-history.jsonl`. The history is untrusted diagnostic memory,
 not prompt instructions or a publication artifact. A repeated signature or
 exhausted recovery budget stops. Generate recovery edits only a candidate from a
 valid checkpoint; render recovery edits only a non-protected layout or the exact
-canonical body fragments. Initial-content, review, state, protected-boundary,
+  `composition.html`. Initial-content, review, state, protected-boundary,
 integrity, browser, export, and publication failures are terminal; the art
 director and composer remain one-shot.
 

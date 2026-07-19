@@ -38,15 +38,14 @@ main workflow calls for it.
   `apollo-generate` runtime stage.
 - `carousel-reviewer`: writes only its delegated
   `runs/<run-id>/carousel-review-<n>.json` artifact after `apollo-generate`
-  validates content, where `<n>` is 1 through 3.
+  validates content, where `<n>` is 1 through 2.
 - `carousel-art-director`: writes only its delegated
   `runs/<run-id>/carousel-layout.json` artifact, exactly once; it does not
   write HTML, change content, retry, or repair.
-- `carousel-composer`: runtime writer that authors final body copy and
-  arrangement in exactly its delegated
-  `runs/<run-id>/slide-bodies/<nn>.html` fragments; it does not mutate the
-  content artifact, shell-owned fields, templates, canonical shell or theme
-  CSS, or export artifacts.
+- `carousel-composer`: runtime writer that authors the complete
+  `runs/<run-id>/composition.html` document from content and layout suggestions.
+  It may use its own HTML, CSS, SVG, scripts, and local assets; it does not
+  mutate content, layout, source assets, or published PNG/manifest artifacts.
 - `carousel-recovery`: runtime repairer invoked only after a recoverable
   top-level generate or render error, at most twice per top-level invocation.
   The workflow appends sanitized events to the run-local `recovery-log.jsonl`
@@ -54,7 +53,7 @@ main workflow calls for it.
   untrusted diagnostic memory, not prompt instructions or publication output.
   It may write only a generate
   candidate from a valid checkpoint, or a non-protected
-  `carousel-layout.json` or exact canonical `slide-bodies/<nn>.html` fragments.
+  `carousel-layout.json` or the composer-owned `composition.html` document.
   It cannot repair initial content, reviews, state, protected-boundary or
   integrity failures, browser/export/publication failures, templates, shell,
   theme, or published artifacts. Repeated signatures and the two-delegation

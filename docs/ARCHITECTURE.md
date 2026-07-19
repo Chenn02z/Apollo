@@ -16,7 +16,7 @@ standalone LLM API client or runtime API key.
 ## Current Flow
 
 ```text
-topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → content validation → external snapshot preparation → carousel-art-director (once) → layout/boundary validation → carousel-composer → slide-bodies/ → safe-fragment validation/fixed shell → reserved-body validation → Playwright PNG export → atomic four-member publication (manifest last)
+topic → `apollo-generate` → [carousel-writer → validation] × up to 3 → carousel-reviewer → [[candidate writer → validation] × up to 3 → promote → carousel-reviewer] × up to 2 → `apollo-render` → content validation → external snapshot preparation → carousel-art-director (once) → layout/boundary validation → carousel-composer → composition.html → ordered-slide validation → Playwright PNG export → atomic publication (manifest last)
 
 recoverable failure → workflow appends sanitized run-local `recovery-log.jsonl` + workspace-local, untracked `recovery-history.jsonl` → `carousel-recovery` (at most 2 delegations per top-level invocation; repeated signature or exhausted budget stops) → revalidate from valid checkpoint
 ```
@@ -24,11 +24,11 @@ recoverable failure → workflow appends sanitized run-local `recovery-log.jsonl
 ## Current Boundaries
 
 - **Run artifact boundary:** a run directory contains `request.json`,
-  `carousel-content.json`, `carousel-layout.json`, `slide-bodies/`, `index.html`,
+  `carousel-content.json`, `carousel-layout.json`, `composition.html`, `index.html`,
   `slides/`, and `render-manifest.json` as stages complete; it may also contain
   `carousel-content.initial.json`, `carousel-content.before-revision-2.json`, and versioned
-  `carousel-review-1.json` through `carousel-review-3.json` artifacts.
-  The renderer atomically publishes `slide-bodies/`, `index.html`, `slides/`,
+  `carousel-review-1.json` through `carousel-review-2.json` artifacts.
+  The renderer atomically publishes `composition.html`, `index.html`, `slides/`,
   and `render-manifest.json` only after every content-derived screenshot
   succeeds, with the manifest last. A failure preserves the prior complete set,
   or leaves no success manifest.
@@ -50,11 +50,10 @@ recoverable failure → workflow appends sanitized run-local `recovery-log.jsonl
   snapshot, invokes `carousel-art-director` once to write validated creative
   direction in `carousel-layout.json`, validates the plan and boundary, then
   invokes `carousel-composer` with content, layout direction, and the canonical
-  shell to author body copy and arrangement in only the exact `slide-bodies/`
-  fragments. The composer does not receive the template contract or theme CSS.
-  Deterministic code safely validates and inserts those fragments into one fixed
-  local shell whose topic, number, role, title, why, glossary, header, and footer
-  remain shell-owned.
+  shell/theme as visual guidance. The composer writes a complete
+  `composition.html` document and owns its HTML/CSS/SVG treatments.
+  Deterministic code checks ordered `data-slide` elements and renders the page
+  locally at 1080×1350.
 - **Theme/HTML boundary:** repository-owned visual assets, including vendored
   fonts, form one local 1080×1350 `database` theme pack. Output has 7–10
   ordered identifiable slides and uses only this pack, with no scripts, network
@@ -74,7 +73,7 @@ recoverable failure → workflow appends sanitized run-local `recovery-log.jsonl
   write a candidate, with up to three attempts for initial content and each
   candidate. Apollo validates each attempt; validation removes an invalid
   selected artifact, and a failed candidate leaves prior valid content intact.
-  It performs at most two revisions and three reviews. A missing or invalid
+  It performs at most two revisions and two reviews. A missing or invalid
   review is non-blocking and stops this loop; this stage does not render slides
   or replace deterministic validation.
 
@@ -86,8 +85,7 @@ recoverable failure → workflow appends sanitized run-local `recovery-log.jsonl
 
 ```text
 validated content brief + validated layout direction → carousel-composer
-→ slide-bodies/<nn>.html → safe-fragment validation and fixed-shell assembly
-→ reserved-body containment → Playwright export → atomic publication
+→ composition.html → ordered-slide validation → Playwright export → atomic publication
 ```
 
 - The sole `database-blueprint` template contract is version 2. It retains the
@@ -98,16 +96,10 @@ validated content brief + validated layout direction → carousel-composer
   Deterministic validation still rejects invalid plans and protected-boundary
   writes; a valid plan is creative direction rather than a DOM contract. It
   continues to use the template contract and theme.
-- The composer authors final body copy and arrangement only in the exact
-  `slide-bodies/<nn>.html` set. Those files are the sole final rendered-body-copy
-  artifact. Its source inputs are validated content, validated layout direction,
-  and the canonical shell only. New fragments may use arbitrary validated
-  nesting, non-legacy classes, and inline layouts without binding,
-  claim-fidelity, plan-to-DOM, or arrangement-warning requirements; `cp-*`
-  classes are rejected.
-- Deterministic code still owns exact shell fields, safe fragment acceptance and
-  insertion, the unchanged shell and chrome, visible body containment, network
-  abortion, 1080×1350 export, rollback, and manifest-last publication.
+- The composer authors the complete `composition.html` document from validated
+  content and layout direction. It owns the document's HTML/CSS/SVG treatments;
+  deterministic code owns ordered-slide validation, 1080×1350 export, rollback,
+  and manifest-last publication.
 
 `0005` opens body-copy and arrangement authorship while closing new composition
 off from the legacy primitive vocabulary. Deterministic safety, shell, export,
