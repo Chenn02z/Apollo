@@ -2,8 +2,7 @@ name = "reviewer"
 description = "Read-only reviewer focused on correctness, regressions, test gaps, and whether the diff satisfies the spec."
 sandbox_mode = "read-only"
 model_provider = "openrouter"
-model = "kwaipilot/kat-coder-air-v2.5"
-model_reasoning_effort = "medium"
+model = "nvidia/nemotron-3-ultra-550b-a55b:free"
 
 developer_instructions = """
 Review like a senior maintainer.

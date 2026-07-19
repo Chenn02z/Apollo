@@ -34,3 +34,82 @@ test("rejects legacy variants and exact-shape, cardinality, text, and role viola
 test("removes only an invalid selected candidate", () => { const value = fixture(); write(value); writeFileSync(join(value.run, "carousel-content.candidate.json"), "not json"); assert.throws(() => validateRun(value.run, { file:"carousel-content.candidate.json" })); assert.equal(validateRun(value.run).topic, "ACID"); });
 test("creates a request after normalizing the topic", () => { const root = mkdtempSync(join(tmpdir(), "apollo-")), run = createRun("  ACID  ", { root, runId:"run-1", createdAt:"2026-07-16T00:00:00.000Z" }); assert.equal(existsSync(join(run, "request.json")), true); assert.throws(() => createRun(" ", { root, runId:"run-2" })); });
 test("writer and reviewer contracts use semantic content instead of visual variants", () => { const writer = readFileSync(join(process.cwd(), ".codex/agents/carousel-writer.toml"), "utf8"), reviewer = readFileSync(join(process.cwd(), ".codex/agents/carousel-reviewer.toml"), "utf8"); for (const type of ["statement", "collection", "comparison", "sequence", "example", "checklist"]) assert.match(writer, new RegExp(`- ${type}:`)); assert.match(writer, /at least two distinct, nonredundant concrete supports/); assert.match(reviewer, /Emit a slide-specific finding for\s+every deficient slide/); assert.match(reviewer, /zero supports, one support, or only a rephrased core/); assert.match(reviewer, /existing-schema finding/); assert.match(reviewer, /never approve/); assert.match(reviewer, /semantic content\.type/); assert.doesNotMatch(writer, /Allowed variants|Variant fields|UNDERDEVELOPED_SLIDE/); assert.doesNotMatch(reviewer, /quote variants|levels variants|fact variants/); });
+
+// --- quarantine / diagnostic tests ---
+
+test("quarantines invalid canonical to rejected-content.json", () => {
+  const value = fixture(); write(value);
+  value.content.slides[0].title = "x".repeat(100);
+  writeFileSync(join(value.run, "carousel-content.json"), JSON.stringify(value.content));
+  assert.throws(() => validateRun(value.run));
+  assert.equal(existsSync(join(value.run, "carousel-content.json")), false);
+  assert.equal(existsSync(join(value.run, "rejected-content.json")), true);
+  assert.equal(existsSync(join(value.run, "request.json")), true);
+});
+
+test("quarantines invalid candidate to rejected-content.json", () => {
+  const value = fixture(); write(value);
+  writeFileSync(join(value.run, "carousel-content.candidate.json"), "not json");
+  assert.throws(() => validateRun(value.run, { file: "carousel-content.candidate.json" }));
+  assert.equal(existsSync(join(value.run, "carousel-content.candidate.json")), false);
+  assert.equal(existsSync(join(value.run, "rejected-content.json")), true);
+  assert.equal(existsSync(join(value.run, "carousel-content.json")), true);
+  assert.equal(validateRun(value.run).topic, "ACID");
+});
+
+test("rejected-content.json is not selectable", () => {
+  const value = fixture(); write(value);
+  value.content.slides[0].title = "x".repeat(100);
+  writeFileSync(join(value.run, "carousel-content.json"), JSON.stringify(value.content));
+  assert.throws(() => validateRun(value.run));
+  assert.throws(() => validateRun(value.run, { file: "rejected-content.json" }));
+});
+
+test("preserves prior valid content after candidate rejection", () => {
+  const value = fixture(); write(value);
+  writeFileSync(join(value.run, "carousel-content.candidate.json"), "not json");
+  assert.throws(() => validateRun(value.run, { file: "carousel-content.candidate.json" }));
+  assert.equal(existsSync(join(value.run, "carousel-content.candidate.json")), false);
+  const result = validateRun(value.run);
+  assert.equal(result.topic, "ACID");
+  assert.equal(result.slides.length, 7);
+});
+
+test("replacing prior rejected-content.json is intentional", () => {
+  const value = fixture(); write(value);
+  writeFileSync(join(value.run, "rejected-content.json"), "old reject");
+  value.content.slides[0].title = "x".repeat(100);
+  writeFileSync(join(value.run, "carousel-content.json"), JSON.stringify(value.content));
+  assert.throws(() => validateRun(value.run));
+  assert.equal(existsSync(join(value.run, "rejected-content.json")), true);
+});
+
+test("diagnostics include field path and rule, exclude raw field values", () => {
+  const value = fixture(); write(value);
+  value.content.slides[0].glossary[0] = "not-an-object";
+  writeFileSync(join(value.run, "carousel-content.json"), JSON.stringify(value.content));
+  try { validateRun(value.run); assert.fail("expected throw"); } catch (e) {
+    assert.match(e.message, /glossary\[0\]/);
+    assert.doesNotMatch(e.message, /not-an-object/);
+  }
+});
+
+test("diagnostics report actual length and permitted bound", () => {
+  const value = fixture(); write(value);
+  value.content.slides[0].title = "x".repeat(100);
+  writeFileSync(join(value.run, "carousel-content.json"), JSON.stringify(value.content));
+  try { validateRun(value.run); assert.fail("expected throw"); } catch (e) {
+    assert.match(e.message, /length 100 exceeds limit 56/);
+    assert.match(e.message, /Slide 1 title/);
+  }
+});
+
+test("diagnostics report actual type on type violations", () => {
+  const value = fixture(); write(value);
+  value.content.slides[0].title = 42;
+  writeFileSync(join(value.run, "carousel-content.json"), JSON.stringify(value.content));
+  try { validateRun(value.run); assert.fail("expected throw"); } catch (e) {
+    assert.match(e.message, /expected string, received number/);
+    assert.match(e.message, /Slide 1 title/);
+  }
+});

@@ -341,7 +341,7 @@
               <li>Content selects 7–10 slides from teaching beats.</li>
               <li>A closed role sequence and bounded plain-text copy keep each slide mobile-legible.</li>
               <li>The artifact is <code>carousel-content.json</code>.</li>
-              <li>Initial content and each review-requested candidate get up to three writer attempts. An <code>approve_with_warnings</code> or <code>reject</code> review can request up to two validated candidate rewrites; validation removes an invalid selected artifact, the last valid content is preserved until promotion, and an unavailable or invalid review does not block the run.</li>
+              <li>Initial content and each review-requested candidate get up to three writer attempts. An <code>approve_with_warnings</code> or <code>reject</code> review can request up to two validated candidate rewrites; when validation rejects canonical content, the invalid artifact is removed from its selectable name and only the latest rejected input is retained locally as non-selectable <code>rejected-content.json</code>, while prior valid content remains protected. An unavailable or invalid review does not block the run.</li>
               <li>Recoverable failure can invoke <code>carousel-recovery</code> up to twice per top-level invocation from a valid checkpoint; repeated signatures or an exhausted budget stop.</li>
             </ul>
           </article>
@@ -494,7 +494,7 @@
           </article>
           <article class="artifact">
             <h3>Available: advisory review</h3>
-            <p>Reviews are kept as <code>carousel-review-1.json</code> through <code>carousel-review-3.json</code>. Initial content and each <code>approve_with_warnings</code>- or <code>reject</code>-requested candidate get up to three writer attempts; validation removes an invalid selected artifact, and prior valid content is preserved before candidate promotion. An unavailable or invalid review does not block the run.</p>
+            <p>Reviews are kept as <code>carousel-review-1.json</code> through <code>carousel-review-3.json</code>. Initial content and each <code>approve_with_warnings</code>- or <code>reject</code>-requested candidate get up to three writer attempts; when validation rejects canonical content, the invalid artifact is removed from its selectable name and only the latest rejected input is retained locally as non-selectable <code>rejected-content.json</code>, while prior valid content remains protected. An unavailable or invalid review does not block the run.</p>
           </article>
         </div>
       </section>
