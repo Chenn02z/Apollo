@@ -17,12 +17,13 @@ specs) and the untracked visual reference at `docs/reference/index.html`.
 The MVP production path is a two-stage pipeline with a validation gate between
 the stages:
 
-1. **Outline → self-contained deck HTML.** The authoring agent freely authors
-   each deck's complete `deck.html` for a ten-slide outline — colors,
-   typography, composition, diagrams, and per-slide layout are agent-chosen.
-   The outline is a model-authored content-planning artifact, not input to a
-   fixed layout engine. Output is one offline file (no external assets, no
-   network, no interactivity, each slide 1080×1350 CSS px).
+1. **Topic → self-contained deck HTML.** The active Codex model directly
+   authors each deck's complete `deck.html` for a single topic — colors,
+   typography, composition, diagrams, and per-slide layout are model-chosen.
+   The fixed pedagogical order is an internal content-planning constraint that
+   guides authoring, not a separate outline artifact or a fixed layout engine.
+   Output is one offline file (no external assets, no network, no interactivity,
+   each slide 1080×1350 CSS px).
 2. **HTML → validation + PNG export.** The `deck.html` is validated, then
    exported as exactly ten 1080×1350 PNGs named `slide-01.png` through
    `slide-10.png`.
@@ -32,18 +33,19 @@ the stages:
 Boundaries the MVP deliberately establishes so post-MVP work can extend cleanly.
 These describe the contract the MVP code must respect, not pre-built abstractions.
 
-### Seam 1: Outline → deck HTML boundary
+### Seam 1: Topic → deck HTML boundary
 
-- **What**: a fixed ten-slide outline structure (hook, definition, mental model,
-  mechanics, flow, applied example, code/pseudocode, trade-off,
-  misconception/failure, interviewer follow-up) as a model-authored
-  content-planning contract; the authoring agent realizes it as self-contained
-  `deck.html` with no fixed template or layout engine.
+- **What**: the active Codex model authors a self-contained `deck.html` directly
+  from a single topic, following the fixed ten-slide pedagogical order (hook,
+  definition, mental model, mechanics, flow, applied example,
+  code/pseudocode, trade-off, misconception/failure, interviewer follow-up) as
+  an internal content-planning constraint — no separate outline artifact and
+  no fixed template or layout engine.
 - **Why**: lets a future web/editor UI or alternative authoring model feed the
-  same content contract; the agent still authors the visual HTML directly.
-- **Current path**: the Apollo workflow authors both the outline and the
-  `deck.html` directly in Codex today; the outline order is enforced as the
-  validity contract.
+  same content-then-HTML path; the model still authors the visual HTML directly.
+- **Current path**: the Apollo workflow authors `deck.html` directly in Codex
+  today; the pedagogical order is an internal authoring constraint, not a
+  visual template.
 
 ### Seam 2: HTML → validation/PNG export boundary
 
@@ -62,8 +64,8 @@ These describe the contract the MVP code must respect, not pre-built abstraction
 Features intentionally NOT built in the MVP. Each names what is deferred and
 which seam it builds on.
 
-- **Web/editor UI**: a separate authoring surface feeding Seam 1's outline
-  contract instead of the Codex-native workflow.
+- **Web/editor UI**: a separate authoring surface feeding Seam 1's topic -> deck HTML path
+  instead of the Codex-native workflow.
 - **API / local-model integrations**: alternative authoring backends behind
   Seam 1.
 - **Batching**: multiple decks through Seam 2's export path.

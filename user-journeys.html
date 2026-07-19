@@ -342,8 +342,8 @@
             </div>
             <ul>
               <li>Codex's available model authors the content and visual HTML directly — Apollo has no separate model or API.</li>
-              <li>The ten-slide outline follows the fixed pedagogical order.</li>
-              <li>The outline is authored as one self-contained <code>deck.html</code>; visual style and per-slide layout are agent-chosen, not from a fixed layout engine.</li>
+              <li>Each slide follows the fixed pedagogical order as an internal content-planning constraint — no separate outline artifact exists.</li>
+              <li>The deck is authored directly as one self-contained <code>deck.html</code>; visual style and per-slide layout are model-chosen, not from a fixed layout engine.</li>
             </ul>
           </article>
 
@@ -402,7 +402,7 @@
         <div class="capability-grid">
           <article class="capability">
             <span class="stage">Authoring</span>
-            <h3>Write a ten-slide outline in Codex</h3>
+            <h3>Author a ten-slide deck directly in Codex</h3>
             <p>One topic becomes a fixed-order, interview-ready narrative.</p>
           </article>
           <article class="capability">
@@ -432,7 +432,7 @@
           </article>
         </div>
         <p class="callout">
-          Apollo is strongest as a strict two-stage pipeline: outline →
+          Apollo is strongest as a strict two-stage pipeline: topic →
           agent-authored self-contained HTML, then HTML → validation + Playwright
           PNG export. The shape of the deck is the contract; the reference HTML is
           guidance, not a dependency.

@@ -22,14 +22,14 @@ entirely within a Codex session, with no extra tooling to install or run.
 
 - Input: a single software-engineering topic supplied to the Apollo workflow.
 - Authoring surface: the Apollo workflow running in Codex; the available Codex
-  model writes the outline and the self-contained HTML directly.
+  model directly authors the self-contained `deck.html` from a single topic.
 - Output: one standalone `deck.html` plus ten PNGs, `slide-01.png` to
   `slide-10.png`, each 1080×1350 pixels.
-- Pedagogical order (fixed): hook, definition, mental model, mechanics, flow,
-  applied example, code/pseudocode, trade-off, misconception/failure, interviewer
-  follow-up. The ten-slide outline is a model-authored content-planning
-  artifact; the authoring agent realizes it as self-contained deck HTML with no
-  fixed template or layout engine.
+- Pedagogical order (fixed, internal content-planning constraint): hook,
+  definition, mental model, mechanics, flow, applied example, code/pseudocode,
+  trade-off, misconception/failure, interviewer follow-up. The fixed order
+  guides the model's authoring; it is not a separate outline artifact, visual
+  template, or layout engine input.
 - Broad topics get an interview-relevant angle; narrow topics get deeper
   treatment.
 - Validity contract: exactly 10 top-level slides; no external assets or network

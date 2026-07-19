@@ -11,7 +11,7 @@ complete, valid, self-contained result — and fails clean otherwise.
 
 ## MVP Deliverable
 
-From a `deck.html` produced by milestones 0001–0002, Apollo validates the
+From a `deck.html` produced by milestone 0001, Apollo validates the
 validity contract and exports exactly ten 1080×1350 PNGs named
 `slide-01.png` through `slide-10.png`. If the deck is incomplete or invalid,
 Apollo stops and reports the error rather than producing partial output.
@@ -31,7 +31,7 @@ Validation and export stage; final MVP verification.
 
 ## Out Of Scope
 
-- Authoring the deck HTML (milestones 0002 and 0001).
+- Authoring the deck HTML (milestone 0001).
 - Post-MVP formats (PDF, video/audio), batching, publishing, and analytics.
 
 ## Architecture Seams

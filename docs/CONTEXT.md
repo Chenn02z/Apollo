@@ -48,7 +48,11 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 ## Local Commands And Maturity Gaps
 
 - No project-specific CLI or runtime command exists yet. Apollo is invoked as a
-  Codex workflow (`$apollo`), not a runnable binary.
+  Codex workflow (`$apollo`), not a runnable binary. `$apollo` is the future
+  reusable skill entry point at `.agents/skills/apollo/SKILL.md`, implemented as
+  a skill with no dedicated Apollo agent preset. The implementer role builds
+  support tooling only and never authors normal carousel content; direct
+  authoring is the active Codex model's normal product behavior.
 - PNG export and validation depend on local tooling available in the session.
   The only deterministic rendering stage is a local Playwright export script
   that rasterizes slides 1–10 into `slide-01.png` through `slide-10.png` and
