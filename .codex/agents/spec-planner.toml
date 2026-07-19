@@ -1,7 +1,8 @@
 name = "spec-planner"
 description = "Turns vague product or developer intent into milestone and spec structure with clear scope, contracts, and acceptance criteria."
-model = "gpt-5.5"
-model_reasoning_effort = "high"
+model_provider="openrouter"
+model = "z-ai/glm-5.2"
+model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 
 developer_instructions = """

@@ -1,7 +1,8 @@
 name = "test-runner"
 description = "Runs targeted verification, summarizes failures, and recommends the smallest next debugging step."
-model = "gpt-5.4-mini"
-model_reasoning_effort = "low"
+model_provider="openrouter"
+model = "deepseek/deepseek-v4-flash"
+model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
