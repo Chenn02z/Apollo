@@ -2,7 +2,7 @@ name = "doc-curator"
 description = "Keeps AGENTS.md, durable docs, specs, skills, and agent rules aligned after decisions settle."
 sandbox_mode = "workspace-write"
 model_provider = "openrouter"
-model = "tencent/hy3"
+model = "minimax/minimax-m3"
 model_reasoning_effort = "medium"
 
 developer_instructions = """
