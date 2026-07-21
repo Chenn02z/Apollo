@@ -23,7 +23,8 @@ Accepts Draft milestones from `$bootstrap` or `plan-next`.
    context decision, or implementation request needing a spec first.
 3. Reference `docs/ARCHITECTURE.md` to ensure milestone scope respects
    approved seams and doesn't introduce conflicting deferred work.
-4. Use `$grilling` to pressure-test direction.
+4. Use `$grilling` to pressure-test direction and sharpen plan through asking user 
+   questions.
 5. Use `spec-planner` for scope, scenarios, and acceptance criteria candidates.
 6. Use `spec-griller` to challenge ambiguity, failure modes, and scope creep.
 7. The main agent settles decisions with the user.

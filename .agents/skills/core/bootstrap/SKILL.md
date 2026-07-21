@@ -25,7 +25,7 @@ backbone before normal milestone and spec work begins.
 1. Start `$codex-agent-tracer` before substantial work.
 2. Inspect whether the repo is still in harness-template state or already has
    downstream product direction.
-3. Use `$grilling` to pressure-test vague product language and force
+3. Use `$grilling` to pressure-test user about vague product language and force
    concrete boundary decisions before docs are written.
 4. Delegate repo-state reading to `explorer`.
 5. Delegate ambiguity and failure-mode pressure-testing to `spec-griller`.

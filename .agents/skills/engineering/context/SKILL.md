@@ -43,8 +43,7 @@ settled terminology decision emerges from a workflow.
    - traces should be kept local unless a spec says otherwise
    - cross-references and paths should remain live
 5. Use `spec-griller` when changes affect scope, terminology, or workflow.
-6. Use `$grilling` as an adversarial pass.
-7. Keep implementation details out of `docs/CONTEXT.md`.
+6. Keep implementation details out of `docs/CONTEXT.md`.
 
 ## Output
 

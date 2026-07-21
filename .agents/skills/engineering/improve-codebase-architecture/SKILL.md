@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: Find workspace architecture-deepening opportunities that reduce AI-spaghetti risk, present them as a visual HTML report, then route the chosen candidate through grilling. Use when reviewing workspace structure, workflow seams, module boundaries, or maintainability before implementation work expands.
+description: Find workspace architecture-deepening opportunities that reduce AI-spaghetti risk, present them as a visual HTML report. Use when reviewing workspace structure, workflow seams, module boundaries, or maintainability before implementation work expands.
 ---
 
 # Improve Codebase Architecture
@@ -11,8 +11,7 @@ interface. The aim is to prevent AI-generated spaghetti by improving locality,
 leverage, and testability before implementation work expands.
 
 This skill is for architecture review, not immediate implementation. It should
-produce review artifacts the developer can inspect and then pressure-test with
-`grilling` before spec or code work expands.
+produce review artifacts the developer can inspect.
 
 ## Vocabulary
 
