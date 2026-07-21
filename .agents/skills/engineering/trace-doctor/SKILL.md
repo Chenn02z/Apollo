@@ -18,7 +18,7 @@ recommendations only.
 ## Scope
 
 Only main workflow traces: folders whose name contains `dev-loop`, `spec`,
-`requirements`, or `context`. Skip standalone review passes, `grill-with-docs`
+`requirements`, or `context`. Skip standalone review passes, `grilling`
 traces, and `test` traces unless the user explicitly widens scope.
 
 ## Workflow

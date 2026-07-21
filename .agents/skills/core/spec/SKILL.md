@@ -58,7 +58,7 @@ Draft
 5. For multi-spec milestones: name child spec paths and Draft or Accepted targets.
 6. Use `spec-griller` before marking any spec Accepted. The griller must
    verify seam compliance against `docs/ARCHITECTURE.md`.
-7. Use `$grill-with-docs` when spec changes terminology, boundaries, or
+7. Use `$grilling` when spec changes terminology, boundaries, or
    milestone direction.
 8. If code reveals the milestone is wrong, hand back to `$requirements`.
 9. If the spec settles context changes, hand off to `$context`.

@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: Find workspace architecture-deepening opportunities that reduce AI-spaghetti risk, present them as a visual HTML report, then route the chosen candidate through grill-with-docs. Use when reviewing workspace structure, workflow seams, module boundaries, or maintainability before implementation work expands.
+description: Find workspace architecture-deepening opportunities that reduce AI-spaghetti risk, present them as a visual HTML report, then route the chosen candidate through grilling. Use when reviewing workspace structure, workflow seams, module boundaries, or maintainability before implementation work expands.
 ---
 
 # Improve Codebase Architecture
@@ -12,7 +12,7 @@ leverage, and testability before implementation work expands.
 
 This skill is for architecture review, not immediate implementation. It should
 produce review artifacts the developer can inspect and then pressure-test with
-`grill-with-docs` before spec or code work expands.
+`grilling` before spec or code work expands.
 
 ## Vocabulary
 
@@ -51,7 +51,7 @@ is written, ask which candidate should be grilled first.
 
 ### 4. Grilling loop
 
-Once the user picks a candidate, use `grill-with-docs` to pressure-test it
+Once the user picks a candidate, use `grilling` to pressure-test it
 against product intent, milestone docs, code, and terminology.
 
 If the candidate changes product requirements or executable behavior, route to

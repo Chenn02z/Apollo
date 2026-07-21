@@ -46,7 +46,7 @@ Does NOT implement code or write specs. Produces Draft milestones only.
    Discarded milestones should be noted in the handoff.
 7. Use `spec-griller` to challenge the proposed phase for scope creep,
    ambiguity, and seam consistency.
-8. Use `$grill-with-docs` as an adversarial pass.
+8. Use `$grilling` as an adversarial pass.
 9. The main agent presents the proposed phase to the developer for approval.
 10. Delegate milestone creation to `doc-curator`. Write Draft milestones to
     `docs/milestones/`. Do NOT mark them Accepted.
