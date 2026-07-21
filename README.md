@@ -1,91 +1,65 @@
-# AI Harness
+# Apollo
 
-> A specs-driven agent workspace template for indie developers.
+> Turn one software-engineering topic into a self-contained, interview-ready slide deck — authored in Codex, delivered as one offline HTML file and ten PNGs.
 
-AI Harness is a reusable starter repo for building software with a strict
-multi-agent development loop and incremental MVP delivery. It gives you:
+Apollo is a Codex-native workflow. You invoke it with a single
+software-engineering topic (for example, "database transactions" or "consistent
+hashing"). The Codex model that is already available in your session authors the
+content directly and lays it out as a standalone HTML deck. There is no external
+model, no API integration, and no runtime to run.
 
-- a repo operating contract in `AGENTS.md`
-- reusable workflow skills under `.agents/skills/`
-- reusable agent presets under `.codex/agents/`
-- docs and templates for milestones, specs, architecture, handoffs, and context alignment
-- a first-run bootstrap path for turning the template into a real product repo
-- phase-based replanning to ship the next increment based on what actually shipped
+## What You Get
 
-This repo is the harness, not your product runtime. Bring your own app, domain,
-and codebase. The harness exists to keep planning, implementation, review, and
-documentation aligned as your project grows.
+- **One topic in, one deck out.** Apollo produces exactly one standalone HTML
+  file (`deck.html`) plus exactly ten PNG slides.
+- **Exactly ten coherent slides.** Every deck follows a fixed pedagogical order:
+  hook, definition, mental model, mechanics, flow, applied example,
+  code/pseudocode, trade-off, misconception/failure, interviewer follow-up.
+- **Self-contained output.** No external assets, no network calls, no
+  interactivity or animation. Each slide is 1080×1350 CSS pixels and exports as
+  `slide-01.png` through `slide-10.png`.
+- **Fails clean.** If a deck cannot be produced complete and valid, Apollo stops
+  rather than handing back a partial or invalid result.
 
-## Who It Is For
+## How It Works
 
-Solo and indie developers who want:
-
-- explicit milestone and spec gates
-- incremental, phase-based delivery (ship something real, then replan)
-- repeatable multi-agent workflows
-- stable repo terminology
-- architecture seams that keep future work clean without speculative overbuild
-- traceable handoffs between planning, implementation, testing, and docs
-
-## Workflow Backbone
-
-1. Run `$bootstrap` immediately after forking to determine the MVP boundary,
-   derive architecture seams, build an MVP milestone ladder, and replace this
-   harness-template README with a project-specific public overview.
-2. Shape the first milestone with `$requirements`.
-3. Accept a milestone in `docs/milestones/` when scope is settled.
-4. Draft an implementation spec with `$spec`, referencing architecture seams.
-5. Pressure-test the spec before implementation.
-6. Implement through `$dev-loop`, which respects architecture seams and includes
-   verification by delegating to `$test`.
-7. Invoke `$test` directly for standalone or ad hoc verification when you do
-   not need the full dev loop.
-8. When a phase ships (all its milestones are complete), trigger `plan-next`
-   to propose the next phase's Draft milestones based on what shipped.
-9. Realign docs, skills, `user-journeys.html`, and agent rules through
-   `$context` when decisions settle (auto-triggered by `AGENTS.md`).
+1. You give Apollo a single software-engineering topic.
+2. Codex authors the ten-slide outline and independently authors it as a
+   self-contained `deck.html` (no fixed template or layout engine; visual
+   style and per-slide layout are agent-chosen).
+3. Apollo validates the deck (exactly ten top-level slides, correct dimensions,
+   no overflow, no external dependencies).
+4. Apollo exports exactly ten 1080×1350 PNGs via a deterministic local
+   Playwright script that rasterizes slides 1–10 into `slide-01.png` through
+   `slide-10.png` and validates count and dimensions.
 
 ## Repository Layout
 
 ```text
 .
-├── AGENTS.md
+├── README.md
 ├── user-journeys.html
-├── .agents/skills/
-├── .codex/agents/
+├── AGENTS.md
 └── docs/
-    ├── adr/
-    ├── ARCHITECTURE.md
     ├── PRODUCT.md
+    ├── ARCHITECTURE.md
     ├── CONTEXT.md
     ├── WORKFLOWS.md
     ├── AGENT_ROLES.md
     ├── DOCS_POLICY.md
     ├── milestones/
     ├── specs/
-    └── techdebt/
+    ├── adr/
+    ├── techdebt/
+    └── reference/
 ```
 
-## How To Use
+`docs/PRODUCT.md` carries the full product intent and scope. Deeper architecture
+notes live in `docs/ARCHITECTURE.md`; canonical terminology is in
+`docs/CONTEXT.md`. `user-journeys.html` is the visual map of the current path.
 
-1. Start from this repo as a template.
-2. Run `$bootstrap` as the first real task after the fork.
-3. Answer the grilling session until the product backbone is coherent, then
-   explicitly confirm the concrete bootstrap summary: MVP boundary, ordered
-   MVP milestone ladder, and explicit post-MVP cutoff.
-4. Let bootstrap tailor `README.md` into a project-specific public overview
-   while keeping deeper product detail in `docs/PRODUCT.md`.
-5. Shape and implement milestones one phase at a time. Run `plan-next` after
-   each phase to propose the next increment.
-6. Use `user-journeys.html` at the repo root as the visual map of what the
-   harness supports and what the intended developer paths are.
-7. Keep the workflow docs and agent presets strict unless you intentionally
-   change the harness rules.
-8. Add your application code beside this harness structure.
+## Non-Goals (MVP)
 
-## Non-Goals
-
-- application runtime code
-- framework-specific scaffolding
-- domain-specific examples
-- historical traces, accepted milestones, or completed specs from another repo
+The MVP does not include a web/editor UI, API or local-model integrations,
+batching, publishing, analytics, video/audio, PDF, accounts, cloud, or an
+automatic factual-review pipeline. Those are explicitly post-MVP.

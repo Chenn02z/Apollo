@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Redis and Caching</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #111827; color: #f8fafc; font-family: Arial, Helvetica, sans-serif; }
+    .slide { width: 1080px; height: 1350px; position: relative; overflow: hidden; padding: 78px 82px; background: #0f172a; }
+    .slide::before { content: ""; position: absolute; width: 700px; height: 700px; border-radius: 50%; background: #ef4444; opacity: .11; right: -280px; top: -250px; }
+    .kicker { color: #f87171; font-size: 25px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
+    h1 { font-size: 90px; line-height: .98; letter-spacing: -4px; margin: 24px 0; max-width: 840px; }
+    h2 { font-size: 62px; line-height: 1.02; letter-spacing: -2px; margin: 22px 0 32px; max-width: 850px; }
+    h3 { margin: 0 0 12px; font-size: 29px; }
+    p { color: #cbd5e1; font-size: 29px; line-height: 1.42; margin: 0; }
+    .muted { color: #94a3b8; }
+    .num { position: absolute; right: 82px; bottom: 66px; color: #64748b; font-size: 23px; font-weight: 700; }
+    .tag { display: inline-block; border: 1px solid #475569; color: #cbd5e1; border-radius: 999px; padding: 12px 19px; font-size: 20px; font-weight: 700; }
+    .hero { min-height: 1194px; display: flex; flex-direction: column; justify-content: center; }
+    .hero .big { color: #f87171; font-size: 168px; line-height: .85; font-weight: 800; letter-spacing: -10px; margin: 26px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .card { background: #172033; border: 1px solid #334155; border-radius: 22px; padding: 28px; }
+    .card.accent { background: #30191f; border-color: #9f3b47; }
+    .card p { font-size: 23px; }
+    .quote { border-left: 7px solid #f87171; padding: 24px 0 24px 30px; font-size: 42px; color: #f8fafc; line-height: 1.18; font-weight: 700; margin: 44px 0; }
+    .warehouse { margin-top: 82px; display: flex; gap: 16px; align-items: end; }
+    .shelf { width: 130px; height: 310px; border: 6px solid #f87171; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-around; padding: 12px; }
+    .box { height: 44px; background: #fecaca; border-radius: 4px; }
+    .person { width: 120px; height: 175px; background: #38bdf8; border-radius: 60px 60px 22px 22px; }
+    .arrow { color: #f87171; font-size: 70px; padding-bottom: 70px; }
+    .layers { margin-top: 48px; }
+    .layer { min-height: 116px; display: flex; align-items: center; gap: 24px; margin: 14px 0; border-radius: 18px; padding: 23px 28px; font-size: 28px; font-weight: 700; }
+    .layer span { display: inline-grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: #0f172a; color: #f8fafc; font-size: 20px; }
+    .l1 { background: #ef4444; } .l2 { background: #d65a43; } .l3 { background: #9f3b47; } .l4 { background: #334155; }
+    .flow { margin-top: 48px; display: grid; gap: 14px; }
+    .step { display: grid; grid-template-columns: 70px 1fr auto; align-items: center; gap: 20px; background: #172033; border-radius: 18px; padding: 22px 25px; min-height: 112px; }
+    .step strong { font-size: 28px; } .step small { color: #94a3b8; font-size: 21px; } .step em { color: #fca5a5; font-style: normal; font-weight: 700; font-size: 20px; }
+    .bubble { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: #f87171; color: #1f1220; font-size: 20px; font-weight: 800; }
+    .code { background: #020617; border: 1px solid #334155; border-radius: 22px; padding: 34px; margin-top: 48px; color: #dbeafe; font-family: Menlo, Consolas, monospace; font-size: 24px; line-height: 1.75; white-space: pre-wrap; }
+    .code b { color: #f87171; font-weight: 400; } .code i { color: #7dd3fc; font-style: normal; }
+    .balance { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 70px; border-radius: 24px; overflow: hidden; border: 1px solid #475569; }
+    .balance > div { min-height: 335px; padding: 40px 34px; } .gain { background: #153b35; } .cost { background: #3d2028; }
+    .balance h3 { font-size: 35px; } .balance li { color: #d1fae5; font-size: 23px; line-height: 1.6; } .cost li { color: #fecdd3; }
+    .wrong { margin-top: 62px; background: #30191f; border: 1px solid #9f3b47; border-radius: 26px; padding: 40px; }
+    .wrong .x { color: #f87171; font-size: 70px; font-weight: 800; float: left; margin-right: 22px; line-height: .8; }
+    .answer { margin-top: 50px; background: #172033; border-radius: 24px; padding: 38px; border: 1px solid #334155; }
+    .answer p { font-size: 26px; }
+    ul { margin: 18px 0 0; padding-left: 27px; }
+  </style>
+</head>
+<body>
+  <section class="slide">
+    <div class="hero">
+      <span class="tag">Redis + Caching</span>
+      <div class="big">1 ms<br>or 1 s?</div>
+      <h1>Your database is not slow.<br>Your hot path is expensive.</h1>
+      <p>For repeated reads, caching turns a trip to durable storage into a memory lookup.</p>
+    </div>
+    <div class="num">01 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">The definition</div>
+    <h2>Redis is a fast, in-memory data store often used as a shared cache.</h2>
+    <div class="quote">A cache keeps a disposable copy of data close to the code that needs it.</div>
+    <div class="grid">
+      <div class="card accent"><h3>Fast because</h3><p>Most reads and writes happen in RAM, not on a database disk path.</p></div>
+      <div class="card"><h3>Safe to lose because</h3><p>The database remains the source of truth for cacheable application data.</p></div>
+    </div>
+    <div class="num">02 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Mental model</div>
+    <h2>Think of Redis as the stocked shelf beside a warehouse.</h2>
+    <p>The warehouse has everything and stays authoritative. The shelf has the popular items, ready now.</p>
+    <div class="warehouse">
+      <div class="person"></div><div class="arrow">→</div>
+      <div class="shelf"><div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div></div>
+      <div class="arrow">→</div>
+      <div class="shelf" style="height:420px;border-color:#64748b"><div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div></div>
+    </div>
+    <div class="grid" style="margin-top:34px"><div class="card"><h3>Redis</h3><p>Small, nearby, replaceable</p></div><div class="card"><h3>Database</h3><p>Complete, durable, authoritative</p></div></div>
+    <div class="num">03 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Mechanics</div>
+    <h2>A key maps to a value, usually with an expiry.</h2>
+    <div class="layers">
+      <div class="layer l1"><span>1</span> Application asks for <code style="font:inherit">user:42</code></div>
+      <div class="layer l2"><span>2</span> Redis checks its in-memory keyspace</div>
+      <div class="layer l3"><span>3</span> A TTL removes stale entries automatically</div>
+      <div class="layer l4"><span>4</span> Redis may evict keys when memory is full</div>
+    </div>
+    <p class="muted" style="margin-top:46px">Common Redis structures: strings, hashes, lists, sets, sorted sets, streams.</p>
+    <div class="num">04 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Cache-aside flow</div>
+    <h2>Read from cache first. Fill it only after a miss.</h2>
+    <div class="flow">
+      <div class="step"><div class="bubble">1</div><div><strong>GET product:981</strong><br><small>Application asks Redis</small></div><em>LOOKUP</em></div>
+      <div class="step"><div class="bubble">2</div><div><strong>Miss</strong><br><small>Key is absent or expired</small></div><em>FALL BACK</em></div>
+      <div class="step"><div class="bubble">3</div><div><strong>Query database</strong><br><small>Get the canonical record</small></div><em>AUTHORITATIVE</em></div>
+      <div class="step"><div class="bubble">4</div><div><strong>SET product:981 EX 300</strong><br><small>Store a copy for five minutes</small></div><em>FILL</em></div>
+      <div class="step"><div class="bubble">5</div><div><strong>Return response</strong><br><small>The next request should hit</small></div><em>FAST PATH</em></div>
+    </div>
+    <div class="num">05 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Applied example</div>
+    <h2>A product page asks for the same catalog record thousands of times.</h2>
+    <div class="grid" style="margin-top:56px">
+      <div class="card accent"><h3>Without cache</h3><p>Every visitor consumes a database connection and query for mostly unchanged data.</p></div>
+      <div class="card"><h3>With cache</h3><p>Redis absorbs repeated reads; the database handles misses and writes.</p></div>
+    </div>
+    <div class="quote" style="margin-top:72px">Cache stable, read-heavy data.<br>Skip caching what must be exact right now.</div>
+    <p>Good candidates: product details, rendered fragments, rate-limit counters, session data, leaderboard rankings.</p>
+    <div class="num">06 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Pseudocode</div>
+    <h2>Keep cache logic at the read boundary.</h2>
+    <div class="code"><i>key</i> = <b>"product:"</b> + product_id
+<i>cached</i> = redis.get(key)
+
+<b>if</b> cached:
+    <b>return</b> decode(cached)
+
+<i>product</i> = database.find(product_id)
+redis.set(key, encode(product), ex=300)
+<b>return</b> product</div>
+    <p class="muted" style="margin-top:37px">This is cache-aside: application code owns the fallback and population behavior.</p>
+    <div class="num">07 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Trade-off</div>
+    <h2>Caching buys speed by accepting that copies can be old.</h2>
+    <div class="balance">
+      <div class="gain"><h3>Gain</h3><ul><li>Lower latency</li><li>Fewer database reads</li><li>Higher burst capacity</li></ul></div>
+      <div class="cost"><h3>Give up</h3><ul><li>Perfect freshness</li><li>Simple invalidation</li><li>Unbounded memory</li></ul></div>
+    </div>
+    <div class="answer"><h3>Choose a TTL intentionally</h3><p>It is a product decision: how stale may this data be before a user notices or is harmed?</p></div>
+    <div class="num">08 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Common failure</div>
+    <h2>“We added Redis, so the database will be fine.”</h2>
+    <div class="wrong"><div class="x">×</div><h3>Cache stampede</h3><p>One popular key expires. A crowd of requests misses together and all hit the database at once.</p></div>
+    <div class="grid" style="margin-top:30px">
+      <div class="card"><h3>Reduce the blast</h3><p>Add TTL jitter so hot keys do not expire in lockstep.</p></div>
+      <div class="card"><h3>For the hottest keys</h3><p>Coalesce refreshes or serve a slightly stale value while one request refills it.</p></div>
+    </div>
+    <p class="muted" style="margin-top:48px">Also avoid caching errors indefinitely and remember to invalidate after meaningful writes.</p>
+    <div class="num">09 / 10</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Interview follow-up</div>
+    <h2>“How would you keep cached data fresh after an update?”</h2>
+    <div class="answer"><h3>Concise answer</h3><p>Write the database first, then delete or update the corresponding cache key. A later read repopulates it. Use a TTL as a backstop, not as the only correctness mechanism.</p></div>
+    <div class="quote" style="margin-top:66px">Cache invalidation is not magic. It is a consistency contract.</div>
+    <p>State the acceptable staleness, choose an invalidation path, and measure hit rate, latency, evictions, and memory.</p>
+    <div class="num">10 / 10</div>
+  </section>
+</body>
+</html>
