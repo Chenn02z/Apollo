@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -84,13 +84,18 @@ The check split between `0001` and `0002`:
 
 - `0001` checks structural validity of the authored output: valid and
   self-contained HTML, exactly ten top-level slides, no external resource URLs,
-  and no animations or interactivity.
+  and no animations or interactivity. It also verifies the declared 1080x1350
+  CSS dimensions as written in the authored HTML. It does not assert rendered
+  output.
 - `0002`'s Playwright pass is authoritative for rendered 1080x1350 dimensions,
-  overflow, and exactly ten PNGs; `0001` does not assert those.
+  overflow, and exactly ten PNGs; `0001` does not assert those. PNG export is
+  owned by `0002`.
 
 ## Deferred
 
-PNG export and authoritative validation live in milestone 0002.
+PNG export and authoritative rendered-dimension, overflow, and PNG validation
+live in milestone 0002. `0001` only checks declared CSS dimensions, HTML
+structure, and resource/interactivity constraints.
 
 ## Blocking Choices (Settled)
 
