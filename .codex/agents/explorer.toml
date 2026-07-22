@@ -1,7 +1,7 @@
 name = "explorer"
 description = "Read-only repo explorer for code, docs, tests, configuration, and current implementation shape."
 model_provider="openrouter"
-model = "deepseek/deepseek-v4-flash"
+model = "meituan/longcat-2.0"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 

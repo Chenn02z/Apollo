@@ -1,0 +1,12 @@
+{
+  "name": "apollo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "export": "node scripts/export-carousel.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}

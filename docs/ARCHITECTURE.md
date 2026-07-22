@@ -28,6 +28,12 @@ the stages:
    exported as exactly ten 1080×1350 PNGs named `slide-01.png` through
    `slide-10.png`.
 
+Each run is identified by a caller-supplied unique `run-id`; its artifacts live in
+a per-run folder `runs/<run-id>/` (its `deck.html` and `slide-01.png` …
+`slide-10.png`). `runs/` is local, gitignored generated output. The legacy flat
+`runs/deck.html` is preserved as pre-0002 evidence and is not overwritten by new
+runs.
+
 ## Approved Seams
 
 Boundaries the MVP deliberately establishes so post-MVP work can extend cleanly.
@@ -55,9 +61,12 @@ These describe the contract the MVP code must respect, not pre-built abstraction
 - **Why**: isolates authoring from export so future formats (PDF, video/audio)
   or batching can reuse the same validated HTML input.
 - **Current path**: validation and PNG export run as the second stage of the
-  MVP pipeline. The only deterministic rendering stage is a local Playwright
-  export script that rasterizes slides 1–10 into `slide-01.png` through
-  `slide-10.png` and validates exact count and 1080×1350 image dimensions.
+  MVP pipeline. `scripts/check-deck.py` validates `runs/<run-id>/deck.html`
+  unchanged, then `node scripts/export-carousel.mjs <run-id>` rasterizes slides
+  1–10 into `runs/<run-id>/slide-01.png` through `slide-10.png` under
+  local/offline Playwright (network disabled, 1080×1350 viewport, device scale 1)
+  and validates exact count and 1080×1350 image dimensions. The exporter owns
+  rendered-dimension/overflow checks, exact names/count/sizes, and atomic output.
 
 ## Deferred Architecture
 

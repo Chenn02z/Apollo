@@ -332,6 +332,7 @@
               <li>Invoke Apollo (<code>$apollo</code>) with a single software-engineering topic.</li>
               <li>Broad topics get an interview-relevant angle; narrow topics get deeper treatment.</li>
               <li>No project runtime exists yet — this runs inside a Codex session.</li>
+              <li>Every run has a caller-supplied unique <code>run-id</code>; its <code>deck.html</code> and ten PNGs live in <code>runs/&lt;run-id&gt;/</code> (no shared or cwd output folder).</li>
             </ul>
           </article>
 
@@ -377,9 +378,9 @@
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li>Export exactly ten 1080×1350 PNGs, predictably named <code>slide-01.png</code> through <code>slide-10.png</code>.</li>
-              <li>The only deterministic rendering stage is a local Playwright export script that rasterizes slides 1–10 and validates count and 1080×1350 dimensions.</li>
-              <li>Count and size are checked; the run fails if either is wrong.</li>
+              <li>Export exactly ten 1080×1350 PNGs, predictably named <code>runs/&lt;run-id&gt;/slide-01.png</code> through <code>runs/&lt;run-id&gt;/slide-10.png</code>.</li>
+              <li>The structural validator runs first (<code>scripts/check-deck.py</code>), then a local Node Playwright export script rasterizes slides 1–10 and validates count and 1080×1350 dimensions.</li>
+              <li>Network is disabled and the viewport is 1080×1350 at device scale 1; the run fails clean with no partial slide PNGs if either is wrong.</li>
             </ul>
           </article>
 
@@ -452,7 +453,7 @@
           </article>
           <article class="artifact">
             <h3>PNG export</h3>
-            <p>Exactly ten 1080×1350 PNGs, <code>slide-01.png</code> through <code>slide-10.png</code>.</p>
+            <p>Exactly ten 1080×1350 PNGs in the run folder: <code>runs/&lt;run-id&gt;/slide-01.png</code> through <code>runs/&lt;run-id&gt;/slide-10.png</code>.</p>
           </article>
           <article class="artifact">
             <h3>Validity contract</h3>
