@@ -25,6 +25,11 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
   or invalid output.
 - `reference HTML`: `docs/reference/index.html`, visual guidance only; untracked
   and preserved; not a dependency and not copied.
+- `runs/` / `run-id`: the local, gitignored generated-output directory and the
+  caller-supplied unique identifier for one Apollo run. Each new run writes its
+  artifacts to its own folder `runs/<run-id>/` (its `deck.html` and
+  `slide-01.png` … `slide-10.png`); there is no shared or cwd output folder.
+  The legacy flat `runs/deck.html` is preserved as pre-0002 evidence.
 - `MVP boundary`: the line between full delivery (one deck, ten coherent slides,
   ten PNGs) and post-MVP features. Drives architecture seams.
 - `post-MVP`: explicitly deferred features — web/editor UI, API/local-model
@@ -45,20 +50,32 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 - The reference HTML is guidance, not code to reuse; do not copy its external
   assets.
 
-## Local Commands And Maturity Gaps
+## Run Layout And Output
+
+- `runs/` is local, gitignored generated output. Every Apollo run has a
+  caller-supplied unique `run-id`; all of that run's artifacts (its `deck.html`
+  and `slide-01.png` … `slide-10.png`) live under `runs/<run-id>/`.
+- There is no shared or cwd output folder. New runs never write to a common
+  directory; the per-run layout keeps outputs isolated and reviewable.
+- The legacy flat `runs/deck.html` is kept untouched as pre-0002 evidence of the
+  earlier single-file layout; it is not overwritten by per-run output.
+
+## Local Commands
 
 - No project-specific CLI or runtime command exists yet. Apollo is invoked as a
-  Codex workflow (`$apollo`), not a runnable binary. `$apollo` is the future
+  Codex workflow (`$apollo`), not a runnable binary. `$apollo` is the live
   reusable skill entry point at `.agents/skills/apollo/SKILL.md`, implemented as
   a skill with no dedicated Apollo agent preset. The implementer role builds
   support tooling only and never authors normal carousel content; direct
   authoring is the active Codex model's normal product behavior.
-- PNG export and validation depend on local tooling available in the session.
-  The only deterministic rendering stage is a local Playwright export script
-  that rasterizes slides 1–10 into `slide-01.png` through `slide-10.png` and
-  validates exact count and 1080×1350 image dimensions. The precise local
-  invocation is a maturity gap to record once the MVP pipeline is built;
-  milestone specs must not invent commands.
+- PNG export and validation use local Node Playwright tooling. The pipeline runs the
+  structural validator `scripts/check-deck.py` (reused unchanged) against
+  `runs/<run-id>/deck.html`, then `node scripts/export-carousel.mjs <run-id>`
+  rasterizes slides 1–10 into `runs/<run-id>/slide-01.png` through
+  `slide-10.png` and validates exact count and 1080×1350 image dimensions.
+  Network is disabled and the viewport is 1080×1350 at device scale 1; the
+  exporter fails clean with a clear nonzero error and no partial slide PNGs on any
+  breach. The invocation is settled in milestone 0002 (Verified).
 - `.agent-trace/` and the harness workflow skills remain available; they are
   harness-level, not Apollo product features.
 

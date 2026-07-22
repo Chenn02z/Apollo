@@ -1,7 +1,7 @@
 name = "spec-griller"
 description = "Pressure-tests specs and milestones for ambiguity, missing failure modes, weak contracts, and scope creep."
 model_provider="openrouter"
-model = "kwaipilot/kat-coder-pro-v2.5"
+model = "qwen/qwen3.7-plus"
 sandbox_mode = "read-only"
 
 developer_instructions = """

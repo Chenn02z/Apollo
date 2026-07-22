@@ -58,11 +58,9 @@ Draft
 5. For multi-spec milestones: name child spec paths and Draft or Accepted targets.
 6. Use `spec-griller` before marking any spec Accepted. The griller must
    verify seam compliance against `docs/ARCHITECTURE.md`.
-7. Use `$grill-with-docs` when spec changes terminology, boundaries, or
-   milestone direction.
-8. If code reveals the milestone is wrong, hand back to `$requirements`.
-9. If the spec settles context changes, hand off to `$context`.
-10. Leave an explicit handoff artifact for `$dev-loop` when ready.
+7. If code reveals the milestone is wrong, hand back to `$requirements`.
+8. If the spec settles context changes, hand off to `$context`.
+9. Leave an explicit handoff artifact for `$dev-loop` when ready.
 
 ## Required Agent Gates
 

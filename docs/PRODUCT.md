@@ -24,7 +24,9 @@ entirely within a Codex session, with no extra tooling to install or run.
 - Authoring surface: the Apollo workflow running in Codex; the available Codex
   model directly authors the self-contained `deck.html` from a single topic.
 - Output: one standalone `deck.html` plus ten PNGs, `slide-01.png` to
-  `slide-10.png`, each 1080×1350 pixels.
+  `slide-10.png`, each 1080×1350 pixels — all written to a per-run folder
+  `runs/<run-id>/` for a caller-supplied unique `run-id`. No shared or cwd
+  output folder is used.
 - Pedagogical order (fixed, internal content-planning constraint): hook,
   definition, mental model, mechanics, flow, applied example, code/pseudocode,
   trade-off, misconception/failure, interviewer follow-up. The fixed order
@@ -35,7 +37,10 @@ entirely within a Codex session, with no extra tooling to install or run.
 - Validity contract: exactly 10 top-level slides; no external assets or network
   dependencies; no interactivity or animation; each slide is 1080×1350 CSS px;
   overflow is detected; exactly 10 correctly sized PNGs with predictable
-  numbering.
+  numbering. The structural validator (`scripts/check-deck.py`) runs first,
+  then the exporter renders and enforces rendered dimensions, overflow,
+  names, count, and sizes — failing clean with a clear error and no partial
+  slide PNGs on any breach.
 
 ## Principles
 
@@ -46,6 +51,8 @@ entirely within a Codex session, with no extra tooling to install or run.
   visual style and per-slide layout within that contract — there is no fixed
   deck template or layout engine.
 - **Fail clean.** Incomplete or invalid output is an error, not a deliverable.
+  The structural validator runs before export; any breach stops the run with a
+  clear error and no partial slide PNGs left in `runs/<run-id>/`.
 - **Codex is the engine.** No model/API layer to configure; the authoring model
   is whatever Codex already provides.
 

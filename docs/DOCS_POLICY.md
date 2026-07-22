@@ -20,6 +20,9 @@ This document defines where durable project information belongs.
 - `docs/DOCS_POLICY.md`: documentation destinations and status rules.
 - `docs/specs/`: implementation-ready contracts.
 - `docs/milestones/`: larger deliverable slices.
+- `runs/`: local, gitignored generated output (per-run `deck.html` and
+  `slide-01.png`–`slide-10.png`). Generated, never committed; the flat
+  `runs/deck.html` is preserved as pre-0002 evidence.
 - `docs/techdebt/`: durable architecture and tech-debt candidate tickets.
 - `.agents/skills/`: reusable Codex workflows.
 - `.codex/agents/`: project-scoped role, model, and permission presets.

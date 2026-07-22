@@ -11,13 +11,14 @@ model, no API integration, and no runtime to run.
 ## What You Get
 
 - **One topic in, one deck out.** Apollo produces exactly one standalone HTML
-  file (`deck.html`) plus exactly ten PNG slides.
+  file (`deck.html`) plus exactly ten PNG slides, written to a per-run folder
+  `runs/<run-id>/` for a caller-supplied unique `run-id`.
 - **Exactly ten coherent slides.** Every deck follows a fixed pedagogical order:
   hook, definition, mental model, mechanics, flow, applied example,
   code/pseudocode, trade-off, misconception/failure, interviewer follow-up.
 - **Self-contained output.** No external assets, no network calls, no
   interactivity or animation. Each slide is 1080×1350 CSS pixels and exports as
-  `slide-01.png` through `slide-10.png`.
+  `runs/<run-id>/slide-01.png` through `runs/<run-id>/slide-10.png`.
 - **Fails clean.** If a deck cannot be produced complete and valid, Apollo stops
   rather than handing back a partial or invalid result.
 
@@ -27,11 +28,15 @@ model, no API integration, and no runtime to run.
 2. Codex authors the ten-slide outline and independently authors it as a
    self-contained `deck.html` (no fixed template or layout engine; visual
    style and per-slide layout are agent-chosen).
-3. Apollo validates the deck (exactly ten top-level slides, correct dimensions,
-   no overflow, no external dependencies).
+3. Apollo validates the deck first (`scripts/check-deck.py`, reused unchanged):
+   exactly ten top-level slides, correct dimensions, no overflow, no external
+   dependencies.
 4. Apollo exports exactly ten 1080×1350 PNGs via a deterministic local
-   Playwright script that rasterizes slides 1–10 into `slide-01.png` through
-   `slide-10.png` and validates count and dimensions.
+   Node Playwright script (`scripts/export-carousel.mjs <run-id>`) that
+   rasterizes slides 1–10 into `runs/<run-id>/slide-01.png` through
+   `runs/<run-id>/slide-10.png` (network disabled, 1080×1350 viewport, device
+   scale 1) and validates count and dimensions. On any failure it emits a clear
+   error and leaves no partial slide PNGs for the run.
 
 ## Repository Layout
 
