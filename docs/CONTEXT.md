@@ -50,6 +50,16 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 - The reference HTML is guidance, not code to reuse; do not copy its external
   assets.
 
+## Workflow Boundaries
+
+- `grilling` is pre-requirements discovery, not spec review; `spec-griller`
+  owns the later concrete-spec quality gate. A grilling session must not hand
+  off to `$requirements` until outcome, non-goals, constraints, and verifiable
+  success criteria can be stated without invention.
+- `$requirements` must not draft while material intent, terminology, success
+  criteria, or constraints remain unanswered. If `$grilling` has not settled
+  them, the handoff stays Draft.
+
 ## Run Layout And Output
 
 - `runs/` is local, gitignored generated output. Every Apollo run has a

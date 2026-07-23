@@ -35,13 +35,10 @@ changes:
 2. Gather requirements.
 3. Draft or update an Accepted milestone when the work is milestone-sized.
 4. Create or update specs from Accepted milestones.
-5. Grill the spec for ambiguity and missing failure modes.
+5. Use `spec-griller` on the spec for ambiguity and missing failure modes.
 6. Mark the spec Accepted before implementation.
 7. Implement only what the spec requires, respecting architecture seams.
-7. Implement only what the spec requires, respecting architecture seams.
 8. Verify and review against the spec.
-9. When a phase ships, run `plan-next` to propose the next increment.
-10. Update docs and spec status when decisions settle.
 9. When a phase ships, run `plan-next` to propose the next increment.
 10. Update docs and spec status when decisions settle.
 

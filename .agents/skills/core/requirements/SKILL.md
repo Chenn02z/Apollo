@@ -23,8 +23,10 @@ Accepts Draft milestones from `$bootstrap` or `plan-next`.
    context decision, or implementation request needing a spec first.
 3. Reference `docs/ARCHITECTURE.md` to ensure milestone scope respects
    approved seams and doesn't introduce conflicting deferred work.
-4. Use `$grilling` to pressure-test direction and sharpen plan through asking user 
-   questions.
+4. Use `$grilling` to pressure-test direction and sharpen plan through asking user
+   questions. Grilling is pre-requirements discovery. Do not draft while
+   material intent, terminology, success criteria, or constraints remain
+   unanswered.
 5. Use `spec-planner` for scope, scenarios, and acceptance criteria candidates.
 6. Use `spec-griller` to challenge ambiguity, failure modes, and scope creep.
 7. The main agent settles decisions with the user.
@@ -40,6 +42,10 @@ Blocking questions must be answered by the repo or the user before milestone
 acceptance. If unanswered, return Draft or blocked, not Accepted. Deferred
 questions may remain only when explicitly listed as non-blocking and assigned
 to child specs or later milestones.
+
+Requirements must not draft while material intent, terminology, success
+criteria, or constraints are unanswered. If `$grilling` has not settled them,
+the handoff stays Draft.
 
 When accepting a milestone from `plan-next`, resolve any deferred items into
 concrete scope or explicit non-blocking deferrals. Cross-check deferred items
