@@ -29,8 +29,6 @@ mkdir -p runs/<run-id>
 Write `runs/<run-id>/deck.html` — a valid, parseable, self-contained
 HTML file with no external dependencies.
 
-The legacy flat `runs/deck.html` is left untouched.
-
 ## 4. Validate
 
 ```sh
@@ -47,16 +45,16 @@ declares `width: 1080px; height: 1350px` via inline `style` or embedded
 
 ## Pedagogical Order (internal plan only)
 
-1. **Hook** — provocative question, fact, or visual
-2. **Definition** — one-sentence definition
-3. **Mental Model** — analogy or framework
-4. **Mechanics** — how it works under the hood
-5. **Flow** — step-by-step scenario
-6. **Applied Example** — real-world use case
-7. **Code / Pseudocode** — short illustrative snippet
-8. **Trade-off** — gain vs. give up
-9. **Misconception / Common Failure** — most common mistake
-10. **Interviewer Follow-up** — likely next question + concise answer
+Use the following as a default narrative arc, not a rigid slide-by-slide template:
+
+Hook — provocative question, fact, or visual
+Foundation — definition, context, or prerequisite
+3–7. Explanation — choose the sequence that best teaches the topic, using mechanisms, mental models, flows, comparisons, examples, architecture, or code as appropriate
+Trade-off — gain versus cost, limitation, or alternative
+Misconception / Common Failure — a realistic mistake or failure mode
+Interviewer Follow-up — likely next question with a concise answer
+
+Preserve a coherent progression across all ten slides, but do not force every deck to contain a separate analogy, flow, applied example, and code slide. Select and order these forms according to the topic.
 
 ## Constraints
 
