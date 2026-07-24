@@ -33,6 +33,7 @@ Does NOT implement code or write specs. Produces Draft milestones only.
    - what was delivered (MVP deliverable)
    - what seams were opened or populated
    - what was deferred
+4. Use '`$grilling` to question the user about requirements for the next phase.
 4. Use `spec-planner` to propose a **next phase**: how many milestones are
    recommended, at what granularity, and what each delivers.
 5. For each milestone in the proposed phase, produce a Draft milestone with:

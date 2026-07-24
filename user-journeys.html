@@ -344,7 +344,7 @@
             <ul>
               <li>Codex's available model authors the content and visual HTML directly — Apollo has no separate model or API.</li>
               <li>Each slide follows the fixed pedagogical order as an internal content-planning constraint — no separate outline artifact exists.</li>
-              <li>The deck is authored directly as one self-contained <code>deck.html</code>; visual style and per-slide layout are model-chosen, not from a fixed layout engine.</li>
+              <li>A single checked-in frame template locks the header, footer, visual feel, type, and colors and declares a body-safe area; the author composes the body freely within it.</li>
             </ul>
           </article>
 
@@ -362,7 +362,19 @@
 
           <article class="journey">
             <div class="journey-head">
-              <h3>4. Validate the deck</h3>
+              <h3>4. Review and revise (advisory)</h3>
+              <span class="status status-growing">Growing</span>
+            </div>
+            <ul>
+              <li>A checked-in manifest sets independent content and visual revision limits (each 0–5).</li>
+              <li>Content review checks a correct explanation, a concrete example, a trade-off or failure mode, and interview-ready Q/A; visual review reads the rendered PNGs for frame integrity, legibility, and collisions.</li>
+              <li>Reviewers report feedback to the author, who revises the deck HTML. On exhaustion the run still delivers with reports under <code>runs/&lt;run-id&gt;/reviews/</code>; review is advisory, not a hard gate.</li>
+            </ul>
+          </article>
+
+          <article class="journey">
+            <div class="journey-head">
+              <h3>5. Validate the deck</h3>
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
@@ -374,7 +386,7 @@
 
           <article class="journey">
             <div class="journey-head">
-              <h3>5. Export ten PNGs</h3>
+              <h3>6. Export ten PNGs</h3>
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
@@ -386,7 +398,7 @@
 
           <article class="journey">
             <div class="journey-head">
-              <h3>6. Keep docs and terminology aligned</h3>
+              <h3>7. Keep docs and terminology aligned</h3>
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
@@ -409,7 +421,7 @@
           <article class="capability">
             <span class="stage">Author deck</span>
             <h3>Write a self-contained deck</h3>
-            <p>One offline <code>deck.html</code>, agent-styled, no assets or network.</p>
+            <p>One offline <code>deck.html</code>: locked frame template, free body composition, no assets or network.</p>
           </article>
           <article class="capability">
             <span class="stage">Validation</span>
@@ -433,10 +445,11 @@
           </article>
         </div>
         <p class="callout">
-          Apollo is strongest as a strict two-stage pipeline: topic →
-          agent-authored self-contained HTML, then HTML → validation + Playwright
-          PNG export. The shape of the deck is the contract; the reference HTML is
-          guidance, not a dependency.
+          Apollo runs as a pipeline: topic → self-contained HTML authored into a
+          locked frame template with free body composition, then advisory content
+          and visual review that reports back to the author, then HTML →
+          validation + Playwright PNG export. Structural validation and PNG export
+          are the only hard gates; the reference HTML is guidance, not a dependency.
         </p>
       </section>
 
@@ -456,8 +469,16 @@
             <p>Exactly ten 1080×1350 PNGs in the run folder: <code>runs/&lt;run-id&gt;/slide-01.png</code> through <code>runs/&lt;run-id&gt;/slide-10.png</code>.</p>
           </article>
           <article class="artifact">
+            <h3>Frame template &amp; manifest</h3>
+            <p>A checked-in frame template locks header/footer/feel/type/colors and a body-safe area; the manifest sets content and visual revision limits (each 0–5).</p>
+          </article>
+          <article class="artifact">
+            <h3>Review reports</h3>
+            <p>Advisory content and visual feedback under <code>runs/&lt;run-id&gt;/reviews/</code>; the author revises, and runs still deliver on exhaustion.</p>
+          </article>
+          <article class="artifact">
             <h3>Validity contract</h3>
-            <p>The rules every deck must satisfy, enforced before export.</p>
+            <p>The rules every deck must satisfy, enforced before export — the only hard gate alongside PNG export.</p>
           </article>
         </div>
       </section>

@@ -22,7 +22,10 @@ entirely within a Codex session, with no extra tooling to install or run.
 
 - Input: a single software-engineering topic supplied to the Apollo workflow.
 - Authoring surface: the Apollo workflow running in Codex; the available Codex
-  model directly authors the self-contained `deck.html` from a single topic.
+  model authors the self-contained `deck.html` from a single topic into a single
+  checked-in frame template that locks the header, footer, visual feel, type, and
+  colors and declares a body-safe area. The author composes the body freely
+  within that safe area.
 - Output: one standalone `deck.html` plus ten PNGs, `slide-01.png` to
   `slide-10.png`, each 1080×1350 pixels — all written to a per-run folder
   `runs/<run-id>/` for a caller-supplied unique `run-id`. No shared or cwd
@@ -30,8 +33,9 @@ entirely within a Codex session, with no extra tooling to install or run.
 - Pedagogical order (fixed, internal content-planning constraint): hook,
   definition, mental model, mechanics, flow, applied example, code/pseudocode,
   trade-off, misconception/failure, interviewer follow-up. The fixed order
-  guides the model's authoring; it is not a separate outline artifact, visual
-  template, or layout engine input.
+  guides the model's authoring; it is not a separate outline artifact or layout
+  engine input. It is distinct from the frame template, which locks the
+  header/footer/visual feel/type/colors and declares the body-safe area.
 - Broad topics get an interview-relevant angle; narrow topics get deeper
   treatment.
 - Validity contract: exactly 10 top-level slides; no external assets or network
@@ -41,15 +45,25 @@ entirely within a Codex session, with no extra tooling to install or run.
   then the exporter renders and enforces rendered dimensions, overflow,
   names, count, and sizes — failing clean with a clear error and no partial
   slide PNGs on any breach.
+- Advisory review: a checked-in manifest sets independent content and visual
+  revision limits (each 0–5). Content review checks a correct explanation, a
+  concrete example, a trade-off or failure mode, and interview-ready Q/A for
+  mid-level generalists; visual review reads the rendered PNGs for frame
+  integrity, legibility, and collisions. Reviewers report feedback to the author,
+  who revises the deck HTML. Review is advisory: on exhaustion the run still
+  delivers with run-scoped reports under `runs/<run-id>/reviews/content` and
+  `runs/<run-id>/reviews/visual`. Structural validation and PNG export remain the
+  only hard gates.
 
 ## Principles
 
 - **Self-contained by default.** Output must open and render offline with no
   network, no external fonts or scripts, and no interactivity.
-- **Deterministic shape.** Ten slides, fixed order, fixed dimensions, predictable
-  file names. The structure is the contract; the authoring agent freely chooses
-  visual style and per-slide layout within that contract — there is no fixed
-  deck template or layout engine.
+- **Locked frame, free body.** Ten slides, fixed order, fixed dimensions,
+  predictable file names. A single checked-in frame template locks the header,
+  footer, visual feel, type, and colors and declares a body-safe area; the author
+  composes the body freely within that safe area. The structure and frame are the
+  contract; there is no separate deterministic layout engine for body content.
 - **Fail clean.** Incomplete or invalid output is an error, not a deliverable.
   The structural validator runs before export; any breach stops the run with a
   clear error and no partial slide PNGs left in `runs/<run-id>/`.

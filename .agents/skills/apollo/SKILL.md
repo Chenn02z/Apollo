@@ -6,7 +6,10 @@ description: Authors a ten-slide deck.html from a topic for carousel export.
 # Apollo Deck Authoring
 
 When the user invokes `$apollo "<topic>"`, produce the complete per-run
-artifact set without delegation. No intermediate outline or template.
+artifact set without delegation. No intermediate outline artifact. Author into
+the single checked-in frame template, which locks the header, footer, visual
+feel, type, and colors and declares a body-safe area; compose the body freely
+within that safe area.
 
 ## 1. Generate run-id
 
@@ -27,7 +30,10 @@ mkdir -p runs/<run-id>
 ## 3. Author deck
 
 Write `runs/<run-id>/deck.html` — a valid, parseable, self-contained
-HTML file with no external dependencies.
+HTML file with no external dependencies. Keep the frame (header, footer, visual
+feel, type, and colors) as defined by the checked-in frame template; compose
+body content freely within the declared body-safe area. Only the author revises
+deck HTML.
 
 ## 4. Validate
 

@@ -19,19 +19,34 @@ model, no API integration, and no runtime to run.
 - **Self-contained output.** No external assets, no network calls, no
   interactivity or animation. Each slide is 1080×1350 CSS pixels and exports as
   `runs/<run-id>/slide-01.png` through `runs/<run-id>/slide-10.png`.
+- **Locked frame, free body.** A single checked-in frame template fixes the
+  header, footer, visual feel, type, and colors and declares a body-safe area;
+  the author composes the body freely within it.
+- **Advisory content and visual review.** A checked-in manifest sets independent
+  content and visual revision limits (each 0–5). Content review checks a correct
+  explanation, a concrete example, a trade-off or failure mode, and an
+  interview-ready Q/A; visual review reads the rendered PNGs for frame integrity,
+  legibility, and collisions. Reviewers report feedback to the author, who
+  revises the deck; review is advisory, not a blocking gate.
 - **Fails clean.** If a deck cannot be produced complete and valid, Apollo stops
-  rather than handing back a partial or invalid result.
+  rather than handing back a partial or invalid result. Structural validation and
+  PNG export remain the only hard gates.
 
 ## How It Works
 
 1. You give Apollo a single software-engineering topic.
-2. Codex authors the ten-slide outline and independently authors it as a
-   self-contained `deck.html` (no fixed template or layout engine; visual
-   style and per-slide layout are agent-chosen).
-3. Apollo validates the deck first (`scripts/check-deck.py`, reused unchanged):
+2. Codex authors the ten slides into a single checked-in frame template that
+   locks the header, footer, visual feel, type, and colors, and declares a
+   body-safe area. The author freely composes the body content within that
+   safe area; the frame itself is fixed.
+3. Content and visual reviewers check the deck against the manifest's
+   independent revision limits and report feedback to the author, who revises the
+   deck HTML. Review is advisory: when the revision budget is exhausted the run
+   still delivers, writing run-scoped reports under `runs/<run-id>/reviews/`.
+4. Apollo validates the deck first (`scripts/check-deck.py`, reused unchanged):
    exactly ten top-level slides, correct dimensions, no overflow, no external
    dependencies.
-4. Apollo exports exactly ten 1080×1350 PNGs via a deterministic local
+5. Apollo exports exactly ten 1080×1350 PNGs via a deterministic local
    Node Playwright script (`scripts/export-carousel.mjs <run-id>`) that
    rasterizes slides 1–10 into `runs/<run-id>/slide-01.png` through
    `runs/<run-id>/slide-10.png` (network disabled, 1080×1350 viewport, device
