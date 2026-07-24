@@ -22,10 +22,11 @@ entirely within a Codex session, with no extra tooling to install or run.
 
 - Input: a single software-engineering topic supplied to the Apollo workflow.
 - Authoring surface: the Apollo workflow running in Codex; the available Codex
-  model authors the self-contained `deck.html` from a single topic into a single
-  checked-in frame template that locks the header, footer, visual feel, type, and
-  colors and declares a body-safe area. The author composes the body freely
-  within that safe area.
+  model authors the self-contained `deck.html` from a single topic by repeating
+  one checked-in `templates/frame.html` — a single standalone 1080×1350 source
+  slide — ten times and filling each slide's CSS-sized `<div id="body-safe-area">`
+  while the locked header, footer, visual feel, type, and colors stay fixed. The
+  author composes the body freely
 - Output: one standalone `deck.html` plus ten PNGs, `slide-01.png` to
   `slide-10.png`, each 1080×1350 pixels — all written to a per-run folder
   `runs/<run-id>/` for a caller-supplied unique `run-id`. No shared or cwd
@@ -48,10 +49,12 @@ entirely within a Codex session, with no extra tooling to install or run.
 - **Self-contained by default.** Output must open and render offline with no
   network, no external fonts or scripts, and no interactivity.
 - **Locked frame, free body.** Ten slides, fixed order, fixed dimensions,
-  predictable file names. A single checked-in frame template locks the header,
-  footer, visual feel, type, and colors and declares a body-safe area; the author
-  composes the body freely within that safe area. The structure and frame are the
-  contract; there is no separate deterministic layout engine for body content.
+  predictable file names. One checked-in `templates/frame.html` is a single
+  standalone 1080×1350 source slide; Apollo repeats it to build the deck, filling
+  each slide's CSS-sized `<div id="body-safe-area">` while the locked header,
+  footer, visual feel, type, and colors stay fixed. The author composes the body
+  freely within each safe area. The structure and frame are the contract; there is
+  no separate deterministic layout engine for body content.
 - **Fail clean.** Incomplete or invalid output is an error, not a deliverable.
   The structural validator runs before export; any breach stops the run with a
   clear error and no partial slide PNGs left in `runs/<run-id>/`.

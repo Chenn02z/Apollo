@@ -11,11 +11,14 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 - `topic`: the single software-engineering subject a user supplies to Apollo.
 - `deck` / `deck.html`: the one standalone offline HTML file Apollo produces.
 - `slide`: one top-level unit of the deck; the MVP requires exactly ten.
-- `frame template`: the single checked-in template that locks the header,
-  footer, visual feel, type, and colors for every slide and declares a
-  `body-safe area`. It is fixed; the author does not restyle the frame.
-- `body-safe area`: the region the frame template declares for author content.
-  The author composes body content freely within it (`free body composition`).
+- `frame template`: the single checked-in `templates/frame.html` — one standalone
+  1080×1350 source slide, not a full deck. Apollo repeats it to build the
+  ten-slide `deck.html`, filling each slide's CSS-sized
+  `<div id="body-safe-area">` while the header and footer stay fixed. The frame
+  is fixed; the author does not restyle it.
+- `body-safe area`: the CSS-sized `<div id="body-safe-area">` each repeated slide
+  carries for author content. The author composes body content freely within it
+  (`free body composition`); the header and footer stay fixed.
 - `manifest`: the checked-in configuration that sets independent
   `content revision limit` and `visual revision limit`, each 0–5.
 - `content review`: an advisory check that the deck gives a correct explanation,
@@ -67,9 +70,11 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
   inside a Codex session.
 - The reference HTML is guidance, not code to reuse; do not copy its external
   assets.
-- A single checked-in `frame template` locks the header, footer, visual feel,
-  type, and colors and declares the `body-safe area`; the author has free body
-  composition within it. Content and visual review are advisory and driven by the
+- One checked-in `templates/frame.html` is a single standalone 1080×1350 source
+  slide; Apollo repeats it to build the deck, filling each slide's CSS-sized
+  `<div id="body-safe-area">` while the locked header, footer, visual feel, type,
+  and colors stay fixed; the author has free body composition within each safe
+  area. Content and visual review are advisory and driven by the
   `manifest` revision limits; only structural validation and PNG export are hard
   gates. The author, not the reviewer, revises the deck HTML.
 

@@ -18,14 +18,15 @@ The MVP production path is a pipeline of authoring, advisory review, and a
 validation-plus-export gate:
 
 1. **Topic → self-contained deck HTML.** The active Codex model authors each
-   deck's complete `deck.html` for a single topic into a single checked-in frame
-   template that locks the header, footer, visual feel, type, and colors and
-   declares a body-safe area; the author composes the body freely within that
-   safe area. The fixed pedagogical order is an internal content-planning
-   constraint that guides authoring, not a separate outline artifact or a fixed
-   layout engine, and is distinct from the frame template. Output is one offline
-   file (no external assets, no network, no interactivity, each slide 1080×1350
-   CSS px).
+   deck's complete `deck.html` for a single topic by repeating one checked-in
+   `templates/frame.html` (a single standalone 1080×1350 source slide) ten times
+   and filling each slide's CSS-sized `<div id="body-safe-area">`, while the
+   locked header, footer, visual feel, type, and colors stay fixed. The author
+   composes the body freely within each safe area. The fixed pedagogical order is
+   an internal content-planning constraint that guides authoring, not a separate
+   outline artifact or a fixed layout engine, and is distinct from the frame
+   template. Output is one offline file (no external assets, no network, no
+   interactivity, each slide 1080×1350 CSS px).
 2. **Advisory review (non-blocking).** Content and visual reviewers check the
    `deck.html` against a checked-in manifest's independent content and visual
    revision limits (each 0–5) and report feedback to the author, who revises the
@@ -56,19 +57,23 @@ These describe the contract the MVP code must respect, not pre-built abstraction
 ### Seam 1: Topic → deck HTML boundary
 
 - **What**: the active Codex model authors a self-contained `deck.html` from a
-  single topic into a single checked-in frame template that locks the header,
-  footer, visual feel, type, and colors and declares a body-safe area, following
-  the fixed ten-slide pedagogical order (hook, definition, mental model,
-  mechanics, flow, applied example, code/pseudocode, trade-off,
-  misconception/failure, interviewer follow-up) as an internal content-planning
-  constraint. The author composes the body freely within the safe area; there is
-  no separate outline artifact and no deterministic body layout engine.
+  single topic by repeating one checked-in `templates/frame.html` — a single
+  standalone 1080×1350 source slide — ten times and filling each slide's
+  CSS-sized `<div id="body-safe-area">`, while the locked header, footer, visual
+  feel, type, and colors stay fixed. Authoring follows the fixed ten-slide
+  pedagogical order (hook, definition, mental model, mechanics, flow, applied
+  example, code/pseudocode, trade-off, misconception/failure, interviewer
+  follow-up) as an internal content-planning constraint. The author composes the
+  body freely within each safe area; there is no separate outline artifact and no
+  deterministic body layout engine.
 - **Why**: lets a future web/editor UI or alternative authoring model feed the
   same content-then-HTML path; the model still authors the visual HTML directly.
-- **Current path**: the Apollo workflow authors `deck.html` in Codex today; the
-  pedagogical order is an internal authoring constraint. The frame template
-  (header/footer/visual feel/type/colors and body-safe area) is the fixed visual
-  contract; the author composes body content freely within it.
+- **Current path**: the Apollo workflow authors `deck.html` in Codex today by
+  repeating the one-slide `templates/frame.html` ten times; the pedagogical order
+  is an internal authoring constraint. The frame template
+  (header/footer/visual feel/type/colors and the CSS-sized body-safe area) is the
+  fixed visual contract; the author composes body content freely within each
+  slide's safe area while the header and footer stay identical to the template.
 
 ### Seam 2: HTML → validation/PNG export boundary
 
