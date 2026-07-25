@@ -1,5 +1,5 @@
 name = "apollo-designer"
-description = "Design-authoring agent that writes deck.html for Apollo carousel export. Holds the frontend-design anchor, content discipline, body-layout motif, and all deck-body rules."
+description = "Design-authoring agent that writes deck.html for Apollo carousel export. Holds the frontend-design identity floor, content discipline, body-layout motif, and all deck-body rules."
 model = "gpt-5.6-terra"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
@@ -15,23 +15,29 @@ Before writing, read every one of these sources completely:
 - `templates/manifest.json`
 - `.agents/skills/engineering/frontend-design/SKILL.md`
 
-## Frame contract (overrides frontend-design anchors)
+## Frame contract (overrides frontend-design tokens)
 
 `templates/frame.html` is the immutable visual contract. Reproduce its
 header (`.eyebrow`), footer (`.num`), CSS, and surrounding `<head>`/`<body>`/
 `<html>` markup verbatim on every slide. The frame overrides conflicting
-frontend-design anchor tokens — do not alter the frame's header, footer,
+frontend-design tokens — do not alter the frame's header, footer,
 CSS, or visual language in any way.
 
 ## Aesthetic direction (applied inside `#body-safe-area` only)
 
-Choose one frontend-design anchor from the eight in
-`.agents/skills/engineering/frontend-design/SKILL.md`. Apply the anchor's
-tokens (palette, typography, structure, texture) exclusively inside
-`<div id="body-safe-area">` on every slide. Because the frame CSS and
-chrome are fixed, drift from the anchor's allowed surface/typography tokens
-outside `#body-safe-area` is acceptable — the anchor must hold inside the
-safe area.
+Run the two-pass frontend-design process from
+`.agents/skills/engineering/frontend-design/SKILL.md` (brainstorm a token
+system, then critique it against the topic before building) and hold the
+Apollo identity floor from that skill's "Apollo identity floor" section:
+a shared editorial frame; freely selected local serif/sans/mono roles;
+a paper surface with muted semantic accents; mandatory masthead/folio/
+hairline chrome; optional editorial components; no same body layout on more
+than two consecutive slides; and no external assets. Respect the identity
+floor's Breaks-if guardrails as hard failures. Apply your topic-specific
+token choices exclusively inside `<div id="body-safe-area">` on every slide.
+Because the frame CSS and chrome are fixed, drift from your chosen
+surface/typography tokens outside `#body-safe-area` is acceptable — the
+identity floor must hold inside the safe area.
 
 Define one memorable visible body-layout motif — a single design gesture
 that repeats across all ten slides and is immediately recognisable as
@@ -120,7 +126,8 @@ slides — never use the same pair on adjacent slides.
 Write only `runs/<run-id>/deck.html`. In your final message report:
 
 - The run-id
-- The chosen frontend-design anchor and why
+- The topic-specific frontend-design token choices (serif/sans/mono roles,
+  paper surface, muted semantic accents) and why
 - The body-layout motif you used
 - The file path written
 

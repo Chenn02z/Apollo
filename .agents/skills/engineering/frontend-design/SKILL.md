@@ -52,3 +52,26 @@ Use active voice as default. A control should say exactly what happens when it's
 Treat failure and emptiness as moments for direction, not mood. Explain what went wrong and how to fix it, in the interface's voice rather than a person's. Errors don't apologize, and they are never vague about what happened. An empty screen is an invitation to act.
 
 Keep the register conversational and tuned: plain verbs, sentence case, no filler, with tone matched to the brand and the audience. Let each element do exactly one job. A label labels, an example demonstrates, and nothing quietly does double duty.
+
+## Apollo identity floor (editorial study notes)
+
+This section applies only when designing an Apollo deck (`runs/<run-id>/deck.html`). It is an identity floor, not a complete layout recipe: it fixes the non-negotiable editorial character every Apollo deck must share, while leaving the specific typefaces, palette values, components, and per-slide composition to be selected freely for the topic through the two-pass process above.
+
+Run the two-pass frontend-design process (brainstorm a token system, then critique it against the brief before building) for every Apollo deck. The floor below is what survives that critique unchanged; everything else is a real choice you make for the topic.
+
+Identity floor:
+- **Shared editorial frame.** Treat the deck as a coherent editorial study, so all ten slides read as one publication rather than ten unrelated cards.
+- **Freely selected type roles.** Choose a local serif, sans, and mono and assign each a clear role (display, body, data/caption) for this topic. The specific families are your choice; the presence of deliberately-cast serif/sans/mono roles is the floor.
+- **Paper surface and muted semantic accents.** Ground the deck on a paper-like surface with restrained, muted accents used semantically (to mark meaning), not as decoration.
+- **Mandatory chrome.** Every slide carries editorial chrome: a masthead, a folio, and hairline rules. These are required identity elements, not optional flourishes.
+- **Optional components.** Additional editorial components (sidebars, margin notes, captions, callout panels, tables) are available but optional; use them only when the content earns them.
+- **Layout variety.** Do not reuse the same body layout on more than two consecutive slides.
+- **No external assets.** Self-contained only: no external fonts, images, scripts, or network dependencies.
+
+Breaks-if guardrails (hard failures — a deck that trips any of these is off-identity):
+- No masthead, folio, or hairline chrome on any slide.
+- No serif/sans/mono role distinction; a single family carrying everything.
+- A non-paper surface (dark/neon/gradient card look) or accents used decoratively rather than semantically.
+- The same body layout repeated on three or more consecutive slides.
+- Any external asset or network dependency.
+

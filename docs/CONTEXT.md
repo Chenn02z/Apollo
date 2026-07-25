@@ -38,6 +38,15 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
   from the `frame template`.
 - `PNG export`: the ten 1080×1350 PNGs named `slide-01.png` through
   `slide-10.png` that Apollo produces from `deck.html`.
+- `identity floor`: the Apollo-specific editorial-study-notes character every
+  deck must share, defined in the `frontend-design` skill. It is an identity
+  floor, not a full layout recipe: a shared editorial frame; freely selected
+  local serif/sans/mono roles; a paper surface with muted semantic accents;
+  mandatory masthead/folio/hairline chrome; optional editorial components; no
+  same body layout on more than two consecutive slides; and no external assets.
+  The `apollo-designer` runs the two-pass `frontend-design` process and holds
+  this floor with its Breaks-if guardrails as hard failures; it replaces the
+  obsolete "eight anchors" instruction.
 - `validity contract`: the MVP rules a deck must satisfy — exactly 10 top-level
   slides; no external assets or network dependencies; no interactivity or
   animation; each slide 1080×1350 CSS px; overflow detected; exactly 10
