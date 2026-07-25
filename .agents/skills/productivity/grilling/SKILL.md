@@ -4,7 +4,7 @@ description: Pre-requirements discovery interview. Stress-test a plan, decision,
 ---
 
 # Grilling
-Interview the user relentlessly about every aspect of the idea until those four items are settled. Walk down each branch of the decision tree, resolving dependencies one-by-one. For each question, provide your recommended answer.
+Interview the user relentlessly about every aspect of the idea until those four items are settled. Walk down each branch of the decision tree, resolving dependencies one-by-one. For each question, explain how each option would be implemented, how it would affect the final product, and then provide your recommended answer.
 
 Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
 
