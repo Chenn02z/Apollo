@@ -2,7 +2,12 @@
 
 ## Status
 
-Accepted
+Verified
+
+## Status Notes
+
+- **3a — Frame template (spec 0003): Verified.** The frame-template contract is verified; manifest/frame usage is covered by 3b/spec 0004.
+- **3b — Manifest / frame usage (spec 0004): Verified.** The manifest contract is verified. Reviewer wiring — reading the manifest's revision limits into reviewer behavior and frame usage through the review milestones — is explicitly out of scope here and remains in downstream milestones 0004/0005.
 
 ## Goal
 

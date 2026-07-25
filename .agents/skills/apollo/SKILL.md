@@ -27,7 +27,40 @@ Capture the output; this is `<run-id>`.
 mkdir -p runs/<run-id>
 ```
 
-## 3. Author deck
+## 3. Read frame template
+
+Read `templates/frame.html`. Extract the single `<section class="slide">`
+element and its surrounding `<head>`/`<body>`/`<html>` shell. This frame is the
+fixed visual contract — its header (`.eyebrow`), footer (`.num`), CSS, and
+surrounding markup must be reproduced verbatim on every slide.
+
+## 4. Read and validate manifest
+
+Read `templates/manifest.json`. Validate as follows:
+
+- Must be valid JSON.
+- Must contain **only** `content_revision_limit` and `visual_revision_limit`
+  keys. Unknown keys are an error.
+- Each must be an integer in the range 0-5. Non-integer or out-of-range
+  values are an error.
+- If either key is omitted, its value defaults to `1`. An empty `{}` resolves
+  to both defaults `1`/`1`.
+- If the file is missing, halt with "Missing templates/manifest.json".
+
+`$apollo` reads and validates the manifest but does **not** run review loops.
+The manifest values are consumed by downstream review milestones.
+
+## 5. Author deck
+
+Repeat the single slide from `templates/frame.html` ten times into
+`runs/<run-id>/deck.html`. For each slide:
+
+- Reproduce the surrounding frame (HTML shell, `<head>`, `<body>` tags,
+  header `.eyebrow`, footer `.num`, and all CSS) **verbatim** from the
+  template.
+- Compose body content freely **only** inside `<div id="body-safe-area">`.
+- Do not modify header or footer markup or CSS across any slide.
+
 
 Write `runs/<run-id>/deck.html` — a valid, parseable, self-contained
 HTML file with no external dependencies. Keep the frame (header, footer, visual
@@ -35,7 +68,7 @@ feel, type, and colors) as defined by the checked-in frame template; compose
 body content freely within the declared body-safe area. Only the author revises
 deck HTML.
 
-## 4. Validate
+## 6. Validate
 
 ```sh
 python scripts/check-deck.py runs/<run-id>/deck.html
@@ -70,7 +103,7 @@ Preserve a coherent progression across all ten slides, but do not force every de
 - No CSS animations/transitions/`@keyframes`; `transform`/`opacity` without animation allowed
 - Styles inline or embedded `<style>` only
 
-## 5. Export carousel
+## 7. Export carousel
 
 ```sh
 node scripts/export-carousel.mjs <run-id>
