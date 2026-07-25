@@ -35,6 +35,25 @@ Write-capable subagents must have disjoint file ownership. Use one
 write scopes. `doc-curator` may edit docs and skill or agent rules when
 `context` calls for surgical updates.
 
+## Apollo Design-Agent Routing
+
+The `apollo-designer` agent-routing decision for the `$apollo` workflow. It delegates
+deck-body composition to the dedicated design agent and does not change the
+generic roles above.
+
+- `$apollo` delegates deck-body composition of `runs/<run-id>/deck.html` to the
+  dedicated `.codex/agents/apollo/apollo-designer.toml` agent — not a generic
+  worker/implementer. No generic worker runs Apollo composition.
+- The design agent authors only `runs/<run-id>/deck.html` within the immutable
+  `templates/frame.html` (fixed header, footer, visual feel, type, colors, and
+  body-safe area) and may revise its own `deck.html` from advisory review
+  feedback; it does not alter templates.
+- The main workflow retains run setup, manifest validation, structural
+  validation (`scripts/check-deck.py`), retry orchestration, and PNG export
+  (`scripts/export-carousel.mjs`); the design agent does not run those gates.
+- This is the only Apollo delegation: one task to one design agent, not a
+  multi-agent runtime.
+
 ## Routing Principles
 
 - Use stronger planning and review agents for ambiguity, scope, and failure

@@ -62,8 +62,14 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 
 ## Product Boundaries
 
-- Codex is the authoring surface. Apollo has no external model, no API
-  integration, and no runtime multi-agent orchestration.
+- Codex is the authoring surface. `$apollo` delegates deck-body composition to
+  the dedicated `.codex/agents/apollo/apollo-designer.toml` agent (not a
+  generic worker/implementer); the design agent owns only
+  `runs/<run-id>/deck.html` and does not alter templates, while the main
+  workflow retains run setup, manifest validation, structural validation, retry
+  orchestration, and PNG export. Apollo has no external model, no API
+  integration, and no multi-agent runtime orchestration beyond this narrowly
+  scoped design-agent routing.
 - The authoring model is whatever Codex already provides; Apollo does not
   configure or call a separate model/API.
 - There is no product runtime to run or deploy in the MVP. Delivery happens
@@ -103,9 +109,13 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 - No project-specific CLI or runtime command exists yet. Apollo is invoked as a
   Codex workflow (`$apollo`), not a runnable binary. `$apollo` is the live
   reusable skill entry point at `.agents/skills/apollo/SKILL.md`, implemented as
-  a skill with no dedicated Apollo agent preset. The implementer role builds
-  support tooling only and never authors normal carousel content; direct
-  authoring is the active Codex model's normal product behavior.
+  a skill that delegates deck-body composition to the dedicated
+  `.codex/agents/apollo/apollo-designer.toml` agent (not a generic
+  worker/implementer). The design agent owns only `runs/<run-id>/deck.html` and
+  does not alter templates; the main workflow retains run setup, manifest
+  validation, structural validation, retry orchestration, and PNG export, and
+  `templates/frame.html` stays immutable. The implementer role otherwise builds
+  support tooling only.
 - PNG export and validation use local Node Playwright tooling. The pipeline runs the
   structural validator `scripts/check-deck.py` (reused unchanged) against
   `runs/<run-id>/deck.html`, then `node scripts/export-carousel.mjs <run-id>`
@@ -123,7 +133,8 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 - `docs/PRODUCT.md`: product intent, scope, principles, roadmap.
 - `docs/ARCHITECTURE.md`: current structure, approved seams, deferred architecture.
 - `docs/WORKFLOWS.md`: skill workflow and status contract (unchanged).
-- `docs/AGENT_ROLES.md`: subagent roles and routing (unchanged).
+- `docs/AGENT_ROLES.md`: subagent roles and routing, plus the `apollo-designer`
+  agent-routing decision.
 - `docs/DOCS_POLICY.md`: documentation destinations and status rules (unchanged).
 - `docs/CONTEXT.md`: this file — canonical terminology and boundaries.
 - `user-journeys.html`: visual map of the current Apollo path.

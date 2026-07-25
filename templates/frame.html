@@ -6,16 +6,23 @@
   <title>Apollo slide template</title>
   <style>
     * { box-sizing: border-box; }
-    :root { --ink: #f5f1e8; --muted: #aaaebd; --navy: #10172b; --panel: #1a2440; --lime: #c8f169; --coral: #ff8976; --blue: #75bcff; }
+    :root { --ink: #f5f1e8; --muted: #aaaebd; --navy: #10172b; --panel: #1a2440; --lime: #c8f169; --coral: #ff8976; --blue: #75bcff; --slide-accent: var(--lime); --slide-eyebrow: var(--lime); }
     body { margin: 0; background: #0a0f20; color: var(--ink); font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     .slide { width: 1080px; height: 1350px; overflow: hidden; position: relative; padding: 88px 82px 72px; background: var(--navy); display: flex; flex-direction: column; }
     .slide::before { content: ""; position: absolute; width: 470px; height: 470px; border-radius: 50%; background: #22365e; opacity: .4; right: 0; top: 0; }
-    .eyebrow { color: var(--lime); font-size: 24px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; position: relative; }
+    .eyebrow { color: var(--slide-eyebrow); font-size: 24px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; position: relative; }
     h1, h2, p { margin: 0; position: relative; }
     .num { position: absolute; right: 82px; bottom: 65px; color: var(--muted); font-size: 22px; font-weight: 800; letter-spacing: .12em; }
-    .accent { color: var(--lime); }
+    .accent { color: var(--slide-accent); }
     .coral { color: var(--coral); }
     #body-safe-area { flex: 1; position: relative; display: flex; flex-direction: column; }
+    #body-safe-area.archetype-hero     { justify-content: center; align-items: center; text-align: center; }
+    #body-safe-area.archetype-fact     { justify-content: center; align-items: center; text-align: center; }
+    #body-safe-area.archetype-quote    { justify-content: center; align-items: center; text-align: center; }
+    #body-safe-area.archetype-split    { flex-direction: row; gap: 48px; align-items: center; }
+    #body-safe-area.archetype-flow     { justify-content: flex-start; gap: 28px; }
+    #body-safe-area.archetype-grid     { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-content: center; }
+    #body-safe-area.archetype-takeaway { justify-content: flex-end; align-items: center; text-align: center; }
   </style>
 </head>
 <body>

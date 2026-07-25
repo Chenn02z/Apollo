@@ -342,7 +342,7 @@
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li>Codex's available model authors the content and visual HTML directly — Apollo has no separate model or API.</li>
+              <li>`$apollo` delegates deck-body composition to the dedicated `.codex/agents/apollo/apollo-designer.toml` agent (not a generic worker/implementer); the design agent owns only `runs/&lt;run-id&gt;/deck.html` and does not alter templates, while the main workflow retains run setup, manifest validation, structural validation, retry orchestration, and PNG export, and `templates/frame.html` stays immutable.</li>
               <li>Each slide follows the fixed pedagogical order as an internal content-planning constraint — no separate outline artifact exists.</li>
               <li>A single checked-in frame template locks the header, footer, visual feel, type, and colors and declares a body-safe area; the author composes the body freely within it.</li>
             </ul>
@@ -415,7 +415,7 @@
         <div class="capability-grid">
           <article class="capability">
             <span class="stage">Authoring</span>
-            <h3>Author a ten-slide deck directly in Codex</h3>
+            <h3>Author a ten-slide deck via a Codex design-worker</h3>
             <p>One topic becomes a fixed-order, interview-ready narrative.</p>
           </article>
           <article class="capability">

@@ -5,18 +5,15 @@ description: Authors a ten-slide deck.html from a topic for carousel export.
 
 # Apollo Deck Authoring
 
-When the user invokes `$apollo "<topic>"`, produce the complete per-run
-artifact set without delegation. No intermediate outline artifact. Author into
-the single checked-in frame template, which locks the header, footer, visual
-feel, type, and colors and declares a body-safe area; compose the body freely
-within that safe area.
+When the user invokes `$apollo "<topic>"` with an optional angle or context,
+set up the per-run scaffolding, delegate full deck-body composition to the
+`apollo-designer` agent, validate, export, and re-delegate on failure up to
+3 attempts.
 
 ## 1. Generate run-id
 
-Generate one valid unique run-id using Node built-ins only:
-
 ```sh
-node -e "console.log('run-' + require('crypto').randomUUID())"
+node -e "console.log(\"run-\" + require(\"crypto\").randomUUID())"
 ```
 
 Capture the output; this is `<run-id>`.
@@ -50,58 +47,29 @@ Read `templates/manifest.json`. Validate as follows:
 `$apollo` reads and validates the manifest but does **not** run review loops.
 The manifest values are consumed by downstream review milestones.
 
-## 5. Author deck
+## 5. Delegate deck-body composition to apollo-designer
 
-Repeat the single slide from `templates/frame.html` ten times into
-`runs/<run-id>/deck.html`. For each slide:
+Delegate the full deck-body composition to the `apollo-designer` agent
+(configured at `.codex/agents/apollo/apollo-designer.toml`). That agent
+holds all design-authoring instructions: the frontend-design anchor choice
+adapted to the immutable `templates/frame.html` constraint, content
+discipline, the one visible body-layout motif, and all deck-body rules
+(archetypes, accent palette, pedagogical order, constraints).
 
-- Reproduce the surrounding frame (HTML shell, `<head>`, `<body>` tags,
-  header `.eyebrow`, footer `.num`, and all CSS) **verbatim** from the
-  template.
-- Compose body content freely **only** inside `<div id="body-safe-area">`.
-- Do not modify header or footer markup or CSS across any slide.
+Provide the agent with:
 
+- The `<run-id>`
+- The `<topic>` exactly as given by the user
+- Any user-provided angle or context, passed through verbatim
 
-Write `runs/<run-id>/deck.html` — a valid, parseable, self-contained
-HTML file with no external dependencies. Keep the frame (header, footer, visual
-feel, type, and colors) as defined by the checked-in frame template; compose
-body content freely within the declared body-safe area. Only the author revises
-deck HTML.
+The apollo-designer agent writes `runs/<run-id>/deck.html` and reports its
+chosen anchor, motif, and path.
 
-## 6. Validate
+## 6. Validate deck structure
 
 ```sh
 python scripts/check-deck.py runs/<run-id>/deck.html
 ```
-
-Fix any breaches until exit 0.
-
-## Slide Structure
-
-Exactly ten `<section class="slide">` direct children of `<body>`. Each
-declares `width: 1080px; height: 1350px` via inline `style` or embedded
-`<style>`. No external stylesheets.
-
-## Pedagogical Order (internal plan only)
-
-Use the following as a default narrative arc, not a rigid slide-by-slide template:
-
-Hook — provocative question, fact, or visual
-Foundation — definition, context, or prerequisite
-3–7. Explanation — choose the sequence that best teaches the topic, using mechanisms, mental models, flows, comparisons, examples, architecture, or code as appropriate
-Trade-off — gain versus cost, limitation, or alternative
-Misconception / Common Failure — a realistic mistake or failure mode
-Interviewer Follow-up — likely next question with a concise answer
-
-Preserve a coherent progression across all ten slides, but do not force every deck to contain a separate analogy, flow, applied example, and code slide. Select and order these forms according to the topic.
-
-## Constraints
-
-- No `http://` or `https://` URLs anywhere
-- System fonts only; no external font `<link>` or `@font-face` with external `src`
-- No `<script>` elements or `on*` attributes
-- No CSS animations/transitions/`@keyframes`; `transform`/`opacity` without animation allowed
-- Styles inline or embedded `<style>` only
 
 ## 7. Export carousel
 
@@ -109,10 +77,18 @@ Preserve a coherent progression across all ten slides, but do not force every de
 node scripts/export-carousel.mjs <run-id>
 ```
 
-On success (exit 0) clearly report:
+## 8. Re-delegate on failure
+
+If structural validation (step 6) or export (step 7) fails, re-delegate to
+the `apollo-designer` agent with the failure output. Instruct it to fix
+`runs/<run-id>/deck.html` only — never edit templates. Repeat up to 3
+total delegation attempts (the initial plus up to 2 re-delegations).
+
+On success (step 7 exit 0), clearly report:
+
 - The run-id
 - `runs/<run-id>/deck.html`
 - `runs/<run-id>/slide-01.png` through `runs/<run-id>/slide-10.png`
 
-On export failure surface the error verbatim. Never claim PNG success when
-the export command fails.
+On persistent failure after 3 attempts, surface the final error verbatim.
+Never claim PNG success when the export command fails.

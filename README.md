@@ -4,9 +4,13 @@
 
 Apollo is a Codex-native workflow. You invoke it with a single
 software-engineering topic (for example, "database transactions" or "consistent
-hashing"). The Codex model that is already available in your session authors the
-content directly and lays it out as a standalone HTML deck. There is no external
-model, no API integration, and no runtime to run.
+hashing"). `$apollo` delegates deck-body composition to the dedicated
+`.codex/agents/apollo/apollo-designer.toml` agent (not a generic
+worker/implementer); the design agent owns only `runs/<run-id>/deck.html` and
+does not alter templates, while the main workflow retains run setup, manifest
+validation, structural validation, retry orchestration, and PNG export. There
+is no external
+model, no API integration, and no external runtime to run.
 
 ## What You Get
 
