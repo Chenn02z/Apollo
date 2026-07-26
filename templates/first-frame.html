@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Apollo slide template</title>
+  <title>Apollo first-frame template</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; }
 
@@ -14,8 +14,6 @@
       --font-body: Georgia, "Times New Roman", "Noto Serif", serif;
       --font-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: "SF Mono", "Menlo", "Consolas", "Liberation Mono", monospace;
-      --body-size: 20px;
-      --body-leading: 1.6;
       --palette-1: #1C1C1C;
       --palette-2: #506B62;
       --palette-3: #A85F47;
@@ -90,35 +88,37 @@
       color: #5D7094;
     }
 
-    /* ---- chrome: section label ---- */
-    .section-label {
+    /* ---- first-frame content ---- */
+    .first-frame-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 52px;
       position: relative;
-      font-family: var(--font-heading);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
+    }
+
+    .category {
+      font: 600 14px/1.3 var(--font-heading);
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: #A85F47;
       margin-bottom: 28px;
     }
 
-    /* ---- body-safe-area ---- */
-    #body-safe-area {
-      flex: 1;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      padding-left: 52px;
-      font-size: var(--body-size);
-      line-height: var(--body-leading);
+    .topic {
+      font: 700 72px/0.98 var(--font-body);
+      letter-spacing: -0.055em;
+      color: #1C1C1C;
+      margin: 0;
+      margin-bottom: 28px;
+      max-width: 770px;
     }
 
-    #body-safe-area.archetype-hero     { justify-content: center; align-items: center; text-align: center; }
-    #body-safe-area.archetype-fact     { justify-content: center; align-items: center; text-align: center; }
-    #body-safe-area.archetype-quote    { justify-content: center; align-items: center; text-align: center; }
-    #body-safe-area.archetype-split    { flex-direction: row; gap: 48px; align-items: center; }
-    #body-safe-area.archetype-flow     { justify-content: flex-start; gap: 28px; }
-    #body-safe-area.archetype-grid     { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-content: center; }
+    .commentary {
+      font: 400 30px/1.28 var(--font-body);
+      color: #5D7094;
+    }
 
     /* ---- chrome: folio ---- */
     .folio {
@@ -147,9 +147,10 @@
     <div class="rail"></div>
     <span class="rail-label">get cracked</span>
     <div class="masthead">Editorial Study Notes</div>
-    <div class="section-label">Topic · 01</div>
-    <div id="body-safe-area">
-      <p>Placeholder body content. Replace with authored slide content.</p>
+    <div class="first-frame-body">
+      <p class="category">[CATEGORY]</p>
+      <h1 class="topic">[TOPIC]</h1>
+      <p class="commentary">[COMMENTARY]</p>
     </div>
     <div class="folio">
       <span>Apollo</span>

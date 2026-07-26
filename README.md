@@ -23,11 +23,14 @@ model, no API integration, and no external runtime to run.
 - **Self-contained output.** No external assets, no network calls, no
   interactivity or animation. Each slide is 1080×1350 CSS pixels and exports as
   `runs/<run-id>/slide-01.png` through `runs/<run-id>/slide-10.png`.
-- **Locked frame, free body.** One checked-in `templates/frame.html` is a single
-  standalone 1080×1350 source slide (not a full deck). Apollo repeats it to build
-  the ten-slide deck, filling each slide's CSS-sized `<div id="body-safe-area">`
-  with body content while the header and footer stay fixed; within that safe
-  area, the author composes the body freely.
+- **Locked frame, free body.** Two checked-in standalone 1080×1350 source
+  templates (not full decks) build the ten-slide deck: `templates/first-frame.html`
+  is used only for slide 1, carrying a fixed category/topic/commentary
+  presentation with no body-safe area, and `templates/frame.html` is used for
+  slides 2–10, filling each slide's CSS-sized `<div id="body-safe-area">` with
+  body content; both templates own the fixed rail and rotated `get cracked`
+  label while the header and footer stay fixed; within each safe area, the
+  author composes the body freely.
 - **Advisory content and visual review.** A checked-in manifest sets independent
   content and visual revision limits (each 0–5). Content review checks a correct
   explanation, a concrete example, a trade-off or failure mode, and an
@@ -41,11 +44,12 @@ model, no API integration, and no external runtime to run.
 ## How It Works
 
 1. You give Apollo a single software-engineering topic.
-2. Codex uses one checked-in `templates/frame.html` — a single standalone
-   1080×1350 source slide — and repeats it ten times to build the deck. Each
-   repeated slide keeps the template's fixed header and footer and fills its
-   CSS-sized `<div id="body-safe-area">` with authored body content; the frame
-   itself is fixed.
+2. Codex uses two checked-in standalone 1080×1350 source templates to build the
+   deck: `templates/first-frame.html` for slide 1 (a fixed category/topic/
+   commentary presentation with no body-safe area) and `templates/frame.html`
+   for slides 2–10, each filling its CSS-sized `<div id="body-safe-area">` with
+   authored body content. Both templates keep the fixed rail and rotated
+   `get cracked` label; the frame itself is fixed.
 3. Content and visual reviewers check the deck against the manifest's
    independent revision limits and report feedback to the author, who revises the
    deck HTML. Review is advisory: when the revision budget is exhausted the run

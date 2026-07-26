@@ -45,7 +45,9 @@ generic roles above.
   dedicated `.codex/agents/apollo/apollo-designer.toml` agent — not a generic
   worker/implementer. No generic worker runs Apollo composition.
 - The design agent authors only `runs/<run-id>/deck.html` within the immutable
-  `templates/frame.html` (fixed header, footer, visual feel, type, colors, and
+  `templates/first-frame.html` for slide 1 (fixed category/topic/commentary, no
+  body-safe area) and `templates/frame.html` for slides 2–10 (fixed header,
+  footer, rail, rotated `get cracked` label, visual feel, type, colors, and
   body-safe area) and may revise its own `deck.html` from advisory review
   feedback; it does not alter templates.
 - The main workflow retains run setup, manifest validation, structural

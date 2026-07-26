@@ -24,12 +24,30 @@ Capture the output; this is `<run-id>`.
 mkdir -p runs/<run-id>
 ```
 
-## 3. Read frame template
+## 3. Read both frame templates
 
-Read `templates/frame.html`. Extract the single `<section class="slide">`
-element and its surrounding `<head>`/`<body>`/`<html>` shell. This frame is the
-fixed visual contract — its header (`.eyebrow`), footer (`.num`), CSS, and
-surrounding markup must be reproduced verbatim on every slide.
+Read `templates/first-frame.html` and `templates/frame.html`. These are the
+two immutable visual contracts:
+
+- `templates/first-frame.html`: the fixed presentation for slide 1 only. It
+  carries exactly three authored slots — category, topic, commentary — in
+  fixed placement, type, and color. It has no `#body-safe-area` and no
+  `archetype-*` class. Replace the placeholder tokens `[CATEGORY]`,
+  `[TOPIC]`, and `[COMMENTARY]` with authored text. The topic renders in
+  `#1C1C1C`; the author may wrap selected words in inline `<span>` elements
+  with `color` drawn solely from the seven fixed-palette values
+  (`#1C1C1C`, `#506B62`, `#A85F47`, `#5D7094`, `#A9824F`, `#806277`,
+  `#8E6A58`). Do not add, remove, or restyle any other element on this
+  slide. The rail and `get cracked` label are template-owned; do not
+  inject or restyle them.
+
+- `templates/frame.html`: serves slides 2–10. It owns the same rail and
+  `get cracked` label chrome as the first frame, plus a
+  `#body-safe-area` for free body composition. Reproduce its CSS and
+  surrounding markup verbatim on every slide. The rail and label are
+  template-owned; the agent selects the rail color only via the
+  `--rail-color` CSS custom property from the seven fixed-palette values.
+  Do not inject rail markup or use arbitrary colors.
 
 ## 4. Read and validate manifest
 
@@ -52,9 +70,9 @@ The manifest values are consumed by downstream review milestones.
 Delegate the full deck-body composition to the `apollo-designer` agent
 (configured at `.codex/agents/apollo/apollo-designer.toml`). That agent
 holds all design-authoring instructions: the frontend-design anchor choice
-adapted to the immutable `templates/frame.html` constraint, content
-discipline, the one visible body-layout motif, and all deck-body rules
-(archetypes, accent palette, pedagogical order, constraints).
+adapted to the two immutable templates, content discipline, the one visible
+body-layout motif, and all deck-body rules (archetypes, accent palette,
+pedagogical order, constraints).
 
 Provide the agent with:
 

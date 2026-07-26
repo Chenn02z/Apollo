@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -259,6 +259,8 @@ The sole palette tokens in both templates, exactly:
 
 ## Verification
 
+- `python3 tests/test_frame_template.py` passed 27/27. Live `$apollo`/PNG export was not run because the test workflow requires explicit user opt-in for live smoke tests.
+
 - Extend/keep the existing template tests in `tests/test_frame_template.py`
   proportionally so `templates/frame.html` still satisfies its milestone-0003
   contract (dimensions, self-contained rules, one body-safe-area, frame
@@ -290,7 +292,7 @@ The sole palette tokens in both templates, exactly:
 - **producer skill**: `$spec`
 - **intended consumer skill**: `$dev-loop`
 - **artifact path**: `docs/specs/0004-first-frame-template-contract.md`
-- **status**: `Accepted`
+- **status**: `Verified`
 - **settled decisions**:
   - Two immutable standalone templates: `templates/first-frame.html` (slide 1)
     and `templates/frame.html` (slides 2–10).
@@ -317,7 +319,7 @@ The sole palette tokens in both templates, exactly:
   - Existing runs untouched, not re-exported or re-validated; validator,
     exporter, and manifest unchanged.
 - **unresolved blockers**: none; `spec-griller` review passed and the spec is
-  Accepted, cleared for `$dev-loop` implementation.
+  Verified, cleared for `$dev-loop` implementation.
 - **docs / specs / milestones the next skill must read**:
   - `docs/milestones/0004-first-frame-template-composition.md`
   - `docs/specs/0003a-frame-template-contract.md`

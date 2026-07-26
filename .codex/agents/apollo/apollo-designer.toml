@@ -11,19 +11,39 @@ external dependencies. Write nothing else. Never edit templates.
 
 Before writing, read every one of these sources completely:
 
+- `templates/first-frame.html`
 - `templates/frame.html`
 - `templates/manifest.json`
 - `.agents/skills/engineering/frontend-design/SKILL.md`
 
 ## Frame contract (overrides frontend-design tokens)
 
-`templates/frame.html` is the immutable visual contract. Reproduce its
-header (`.eyebrow`), footer (`.num`), CSS, and surrounding `<head>`/`<body>`/
-`<html>` markup verbatim on every slide. The frame overrides conflicting
-frontend-design tokens — do not alter the frame's header, footer,
-CSS, or visual language in any way.
+`templates/first-frame.html` and `templates/frame.html` are the two
+immutable visual contracts. Reproduce their CSS and surrounding
+`<head>`/`<body>`/`<html>` markup verbatim on every slide. The templates
+override conflicting frontend-design tokens — do not alter the template
+CSS, chrome, or visual language in any way.
 
-## Aesthetic direction (applied inside `#body-safe-area` only)
+## Two-template routing
+
+- **Slide 1** uses `templates/first-frame.html`. Replace the placeholder
+  tokens `[CATEGORY]`, `[TOPIC]`, and `[COMMENTARY]` with authored text.
+  The topic renders in `#1C1C1C`; you may wrap selected words in inline
+  `<span>` elements with `color` drawn solely from the seven fixed-palette
+  values (`#1C1C1C`, `#506B62`, `#A85F47`, `#5D7094`, `#A9824F`, `#806277`,
+  `#8E6A58`). Do not add, remove, or restyle any other element on slide 1.
+  The rail and `get cracked` label are template-owned — do not inject or
+  restyle them. There is no `#body-safe-area` and no `archetype-*` class
+  on this slide.
+
+- **Slides 2–10** use `templates/frame.html`. Reproduce the template
+  verbatim. Compose body content only inside `<div id="body-safe-area">`.
+  The rail and `get cracked` label are template-owned; you may set the
+  rail color only via the `--rail-color` CSS custom property on
+  `<section class="slide">`, using values drawn solely from the fixed
+  palette. Do not inject rail markup or use arbitrary colors.
+
+## Aesthetic direction (applied inside `#body-safe-area` only on slides 2–10)
 
 Run the two-pass frontend-design process from
 `.agents/skills/engineering/frontend-design/SKILL.md` (brainstorm a token
@@ -41,18 +61,20 @@ Fixed (never re-chosen per deck):
   sans for component headings; SF Mono / Menlo for labels/code. Only their
   treatments (size, weight, spacing) vary.
 - **Rail.** Every slide carries an 8px accent rail plus a vertical rotated
-  `get cracked` brand label. No topic-specific rail label; the rail never
-  overlaps body content.
-- **Slide 10.** Always a center-center full follow-up composition.
+  `get cracked` brand label. The rail and label are template-owned; set the
+  rail color via `--rail-color` only. No topic-specific rail label; the rail
+  never overlaps body content.
+- **Slide 10.** Always a center-center full follow-up composition within its
+  safe area.
 
 Free: per-slide body structures, content, and graphics. Use graphics where
 they help. There is no fixed motif and no required component library.
 
 Respect the identity floor's Breaks-if guardrails as hard failures. Apply
-your topic-specific composition inside `<div id="body-safe-area">` on every
-slide. Because the frame CSS and chrome are fixed, drift from tokens outside
-`#body-safe-area` is acceptable — the identity floor must hold inside the
-safe area.
+your topic-specific composition inside `<div id="body-safe-area">` on slides
+2–10 only. Because the frame CSS and chrome are fixed, drift from tokens
+outside `#body-safe-area` is acceptable — the identity floor must hold
+inside the safe area.
 
 ## Content discipline
 
@@ -66,8 +88,10 @@ Exactly ten `<section class="slide">` direct children of `<body>`. Each
 declares `width: 1080px; height: 1350px` via inline `style` or embedded
 `<style>`. No external stylesheets.
 
-Repeat the single slide from `templates/frame.html` ten times. For each
-slide:
+Slide 1: reproduce the single slide from `templates/first-frame.html`,
+replacing `[CATEGORY]`, `[TOPIC]`, and `[COMMENTARY]`.
+
+Slides 2–10: repeat the single slide from `templates/frame.html`. For each:
 
 - Reproduce the surrounding frame verbatim.
 - Compose body content only inside `<div id="body-safe-area">`.
@@ -90,9 +114,9 @@ Preserve a coherent progression, but do not force every deck to contain a
 separate analogy, flow, applied example, and code slide. Select and order
 these forms according to the topic.
 
-## Visual Variety
+## Visual Variety (slides 2–10 only)
 
-The frame supplies seven body archetypes via CSS classes on
+The frame supplies six body archetypes via CSS classes on
 `#body-safe-area`. Assign exactly one archetype per slide and never repeat
 an archetype on two adjacent slides.
 
@@ -105,38 +129,24 @@ an archetype on two adjacent slides.
 | `.archetype-flow` | Process, numbered steps, timeline | `h2` ~32px, `p` ~22px | top |
 | `.archetype-grid` | Diagram, concepts, 2×2 layout | `h3` ~24px, `p` ~20px | center (grid) |
 
-**Accent palette.** Each slide may override the accent and eyebrow color
-by setting `--slide-accent` and `--slide-eyebrow` as `style` attributes on
-`<section class="slide">`. Use the frame palette tokens
-(`--lime`, `--coral`, `--blue`, `--ink`) or any valid color. The accent
-controls `.accent` text; the eyebrow controls `.eyebrow`. Vary across
-slides — never use the same pair on adjacent slides.
+**Accent palette.** Each slide may vary accent and chrome colors by setting
+`--rail-color` on `<section class="slide">` to any of the seven fixed-palette
+values. Vary across slides — never use the same rail color on adjacent
+slides.
 
 **Deliberate variety.** Across the ten slides:
 - No adjacent reuse of the same archetype class.
-- At least three distinct accent/eyebrow color pairs.
+- At least three distinct rail colors.
 - Type scale matches the archetype table above; do not reuse `hero` font
   sizes inside a `grid` slide.
 - Vertical anchoring varies: at least one center-anchored and one top-anchored
-  slide must appear. (`.archetype-takeaway` was removed as an archetype, so a
-  required bottom-anchored slide no longer applies.)
+  slide must appear.
 
 **Optional body alignment.** Middle/body compositions may be left-aligned,
 centered, or right-aligned for visual variety. This is a suggestion, not a hard
 requirement - any of the three alignments is acceptable.
 
-## Cover typography
-
-These rules apply to the cover slide only (the first slide):
-
-- The `The Design Question` title is bold and always uses the exact
-  literal color `#A85F47` on every future deck.
-- The hook is regular weight; individual hook words may use different
-  permitted palette colors.
-- The supplementary line is regular weight and uses one permitted palette
-  color only.
-
-## Body vertical spacing
+## Body vertical spacing (slides 2–10)
 
 Across all slides, inside `#body-safe-area`:
 

@@ -21,11 +21,12 @@ validation-plus-export gate:
    composition of each run's `runs/<run-id>/deck.html` to the dedicated
    `.codex/agents/apollo/apollo-designer.toml` agent (not a generic
    worker/implementer). That design agent authors the complete `deck.html` for a
-   single topic by repeating one checked-in `templates/frame.html` (a single
-   standalone 1080×1350 source slide) ten times and filling each slide's
-   CSS-sized `<div id="body-safe-area">`, while the locked header, footer,
-   visual feel, type, and colors stay fixed; `templates/frame.html` is
-   immutable. The design agent owns only `deck.html` and does not alter
+   single topic using two checked-in standalone 1080×1350 source slides:
+   `templates/first-frame.html` for slide 1 (a fixed category/topic/commentary
+   presentation with no body-safe area) and `templates/frame.html` for slides
+   2–10, filling each slide's CSS-sized `<div id="body-safe-area">`, while the
+   locked header, footer, rail, rotated `get cracked` label, visual feel, type,
+   and colors stay fixed; both templates are immutable. The design agent owns only `deck.html` and does not alter
    templates; the author composes the body freely within each safe area. The
    fixed pedagogical order is an internal content-planning constraint that guides
    authoring, not a separate outline artifact or a fixed layout engine, and is
@@ -66,10 +67,12 @@ These describe the contract the MVP code must respect, not pre-built abstraction
   dedicated `.codex/agents/apollo/apollo-designer.toml` agent (not a generic
   worker/implementer). That design agent authors a self-contained `deck.html`
   from a single
-  topic by repeating one checked-in `templates/frame.html` — a single
-  standalone 1080×1350 source slide — ten times and filling each slide's
-  CSS-sized `<div id="body-safe-area">`, while the locked header, footer, visual
-  feel, type, and colors stay fixed; `templates/frame.html` is immutable.
+  topic using two checked-in standalone 1080×1350 source slides:
+  `templates/first-frame.html` for slide 1 (a fixed category/topic/commentary
+  presentation with no body-safe area) and `templates/frame.html` for slides
+  2–10, filling each slide's CSS-sized `<div id="body-safe-area">`, while the
+  locked header, footer, rail, rotated `get cracked` label, visual feel, type,
+  and colors stay fixed; both templates are immutable.
   Authoring follows the fixed ten-slide pedagogical order (hook, definition,
   mental model, mechanics, flow, applied example, code/pseudocode, trade-off,
   misconception/failure, interviewer follow-up) as an internal content-planning
@@ -78,11 +81,13 @@ These describe the contract the MVP code must respect, not pre-built abstraction
 - **Why**: lets a future web/editor UI or alternative authoring model feed the
   same content-then-HTML path; the model still authors the visual HTML directly.
 - **Current path**: the Apollo workflow authors `deck.html` in Codex today by
-  repeating the one-slide `templates/frame.html` ten times; the pedagogical order
+  routing slide 1 to `templates/first-frame.html` and slides 2–10 to
+  `templates/frame.html`; the pedagogical order
   is an internal authoring constraint. The frame template
-  (header/footer/visual feel/type/colors and the CSS-sized body-safe area) is the
-  fixed visual contract; the author composes body content freely within each
-  slide's safe area while the header and footer stay identical to the template.
+  (header/footer/rail and rotated `get cracked` label, visual feel/type/colors,
+  and the CSS-sized body-safe area on slides 2–10) is the fixed visual contract;
+  the author composes body content freely within each slide's safe area while
+  the header and footer stay identical to the template.
 
 ### Seam 2: HTML → validation/PNG export boundary
 

@@ -11,11 +11,11 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 - `topic`: the single software-engineering subject a user supplies to Apollo.
 - `deck` / `deck.html`: the one standalone offline HTML file Apollo produces.
 - `slide`: one top-level unit of the deck; the MVP requires exactly ten.
-- `frame template`: the single checked-in `templates/frame.html` — one standalone
-  1080×1350 source slide, not a full deck. Apollo repeats it to build the
-  ten-slide `deck.html`, filling each slide's CSS-sized
-  `<div id="body-safe-area">` while the header and footer stay fixed. The frame
-  is fixed; the author does not restyle it.
+- `first-frame template`: the checked-in standalone 1080×1350 source slide `templates/first-frame.html`, used only for slide 1. It carries a fixed category/topic/commentary presentation with no body-safe area and no `archetype-*` class. It owns the fixed rail and rotated `get cracked` label and keeps the header and footer fixed. The first frame is fixed; the author does not restyle it.
+- `frame template`: the checked-in standalone 1080×1350 source slide `templates/frame.html`, used for slides 2–10, filling each slide’s
+  CSS-sized `<div id="body-safe-area">` with free body composition. It owns the
+  fixed rail and rotated `get cracked` label and keeps the header and footer
+  fixed. The frame is fixed; the author does not restyle it.
 - `body-safe area`: the CSS-sized `<div id="body-safe-area">` each repeated slide
   carries for author content. The author composes body content freely within it
   (`free body composition`); the header and footer stay fixed.
@@ -93,9 +93,11 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
   inside a Codex session.
 - The reference HTML is guidance, not code to reuse; do not copy its external
   assets.
-- One checked-in `templates/frame.html` is a single standalone 1080×1350 source
-  slide; Apollo repeats it to build the deck, filling each slide's CSS-sized
-  `<div id="body-safe-area">` while the locked header, footer, visual feel, type,
+- Two checked-in standalone 1080×1350 source slides build the deck:
+  `templates/first-frame.html` for slide 1 (a fixed category/topic/commentary
+  presentation with no body-safe area) and `templates/frame.html` for slides
+  2–10, filling each slide's CSS-sized `<div id="body-safe-area">` while the
+  locked header, footer, rail, rotated `get cracked` label, visual feel, type,
   and colors stay fixed; the author has free body composition within each safe
   area. Content and visual review are advisory and driven by the
   `manifest` revision limits; only structural validation and PNG export are hard
