@@ -342,9 +342,9 @@
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li>`$apollo` delegates deck-body composition to the dedicated `.codex/agents/apollo/apollo-designer.toml` agent (not a generic worker/implementer); the design agent owns only `runs/&lt;run-id&gt;/deck.html` and does not alter templates, while the main workflow retains run setup, manifest validation, structural validation, retry orchestration, and PNG export, and `templates/frame.html` stays immutable.</li>
+              <li>`$apollo` delegates deck-body composition to the dedicated `.codex/agents/apollo/apollo-designer.toml` agent (not a generic worker/implementer); the design agent owns only `runs/&lt;run-id&gt;/deck.html` and does not alter templates, while the main workflow retains run setup, manifest validation, structural validation, retry orchestration, and PNG export; `templates/first-frame.html` (slide 1) and `templates/frame.html` (slides 2–10) stay immutable.</li>
               <li>Each slide follows the fixed pedagogical order as an internal content-planning constraint — no separate outline artifact exists.</li>
-              <li>A single checked-in frame template locks the header, footer, visual feel, type, and colors and declares a body-safe area; the author composes the body freely within it.</li>
+              <li>Two checked-in standalone templates lock the shared frame: `templates/first-frame.html` fixes slide 1's category/topic/commentary, and `templates/frame.html` declares a body-safe area for slides 2–10 where the author composes the body freely.</li>
             </ul>
           </article>
 
@@ -421,7 +421,7 @@
           <article class="capability">
             <span class="stage">Author deck</span>
             <h3>Write a self-contained deck</h3>
-            <p>One offline <code>deck.html</code>: locked frame template, free body composition, no assets or network.</p>
+            <p>One offline <code>deck.html</code>: two locked templates (fixed first frame + free body), no assets or network.</p>
           </article>
           <article class="capability">
             <span class="stage">Validation</span>
@@ -446,7 +446,7 @@
         </div>
         <p class="callout">
           Apollo runs as a pipeline: topic → self-contained HTML authored into a
-          locked frame template with free body composition, then advisory content
+          two locked templates (fixed first frame + free body) with free composition, then advisory content
           and visual review that reports back to the author, then HTML →
           validation + Playwright PNG export. Structural validation and PNG export
           are the only hard gates; the reference HTML is guidance, not a dependency.

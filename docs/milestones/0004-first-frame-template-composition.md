@@ -2,11 +2,11 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Status Notes
 
-- **Accepted by user:** milestone 0004 renumbered into the accepted slot for
+- **Was accepted by user:** milestone 0004 renumbered into the accepted slot for
   first-frame / template composition; prior Draft review milestones (content,
   0005; visual, 0006) are pushed back one slot. Spec authoring may start;
   implementation is not yet authorized.
@@ -14,6 +14,7 @@ Accepted
   typography roles, the template-owned rail plus rotated `get cracked` label,
   slide 10 follow-up placement, and generic body-layout variation language are
   settled below. This revision retains Status: Accepted.
+- **Verified:** spec 0004-first-frame-template-contract is Verified; both standalone templates are checked in and consumed by `$apollo`. Content and visual review remain downstream Draft milestones 0005/0006.
 
 ## Goal
 
@@ -244,7 +245,7 @@ Prompt guidance (agent authoring inputs; not contract guarantees):
 - producer skill: `$requirements`
 - intended consumer skill: `$spec`
 - artifact path: `docs/milestones/0004-first-frame-template-composition.md`
-- status: `Accepted`
+- status: `Verified`
 - settled decisions:
   - Two immutable standalone templates: `templates/first-frame.html` (slide 1)
     and `templates/frame.html` (slides 2–10).

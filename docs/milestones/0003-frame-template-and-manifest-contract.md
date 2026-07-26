@@ -6,14 +6,14 @@ Verified
 
 ## Status Notes
 
-- **3a — Frame template (spec 0003): Verified.** The frame-template contract is verified; manifest/frame usage is covered by 3b/spec 0004.
-- **3b — Manifest / frame usage (spec 0004): Verified.** The manifest contract is verified. Reviewer wiring — reading the manifest's revision limits into reviewer behavior and frame usage through the review milestones — is explicitly out of scope here and remains in downstream milestones 0004/0005.
+- **3a — Frame template (spec 0003): Verified.** The frame-template contract is verified; manifest/frame usage is covered by 3b/spec 0003b.
+- **3b — Manifest / frame usage (spec 0003b): Verified.** The manifest contract is verified. Reviewer wiring — reading the manifest's revision limits into reviewer behavior and frame usage through the review milestones — is explicitly out of scope here and remains in downstream milestones 0005/0006.
 
 ## Goal
 
 Establish the checked-in frame template and manifest that lock Apollo's visual
 frame while leaving each slide's body open to free author composition. This
-settles the contract the later review milestones (0004, 0005) build on: what is
+settles the contract the later review milestones (0005, 0006) build on: what is
 fixed by the frame, what the author freely composes per slide, and how the
 manifest configures independent content and visual revision limits.
 
@@ -99,8 +99,8 @@ body-safe area rather than author decks free-form.
 
 ## Out Of Scope
 
-- Content review behavior and content-review reports (milestone 0004).
-- Visual review behavior and rendered-PNG visual reports (milestone 0005).
+- Content review behavior and content-review reports (milestone 0005).
+- Visual review behavior and rendered-PNG visual reports (milestone 0006).
 - Any reviewer report generation or export changes driven by the manifest.
 - Any change to structural validation or PNG export (owned by 0001/0002).
 - Any manifest fields beyond `content_revision_limit` and
@@ -116,6 +116,6 @@ body-safe area rather than author decks free-form.
 
 ## Deferred
 
-- Content-review revisions and reports (0004).
-- Visual-review revisions and reports (0005).
+- Content-review revisions and reports (0005).
+- Visual-review revisions and reports (0006).
 - Any manifest fields beyond the independent content and visual revision limits.

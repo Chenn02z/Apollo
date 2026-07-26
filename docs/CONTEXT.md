@@ -11,11 +11,14 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
 - `topic`: the single software-engineering subject a user supplies to Apollo.
 - `deck` / `deck.html`: the one standalone offline HTML file Apollo produces.
 - `slide`: one top-level unit of the deck; the MVP requires exactly ten.
-- `first-frame template`: the checked-in standalone 1080×1350 source slide `templates/first-frame.html`, used only for slide 1. It carries a fixed category/topic/commentary presentation with no body-safe area and no `archetype-*` class. It owns the fixed rail and rotated `get cracked` label and keeps the header and footer fixed. The first frame is fixed; the author does not restyle it.
+- `first-frame template`: the checked-in standalone 1080×1350 source slide `templates/first-frame.html`, used only for slide 1. It carries a fixed category/topic/commentary presentation with no body-safe area. It owns the fixed rail and rotated `get cracked` label and keeps the header and footer fixed. The first frame is fixed; the author does not restyle it.
 - `frame template`: the checked-in standalone 1080×1350 source slide `templates/frame.html`, used for slides 2–10, filling each slide’s
   CSS-sized `<div id="body-safe-area">` with free body composition. It owns the
   fixed rail and rotated `get cracked` label and keeps the header and footer
-  fixed. The frame is fixed; the author does not restyle it.
+  fixed. The frame is fixed; the author does not restyle it. Its `<div id="body-safe-area">`
+  supports the still-live `archetype-*` class family (e.g. `archetype-hero`,
+  `archetype-split`, `archetype-grid`) for body-layout variation; those classes are
+  the frame's contract for slides 2–10 and are not obsolete.
 - `body-safe area`: the CSS-sized `<div id="body-safe-area">` each repeated slide
   carries for author content. The author composes body content freely within it
   (`free body composition`); the header and footer stay fixed.
@@ -44,7 +47,8 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
   fixed while slide structures and content stay free. It is an identity floor,
   not a full layout recipe. The `apollo-designer` runs the two-pass
   `frontend-design` process and holds this floor with its Breaks-if guardrails
-  as hard failures; it replaces the obsolete "eight anchors" instruction.
+  as hard failures. (Historical breadcrumb: this two-pass process replaced the
+  obsolete "eight anchors" instruction.)
 - `hybrid visual system`: the settled Apollo visual contract for future runs
   (existing historical runs are untouched). Fixed: the frame; a seven-color
   palette (`#1C1C1C`, `#506B62`, `#A85F47`, `#5D7094`, `#A9824F`, `#806277`,
