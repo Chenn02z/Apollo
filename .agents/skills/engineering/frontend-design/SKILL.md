@@ -55,23 +55,27 @@ Keep the register conversational and tuned: plain verbs, sentence case, no fille
 
 ## Apollo identity floor (editorial study notes)
 
-This section applies only when designing an Apollo deck (`runs/<run-id>/deck.html`). It is an identity floor, not a complete layout recipe: it fixes the non-negotiable editorial character every Apollo deck must share, while leaving the specific typefaces, palette values, components, and per-slide composition to be selected freely for the topic through the two-pass process above.
+This section applies only when designing an Apollo deck (`runs/<run-id>/deck.html`), and only to future runs; existing historical runs are untouched. It is an identity floor, not a complete layout recipe. Apollo now locks a **hybrid visual system**: the frame, the palette, and three strict typography roles are fixed, while slide structures and content remain free. Choose per-slide composition, treatments, and graphics freely for the topic through the two-pass process above; do not re-choose the frame, palette, or typography roles.
 
 Run the two-pass frontend-design process (brainstorm a token system, then critique it against the brief before building) for every Apollo deck. The floor below is what survives that critique unchanged; everything else is a real choice you make for the topic.
 
 Identity floor:
-- **Shared editorial frame.** Treat the deck as a coherent editorial study, so all ten slides read as one publication rather than ten unrelated cards.
-- **Freely selected type roles.** Choose a local serif, sans, and mono and assign each a clear role (display, body, data/caption) for this topic. The specific families are your choice; the presence of deliberately-cast serif/sans/mono roles is the floor.
-- **Paper surface and muted semantic accents.** Ground the deck on a paper-like surface with restrained, muted accents used semantically (to mark meaning), not as decoration.
+- **Shared editorial frame.** Treat the deck as a coherent editorial study, so all ten slides read as one publication rather than ten unrelated cards. The frame is fixed, not re-chosen per deck.
+- **Fixed palette (seven colors).** Use only these seven colors: `#1C1C1C`, `#506B62`, `#A85F47`, `#5D7094`, `#A9824F`, `#806277`, `#8E6A58`. There are no fixed semantic color roles — assign meaning per deck freely, but only from these seven values. Accents remain restrained and semantic, not decorative.
+- **Three fixed typography roles (treatments vary).** Georgia is the editorial face for headings and body; a system sans carries component headings; SF Mono / Menlo carries labels and code. The roles and families are fixed; only their treatments (size, weight, spacing) vary per deck.
+- **Fixed rail.** Every slide carries the fixed rail: an 8px accent rail plus a vertical rotated brand label reading `get cracked`. There is no topic-specific rail label, and the rail never overlaps body content.
 - **Mandatory chrome.** Every slide carries editorial chrome: a masthead, a folio, and hairline rules. These are required identity elements, not optional flourishes.
-- **Optional components.** Additional editorial components (sidebars, margin notes, captions, callout panels, tables) are available but optional; use them only when the content earns them.
+- **Slide 10 composition.** Slide 10 is always a center-center full follow-up composition.
+- **Free structure and graphics.** Per-slide body structures and content are free; use graphics where they help. There is no fixed motif and no required component library.
 - **Layout variety.** Do not reuse the same body layout on more than two consecutive slides.
 - **No external assets.** Self-contained only: no external fonts, images, scripts, or network dependencies.
 
 Breaks-if guardrails (hard failures — a deck that trips any of these is off-identity):
-- No masthead, folio, or hairline chrome on any slide.
-- No serif/sans/mono role distinction; a single family carrying everything.
-- A non-paper surface (dark/neon/gradient card look) or accents used decoratively rather than semantically.
+- No masthead, folio, or hairline chrome on any slide, or a missing/altered 8px accent rail or `get cracked` brand label.
+- Any color outside the fixed seven-color palette, or accents used decoratively rather than semantically.
+- Departing from the three fixed typography roles (Georgia editorial heading/body, system sans component headings, SF Mono/Menlo labels/code) — for example a single family carrying everything.
+- The rail overlapping body content, or a topic-specific rail label.
+- Slide 10 not composed as a center-center full follow-up.
 - The same body layout repeated on three or more consecutive slides.
 - Any external asset or network dependency.
 

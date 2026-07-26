@@ -28,23 +28,31 @@ CSS, or visual language in any way.
 Run the two-pass frontend-design process from
 `.agents/skills/engineering/frontend-design/SKILL.md` (brainstorm a token
 system, then critique it against the topic before building) and hold the
-Apollo identity floor from that skill's "Apollo identity floor" section:
-a shared editorial frame; freely selected local serif/sans/mono roles;
-a paper surface with muted semantic accents; mandatory masthead/folio/
-hairline chrome; optional editorial components; no same body layout on more
-than two consecutive slides; and no external assets. Respect the identity
-floor's Breaks-if guardrails as hard failures. Apply your topic-specific
-token choices exclusively inside `<div id="body-safe-area">` on every slide.
-Because the frame CSS and chrome are fixed, drift from your chosen
-surface/typography tokens outside `#body-safe-area` is acceptable — the
-identity floor must hold inside the safe area.
+Apollo identity floor from that skill's "Apollo identity floor" section.
+Apollo locks a hybrid visual system: the frame, palette, and typography
+roles are fixed while slide structures and content stay free. This applies
+to future runs only; existing historical runs are untouched.
 
-Define one memorable visible body-layout motif — a single design gesture
-that repeats across all ten slides and is immediately recognisable as
-intentional. Examples: a persistent vertical rule on every slide, a
-consistent diagonal-split grid in split/flow slides, a distinctive
-numbered-step marker shape. State the motif in your preamble before the
-code.
+Fixed (never re-chosen per deck):
+- **Palette (seven colors).** Use only `#1C1C1C`, `#506B62`, `#A85F47`,
+  `#5D7094`, `#A9824F`, `#806277`, `#8E6A58`. No fixed semantic color roles —
+  assign meaning per deck, but only from these seven values.
+- **Three typography roles.** Georgia for editorial heading/body; a system
+  sans for component headings; SF Mono / Menlo for labels/code. Only their
+  treatments (size, weight, spacing) vary.
+- **Rail.** Every slide carries an 8px accent rail plus a vertical rotated
+  `get cracked` brand label. No topic-specific rail label; the rail never
+  overlaps body content.
+- **Slide 10.** Always a center-center full follow-up composition.
+
+Free: per-slide body structures, content, and graphics. Use graphics where
+they help. There is no fixed motif and no required component library.
+
+Respect the identity floor's Breaks-if guardrails as hard failures. Apply
+your topic-specific composition inside `<div id="body-safe-area">` on every
+slide. Because the frame CSS and chrome are fixed, drift from tokens outside
+`#body-safe-area` is acceptable — the identity floor must hold inside the
+safe area.
 
 ## Content discipline
 
@@ -96,7 +104,6 @@ an archetype on two adjacent slides.
 | `.archetype-split` | Side-by-side comparison, vs | `h2` ~36px, `p` ~24px | center (row) |
 | `.archetype-flow` | Process, numbered steps, timeline | `h2` ~32px, `p` ~22px | top |
 | `.archetype-grid` | Diagram, concepts, 2×2 layout | `h3` ~24px, `p` ~20px | center (grid) |
-| `.archetype-takeaway` | Bottom-line summary, CTA | `h1` ~56px | bottom |
 
 **Accent palette.** Each slide may override the accent and eyebrow color
 by setting `--slide-accent` and `--slide-eyebrow` as `style` attributes on
@@ -110,8 +117,36 @@ slides — never use the same pair on adjacent slides.
 - At least three distinct accent/eyebrow color pairs.
 - Type scale matches the archetype table above; do not reuse `hero` font
   sizes inside a `grid` slide.
-- Vertical anchoring varies: at least one center-anchored, one top-anchored,
-  and one bottom-anchored slide must appear.
+- Vertical anchoring varies: at least one center-anchored and one top-anchored
+  slide must appear. (`.archetype-takeaway` was removed as an archetype, so a
+  required bottom-anchored slide no longer applies.)
+
+**Optional body alignment.** Middle/body compositions may be left-aligned,
+centered, or right-aligned for visual variety. This is a suggestion, not a hard
+requirement - any of the three alignments is acceptable.
+
+## Cover typography
+
+These rules apply to the cover slide only (the first slide):
+
+- The `The Design Question` title is bold and always uses the exact
+  literal color `#A85F47` on every future deck.
+- The hook is regular weight; individual hook words may use different
+  permitted palette colors.
+- The supplementary line is regular weight and uses one permitted palette
+  color only.
+
+## Body vertical spacing
+
+Across all slides, inside `#body-safe-area`:
+
+- Never bottom-anchor body content. Do not use `flex-end`, `bottom`,
+  `align-items: flex-end`, `justify-content: flex-end`, or any other
+  bottom-edge alignment for body content.
+- Retain deliberate lower whitespace above the folio/footer so content is
+  never visually flushed to the bottom edge of the slide.
+- When a layout would otherwise push content to the lower edge, prefer
+  center or top placement instead.
 
 ## Constraints
 
@@ -126,9 +161,9 @@ slides — never use the same pair on adjacent slides.
 Write only `runs/<run-id>/deck.html`. In your final message report:
 
 - The run-id
-- The topic-specific frontend-design token choices (serif/sans/mono roles,
-  paper surface, muted semantic accents) and why
-- The body-layout motif you used
+- The topic-specific composition choices within the fixed hybrid visual
+  system (how you applied the fixed palette, typography roles, rail, and
+  free per-slide structures/graphics) and why
 - The file path written
 
 ## Re-edit on failure

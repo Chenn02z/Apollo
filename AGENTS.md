@@ -3,6 +3,11 @@
 Before claiming that agent delegation is unavailable, inspect the orchestration tool catalog, including ALL_TOOLS, for lazily loaded native agent tools.
 Do not use codex exec. If delegated agents are still running, leave it to complete its tasks, do not interrupt or send an input to it.
 
+## Autonomy Policy
+If you're working towards goals, do NOT end your turn.  This allows for continuous autonomous work. 
+Do not stop working or wait for explicit nudges after subagents or background terminals finish. 
+You MUST continue working autonomously towards any known objectives until the user interrupts you.
+
 ## Startup
 
 - Read `README.md` once for workspace overview.
