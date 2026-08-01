@@ -187,22 +187,35 @@ def _test_ff_topic_default_ink():
 # ── generated deck smoke (frame.html only) ──────────────────────────
 
 def _build_frame_deck(slide_count=10):
-    tmpl = _read(FRAME)
-    m = re.search(r"(<section\s[^>]*class=\"slide\"[^>]*>.*?</section>)", tmpl, re.DOTALL)
-    if not m:
+    tmpl_frame = _read(FRAME)
+    m_frame = re.search(r"(<section\s[^>]*class=\"slide\"[^>]*>.*?</section>)", tmpl_frame, re.DOTALL)
+    if not m_frame:
         raise ValueError("No slide found in frame.html")
-    slide_html = m.group(1)
-    before = tmpl[: tmpl.index("<body>")] + "<body>\n"
+    slide_html = m_frame.group(1)
+
+    tmpl_ff = _read(FIRST_FRAME)
+    m_ff = re.search(r"(<section\s[^>]*class=\"slide\"[^>]*>.*?</section>)", tmpl_ff, re.DOTALL)
+    if not m_ff:
+        raise ValueError("No slide found in first-frame.html")
+    ff_slide_html = m_ff.group(1)
+
+    before = tmpl_frame[: tmpl_frame.index("<body>")] + "<body>\n"
     after = "\n</body>\n</html>"
     parts = [before]
     for i in range(1, slide_count + 1):
-        s = slide_html
-        s = re.sub(r"TOPIC · \d+", f"TOPIC · {i:02d}", s, count=1)
-        s = re.sub(r"\d+ / \d+", f"{i:02d} / {slide_count}", s, count=1)
-        s = s.replace(
-            "<p>Placeholder body content. Replace with authored slide content.</p>",
-            f"<p>Slide {i} body content.</p>",
-        )
+        if i == 1:
+            s = ff_slide_html
+            s = s.replace('[CATEGORY]', 'Test Category')
+            s = s.replace('[TOPIC]', f'Slide {i:02d}')
+            s = s.replace('[COMMENTARY]', 'Slide 1 body content.')
+        else:
+            s = slide_html
+            s = re.sub(r"TOPIC · \d+", f"TOPIC · {i:02d}", s, count=1)
+            s = re.sub(r"\d+ / \d+", f"{i:02d} / {slide_count}", s, count=1)
+            s = s.replace(
+                "<p>Placeholder body content. Replace with authored slide content.</p>",
+                f"<p>Slide {i} body content.</p>",
+            )
         parts.append(s)
     parts.append(after)
     return "\n".join(parts)
@@ -214,6 +227,13 @@ def _extract_frame_skeleton(slide_html):
         r'(<div[^>]*\bid\s*=\s*["\x27]body-safe-area["\x27][^>]*>).*?(</div>)',
         r'\1\2',
         slide_html,
+        flags=re.DOTALL,
+    )
+    # first-frame-body: normalize placeholder replacement
+    s = re.sub(
+        r'(<div[^>]*\bclass\s*=\s*"[^"]*\bfirst-frame-body\b[^"]*"[^>]*>).*?(</div>)',
+        r'\1__\2',
+        s,
         flags=re.DOTALL,
     )
     s = re.sub(r'class="section-label"[^>]*>[^<]+', 'class="section-label">__', s)
@@ -234,15 +254,21 @@ def _test_frame_deck_passes():
 
 
 def _test_frame_preserved():
-    tmpl_html = _read(FRAME)
-    m = re.search(r"(<section\s[^>]*class=\"slide\"[^>]*>.*?</section>)", tmpl_html, re.DOTALL)
-    template_skeleton = _extract_frame_skeleton(m.group(1))
+    tmpl_frame = _read(FRAME)
+    m_f = re.search(r"(<section\s[^>]*class=\"slide\"[^>]*>.*?</section>)", tmpl_frame, re.DOTALL)
+    frame_skeleton = _extract_frame_skeleton(m_f.group(1))
+
+    tmpl_ff = _read(FIRST_FRAME)
+    m_ff = re.search(r"(<section\s[^>]*class=\"slide\"[^>]*>.*?</section>)", tmpl_ff, re.DOTALL)
+    ff_skeleton = _extract_frame_skeleton(m_ff.group(1))
+
     deck = _build_frame_deck(10)
     slides = re.findall(r"<section\s[^>]*class=\"slide\"[^>]*>.*?</section>", deck, re.DOTALL)
     assert len(slides) == 10
     for i, s in enumerate(slides):
         skel = _extract_frame_skeleton(s)
-        assert _normalize(template_skeleton) == _normalize(skel), \
+        expected = ff_skeleton if i == 0 else frame_skeleton
+        assert _normalize(expected) == _normalize(skel), \
             f"slide {i+1} frame differs from template"
 
 

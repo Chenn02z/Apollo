@@ -11,11 +11,17 @@ def run(html):
 
 def mk(n, **kw):
     dims = kw.get('w','1080px') + '; height:' + kw.get('h','1350px')
-    ss = ''.join('<section class="slide" style="width:' + dims + '">slide {}</section>'.format(i+1) for i in range(n))
+    parts = []
+    for i in range(n):
+        body = ('<div class="first-frame-body">slide {}</div>' if i == 0 else 'slide {}').format(i+1)
+        parts.append('<section class="slide" style="width:' + dims + '">' + body + '</section>')
+    ss = ''.join(parts)
     return '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>{}</body></html>'.format(ss)
 
 SLIDE = '<section class="slide" style="width:1080px; height:1350px">'
 SLIDE_C = SLIDE + '</section>'
+FFB = '<div class="first-frame-body">cover</div>'
+BSA = '<div id="body-safe-area">body</div>'
 
 failures = 0
 def t(name, fn):
@@ -58,13 +64,14 @@ t('keyframes', lambda: (lambda rc,out: (rc==1 and 'ANIMATION' in out and '@keyfr
 # Regression: void elements in slides do not corrupt slide count
 t('void_elements_dont_corrupt_count', lambda: (lambda rc,out: (rc==0 and out=='') or (_ for _ in ()).throw(AssertionError(f'rc={rc}: {out}')))(*run(
     '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>\n' +
+    SLIDE + '<div class="first-frame-body">slide 1</div></section>\n' +
     '\n'.join(
         f'{SLIDE}slide {i}' +
         (' <img src="data:image/png,ok">' if i % 2 == 0 else '') +
         (' <link rel="stylesheet" href="data:text/css,ok">' if i % 3 == 0 else '') +
         (' <br>' if i in (3,7) else '') +
         f'</section>'
-        for i in range(1, 11)
+        for i in range(2, 11)
     ) +
     '\n</body></html>'
 )) and None)
@@ -74,6 +81,97 @@ t('font_link_one_breach', lambda: (lambda rc,out: (rc==1 and len(out.splitlines(
 
 # Regression: @font-face external src reports exactly one breach
 t('font_face_one_breach', lambda: (lambda rc,out: (rc==1 and len(out.splitlines())==1 and 'EXTERNAL_FONT' in out) or (_ for _ in ()).throw(AssertionError(f'rc={rc}, lines={len(out.splitlines())}: {out}')))(*run('<!DOCTYPE html><html><head><style>@font-face{font-family:x;src:url(https://example.com/font.woff2)}</style></head>' + mk(10)[mk(10).find('<body'):])) and None)
+
+# Regression: two-template routing contract
+t('routing_slide1_ff_good', lambda: (lambda rc,out: (rc==0 and out=='') or (_ for _ in ()).throw(AssertionError(f'rc={rc}: {out}')))(*run(
+    '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>' +
+    SLIDE + FFB + '</section>' +
+    ''.join((SLIDE + '__' + BSA + '</section>') for _ in range(2, 11)) +
+    '</body></html>'
+)) and None)
+
+t('routing_slide1_missing_ff_body', lambda: (lambda rc,out: (rc==1 and 'slide 1 missing first-frame-body' in out) or (_ for _ in ()).throw(AssertionError(f'rc={rc}: {out}')))(*run(
+    # no first-frame-body, has body-safe-area — the classic bug pattern
+    '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>' +
+    SLIDE + BSA + '</section>' +
+    ''.join(SLIDE + '__' + BSA + '</section>' for _ in range(2, 11)) +
+    '</body></html>'
+)) and None)
+
+t('routing_slide2_has_ff_body', lambda: (lambda rc,out: (rc==1 and 'slide 2 has first-frame-body' in out) or (_ for _ in ()).throw(AssertionError(f'rc={rc}: {out}')))(*run(
+    '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>' +
+    SLIDE + FFB + '</section>' +
+    SLIDE + FFB + '</section>' +
+    ''.join((SLIDE + '__' + BSA + '</section>') for _ in range(3, 11)) +
+    '</body></html>'
+)) and None)
+
+# --- Spec 0005: marker count mismatch (dangling </div> shifts depth) ---
+t('routing_mismatch_unclosed', lambda: (lambda rc,out: (rc==1 and 'TEMPLATE_ROUTING: marker count mismatch' in out) or (_ for _ in ()).throw(AssertionError(f'rc={rc}: {out}')))(
+    *run(
+        '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>' +
+        # slide 1: extra <div> pushes close-section depth above bd → markers not appended
+        '<section class="slide" style="width:1080px; height:1350px">' +
+        '<div class="first-frame-body">cover</div><div>' +
+        '</section>' +
+        '</div>' +
+        # slides 2-10: 9 normal balanced sections
+        ''.join(
+            '<section class="slide" style="width:1080px; height:1350px">' +
+            '__<div id="body-safe-area">body</div></section>'
+            for _ in range(9)
+        ) +
+        '</body></html>'
+    )
+) and None)
+
+# --- Spec 0005: empty markers ---
+t('routing_empty_markers', lambda: (lambda rc,out: (rc==1 and 'TEMPLATE_ROUTING: empty routing' in out) or (_ for _ in ()).throw(AssertionError(f'rc={rc}: {out}')))(
+    *run(
+        '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>' +
+        ''.join(
+            '<section class="slide" style="width:1080px; height:1350px">' +
+            ('<div class="first-frame-body">cover</div>' if i == 0 else '__<div id="body-safe-area">body</div>') +
+            '<div>' +                 # extra <div> pushes close-section depth above bd
+            '</section>' +
+            '</div>'                  # restores depth after section close
+            for i in range(10)
+        ) +
+        '</body></html>'
+    )
+) and None)
+
+# --- Spec 0005: class-token membership ---
+t('routing_class_token_good', lambda: (lambda rc,out: (rc==0 and out=='') or (_ for _ in ()).throw(AssertionError(f'rc={rc}: {out}')))(
+    *run(
+        '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>' +
+        '<section class="slide large" style="width:1080px; height:1350px">' +
+        '<div class="x first-frame-body y">cover</div></section>' +
+        ''.join(
+            '<section class="slide extra" style="width:1080px; height:1350px">__' +
+            '<div id="body-safe-area">body</div></section>'
+            for _ in range(2, 11)
+        ) +
+        '</body></html>'
+    )
+) and None)
+
+# --- Spec 0005: class-token membership — non-matching id does not trigger body-safe-area ---
+t('routing_id_exact_match', lambda: (lambda rc,out: (rc==0 and out=='') or (_ for _ in ()).throw(AssertionError(f'rc={rc}: {out}')))(
+    *run(
+        '<!DOCTYPE html><html><head><meta charset=utf-8></head><body>' +
+        '<section class="slide" style="width:1080px; height:1350px">' +
+        '<div class="first-frame-body">cover</div>' +
+        '<div id="body-safe-area-extra">not the real id</div></section>' +
+        ''.join(
+            '<section class="slide" style="width:1080px; height:1350px">__' +
+            '<div id="body-safe-area">body</div></section>'
+            for _ in range(2, 11)
+        ) +
+        '</body></html>'
+    )
+) and None)
+
 
 print(f'\n{failures} failures')
 sys.exit(failures)

@@ -1,6 +1,6 @@
 name = "apollo-designer"
 description = "Design-authoring agent that writes deck.html for Apollo carousel export. Holds the frontend-design identity floor, content discipline, body-layout motif, and all deck-body rules."
-model = "gpt-5.6-terra"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 
@@ -75,6 +75,25 @@ your topic-specific composition inside `<div id="body-safe-area">` on slides
 2–10 only. Because the frame CSS and chrome are fixed, drift from tokens
 outside `#body-safe-area` is acceptable — the identity floor must hold
 inside the safe area.
+
+## Inline-SVG illustration guidance (optional, slides 2–10 `#body-safe-area` only)
+
+You may compose inline `<svg>` illustrations inside any slide 2–10
+`#body-safe-area`. These constraints are authoring guidance — the
+validator does not check them. A deck with no inline SVG is valid.
+
+- Palette: fills and strokes use direct hex values drawn only from the
+  seven-color palette (`#1C1C1C`, `#506B62`, `#A85F47`, `#5D7094`,
+  `#A9824F`, `#806277`, `#8E6A58`). `fill="none"` is allowed.
+- Forbidden: `opacity`, `fill-opacity`, `stroke-opacity`, `stop-opacity`;
+  `<linearGradient>`, `<radialGradient>`; `<filter>`; `currentColor`;
+  `<img>`, `<use>`; raster images; any external reference (no
+  `href`/`xlink:href` to external or data URIs).
+- Slide 1 stays template-only: no authored illustration, inline SVG,
+  or added graphic of any kind.
+- Worked examples (not a closed component set — other subjects are
+  permitted within the same constraints): agent/avatar figure,
+  app/terminal window, container/state block, connectors between elements.
 
 ## Content discipline
 

@@ -140,7 +140,7 @@ details out of this file; they belong in specs, `docs/PRODUCT.md`, and
   `templates/frame.html` stays immutable. The implementer role otherwise builds
   support tooling only.
 - PNG export and validation use local Node Playwright tooling. The pipeline runs the
-  structural validator `scripts/check-deck.py` (reused unchanged) against
+  structural validator `scripts/check-deck.py` (validator strengthened by 0005's slide-1 routing gate; exporter unchanged) against
   `runs/<run-id>/deck.html`, then `node scripts/export-carousel.mjs <run-id>`
   rasterizes slides 1–10 into `runs/<run-id>/slide-01.png` through
   `slide-10.png` and validates exact count and 1080×1350 image dimensions.

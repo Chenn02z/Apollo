@@ -101,8 +101,8 @@ preserved unchanged; validator, exporter, and manifest are not modified.
   `.archetype-takeaway` prompt mention is removed, from the designer agent).
 - Adding a fixed semantic color mapping for body content; per-deck color
   meanings are agent-chosen from the fixed palette (prompt guidance).
-- Content-review revisions/reports (milestone 0005) and visual-review
-  revisions/reports (milestone 0006), and any escalation of review into a gate.
+- Content-review revisions/reports (milestone 0006) and visual-review
+  revisions/reports (milestone 0007), and any escalation of review into a gate.
 
 ## Architecture Seams
 

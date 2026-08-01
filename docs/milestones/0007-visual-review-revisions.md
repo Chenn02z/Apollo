@@ -49,7 +49,7 @@ revisions.
 
 ## Out Of Scope
 
-- Content review and content reports (milestone 0005).
+- Content review and content reports (milestone 0006).
 - The frame template and manifest contract themselves (milestone 0003).
 - Any change to the structural validation or PNG export contract (owned by
   0001/0002) beyond re-rendering after an author revision.

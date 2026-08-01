@@ -47,7 +47,7 @@ Implementation loop for advisory content review feeding author revisions.
 
 ## Out Of Scope
 
-- Visual review of rendered PNGs and visual reports (milestone 0006).
+- Visual review of rendered PNGs and visual reports (milestone 0007).
 - The frame template and manifest contract themselves (milestone 0003).
 - Any change to structural validation or PNG export (owned by 0001/0002).
 - Making content review a blocking gate — it is advisory only.
@@ -62,5 +62,5 @@ Implementation loop for advisory content review feeding author revisions.
 
 ## Deferred
 
-- Visual (rendered-PNG) review and reports (0005).
+- Visual (rendered-PNG) review and reports (0007).
 - Any escalation of content review into a hard gate.

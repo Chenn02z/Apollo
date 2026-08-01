@@ -98,7 +98,7 @@ These describe the contract the MVP code must respect, not pre-built abstraction
   or batching can reuse the same validated HTML input.
 - **Current path**: validation and PNG export run as the second stage of the
   MVP pipeline. `scripts/check-deck.py` validates `runs/<run-id>/deck.html`
-  unchanged, then `node scripts/export-carousel.mjs <run-id>` rasterizes slides
+  through the 0005 slide-1 routing gate, then `node scripts/export-carousel.mjs <run-id>` rasterizes slides
   1–10 into `runs/<run-id>/slide-01.png` through `slide-10.png` under
   local/offline Playwright (network disabled, 1080×1350 viewport, device scale 1)
   and validates exact count and 1080×1350 image dimensions. The exporter owns

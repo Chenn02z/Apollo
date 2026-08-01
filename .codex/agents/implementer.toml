@@ -2,7 +2,7 @@ name = "implementer"
 description = "Workspace-write implementation agent for accepted specs and tightly scoped code or doc changes."
 model_provider="openrouter"
 model = "deepseek/deepseek-v4-pro"
-model_reasoning_effort = "max"
+model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """

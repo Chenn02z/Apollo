@@ -54,8 +54,8 @@ unchanged.
 ## Out Of Scope
 
 - `templates/frame.html` itself (owned by spec 0003).
-- Content review behavior and content-review reports (milestone 0004).
-- Visual review behavior and rendered-PNG visual reports (milestone 0005).
+- Content review behavior and content-review reports (milestone 0006).
+- Visual review behavior and rendered-PNG visual reports (milestone 0007).
 - Any reviewer report generation or export changes driven by the manifest.
 - Any manifest fields beyond `content_revision_limit` and
   `visual_revision_limit`.
@@ -109,7 +109,7 @@ unchanged.
   slide's `<div id="body-safe-area">`. All authored content goes inside the
   body-safe area; the header and footer are never modified by the author.
 - **Manifest consumption**: `$apollo` reads `templates/manifest.json` so that
-  downstream review milestones (0004, 0005) can consume the revision limits.
+  downstream review milestones (0006, 0007) can consume the revision limits.
   In the MVP, `$apollo` itself does not run review cycles; it authors,
   validates, and exports. The manifest's revision limits are consumed by
   later review milestones, not by `$apollo`'s authoring step.
@@ -134,13 +134,13 @@ unchanged.
 | Failure | Behavior |
 |---------|----------|
 | `templates/manifest.json` missing | Downstream review milestones cannot read revision limits. `$apollo` authoring may still proceed using defaults, but review milestones must fail or skip cleanly. |
-| Manifest not valid JSON | Parse error; review milestones cannot determine budgets. The run should fail or use defaults — decision deferred to review milestone specs (0004, 0005). |
+| Manifest not valid JSON | Parse error; review milestones cannot determine budgets. The run should fail or use defaults — decision deferred to review milestone specs (0006, 0007). |
 | Manifest has extra keys | Contract violation. Not caught by the structural validator. A manifest validator (if added) should reject unknown keys. |
 | `content_revision_limit` or `visual_revision_limit` out of range (not 0–5) | Contract violation. Review milestones must treat out-of-range values as an error or clamp to defaults — decision deferred to review milestone specs. |
 | `content_revision_limit: 0` | Content reviewer is skipped entirely; no content report is produced. Visual budget is unaffected. |
 | `visual_revision_limit: 0` | Visual reviewer is skipped entirely; no visual report is produced. Content budget is unaffected. |
 | `templates/frame.html` missing | `$apollo` cannot produce a valid deck; the run fails before any deck is written (spec 0003). |
-| Generated slide header/footer differs from template | Frame contract violation. Not caught by the structural validator — visual-review responsibility (milestone 0005). |
+| Generated slide header/footer differs from template | Frame contract violation. Not caught by the structural validator — visual-review responsibility (milestone 0007). |
 | Body content placed outside `body-safe-area` | Authoring-skill violation. The header and footer must never be modified by the author. Not caught by the structural validator — authoring-skill and visual-review responsibility. |
 
 ## Acceptance Criteria
@@ -168,7 +168,7 @@ unchanged.
 2. **Default-budget check**: a manifest `{}` or one omitting a key resolves
    to `1` for that key. Verify via the same parse logic.
 3. **Zero-budget check**: a manifest with `content_revision_limit: 0` produces
-   no content report (verified when milestone 0004 is implemented; for now,
+   no content report (verified when milestone 0006 is implemented; for now,
    the contract is that zero skips the reviewer with no report).
 4. **Generated-deck check**: produce a `runs/<run-id>/deck.html` by running
    `$apollo` on a topic. Run `scripts/check-deck.py` → exit 0. Confirm
@@ -187,4 +187,4 @@ unchanged.
 - How should out-of-range or non-integer revision limits be handled — error,
   clamp, or default? The milestone says "each an integer in the range 0–5"
   but does not specify rejection behavior. This spec defers the decision to
-  review milestone specs (0004, 0005), which are the consumers.
+  review milestone specs (0006, 0007), which are the consumers.

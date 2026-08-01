@@ -11,7 +11,7 @@ source slide that locks Apollo's visual frame — header, footer, visual feel,
 type, and colors — while leaving exactly one CSS-sized
 `<div id="body-safe-area">` for free author composition. This settles the
 fixed-visual contract that manifest configuration (spec 0004) and later review
-milestones (milestones 0004, 0005) build on.
+milestones (milestones 0006, 0007) build on.
 
 ## Scenario
 
@@ -53,8 +53,8 @@ assets, no network, no interactivity or animation) is preserved unchanged.
 - `templates/manifest.json` and revision-limit configuration (spec 0004).
 - `$apollo` authoring alignment to repeat the template and fill the
   body-safe area (spec 0004).
-- Content review behavior and content-review reports (milestone 0004).
-- Visual review behavior and rendered-PNG visual reports (milestone 0005).
+- Content review behavior and content-review reports (milestone 0006).
+- Visual review behavior and rendered-PNG visual reports (milestone 0007).
 - Any reviewer report generation or export changes driven by the manifest.
 - Any change to structural validation or PNG export (owned by specs
   0001/0002).
@@ -117,7 +117,7 @@ assets, no network, no interactivity or animation) is preserved unchanged.
 | Template contains `<script>` or `on*` | Repeated slides fail `SCRIPT` or `EVENT_HANDLER` check. |
 | Template contains CSS animation/transition | Repeated slides fail `ANIMATION` check. |
 | Template missing `<div id="body-safe-area">` | Author has no composition surface; deck is invalid by contract. Not caught by the structural validator — this is an authoring-skill and visual-review responsibility. |
-| Generated slide header/footer differs from template | Frame contract violation. Not caught by the structural validator — this is a visual-review responsibility (milestone 0005). |
+| Generated slide header/footer differs from template | Frame contract violation. Not caught by the structural validator — this is a visual-review responsibility (milestone 0007). |
 
 ## Acceptance Criteria
 

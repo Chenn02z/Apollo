@@ -14,7 +14,7 @@ Verified
   typography roles, the template-owned rail plus rotated `get cracked` label,
   slide 10 follow-up placement, and generic body-layout variation language are
   settled below. This revision retains Status: Accepted.
-- **Verified:** spec 0004-first-frame-template-contract is Verified; both standalone templates are checked in and consumed by `$apollo`. Content and visual review remain downstream Draft milestones 0005/0006.
+- **Verified:** spec 0004-first-frame-template-contract is Verified; both standalone templates are checked in and consumed by `$apollo`. Content and visual review remain downstream Draft milestones 0006/0007.
 
 ## Goal
 
@@ -175,7 +175,7 @@ contract, then implementation through `$spec` and `$dev-loop`.
 - Editing the template-consumer `$apollo` skill/agent instructions or related
   docs now — deferred to later spec implementation (named in scope above).
 - Changing structural validation or PNG export contracts (owned by 0001/0002).
-- The content or visual review behavior and reports (milestones 0005 / 0006).
+- The content or visual review behavior and reports (milestones 0006 / 0007).
 - Any new manifest fields beyond milestone 0003.
 - Any new JSON token files or a color source of truth outside the templates.
 - Any fixed semantic color mapping for agent-designed body content.
@@ -208,8 +208,8 @@ contract, then implementation through `$spec` and `$dev-loop`.
 - During spec implementation, remove only the stale `.archetype-takeaway` prompt
   mention in `.codex/agents/apollo/apollo-designer.toml`. No CSS class is deleted
   from either template.
-- Content-review revisions and reports (0005).
-- Visual-review revisions and reports (0006).
+- Content-review revisions and reports (0006).
+- Visual-review revisions and reports (0007).
 - Any escalation of review into a hard gate.
 
 ## Hard Contract vs Prompt Guidance

@@ -7,7 +7,7 @@ VOID = {'br','hr','img','input','meta','link','area','base','col','embed','sourc
 
 class P(HTMLParser):
     def __init__(s, info):
-        super().__init__(); s.i = info; s.bd = -1; s.d = 0
+        super().__init__(); s.i = info; s.bd = -1; s.d = 0; s.cur_markers = None
         s.ss = False; s.sb = []; s.scr = False; s.td = 0
     def handle_starttag(s, tag, attrs):
         if tag not in VOID:
@@ -19,14 +19,25 @@ class P(HTMLParser):
         if tag not in VOID: s.td += 1
         if s.bd > 0 and s.d == s.bd + 1:
             ad = dict(attrs)
-            if tag == 'section' and ad.get('class') == 'slide':
+            if tag == 'section' and 'slide' in ad.get('class','').split():
                 s.i['slides'].append(ad.get('style',''))
+                s.cur_markers = set()
+                return
+        if s.cur_markers is not None:
+            ad = dict(attrs)
+            if 'first-frame-body' in ad.get('class','').split():
+                s.cur_markers.add('first-frame-body')
+            if ad.get('id') == 'body-safe-area':
+                s.cur_markers.add('body-safe-area')
     def handle_endtag(s, tag):
         if tag not in VOID:
             s.d -= 1
             s.td -= 1
         if tag == 'style' and s.ss: s.ss = False; s.i['styles'].append(''.join(s.sb))
         elif tag == 'script' and s.scr: s.scr = False
+        elif tag == 'section' and s.d == s.bd and s.cur_markers is not None:
+            s.i['slide_markers'].append(s.cur_markers)
+            s.cur_markers = None
     def handle_data(s, d):
         if s.ss: s.sb.append(d)
 
@@ -47,7 +58,7 @@ def check(path):
     except (ValueError,OSError) as e:
         print(f'FILE: cannot read {path}: {e}'); return 1
 
-    info = {'slides':[], 'styles':[], 'scr':[]}
+    info = {'slides':[], 'styles':[], 'scr':[], 'slide_markers':[]}
     try:
         p = P(info); p.feed(raw); p.close()
     except Exception as e:
@@ -64,6 +75,26 @@ def check(path):
     for i, st in enumerate(slides):
         if not dim_ok(st, cb):
             print(f'DIMENSIONS: slide {i+1} missing or incorrect 1080x1350'); b += 1
+
+    # Two-template routing contract (fail-closed: empty/mismatch gate)
+    markers = info['slide_markers']
+    if len(markers) == 0:
+        print('TEMPLATE_ROUTING: empty routing — no slide markers detected')
+        b += 1
+    elif len(markers) != len(slides):
+        print(f'TEMPLATE_ROUTING: marker count mismatch ({len(markers)} markers, {len(slides)} slides)')
+        b += 1
+    else:
+        if 'first-frame-body' not in markers[0]:
+            print('TEMPLATE_ROUTING: slide 1 missing first-frame-body (must use first-frame.html, not frame.html)')
+            b += 1
+        if 'body-safe-area' in markers[0]:
+            print('TEMPLATE_ROUTING: slide 1 has body-safe-area (must use first-frame.html, not frame.html)')
+            b += 1
+        for i in range(1, len(markers)):
+            if 'first-frame-body' in markers[i]:
+                print(f'TEMPLATE_ROUTING: slide {i+1} has first-frame-body (must use frame.html, not first-frame.html)')
+                b += 1
 
     for m in re.finditer(r'href\s*=\s*["\x27](https?://(?!.*font)[^"\x27]*)', raw, re.I):
         print(f'EXTERNAL_URL: attribute="{m.group(1)}"'); b += 1
