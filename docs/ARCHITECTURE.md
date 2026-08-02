@@ -14,10 +14,14 @@ exports ten PNGs. The only durable artifacts today are the docs in this repo
 (`docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/CONTEXT.md`, milestones,
 specs) and the untracked visual reference at `docs/reference/index.html`.
 
+Spec 0006 (Accepted, not yet implemented) adds an orchestration layer above this
+pipeline: `$getcracked` becomes the sole user-facing entry point, taking a
+category and a topic count, and drives the pipeline once per selected topic.
+
 The MVP production path is a pipeline of authoring, advisory review, and a
 validation-plus-export gate:
 
-1. **Topic → self-contained deck HTML.** `$apollo` delegates deck-body
+1. **Topic → self-contained deck HTML.** `$generate` delegates deck-body
    composition of each run's `runs/<run-id>/deck.html` to the dedicated
    `.codex/agents/apollo/apollo-designer.toml` agent (not a generic
    worker/implementer). That design agent authors the complete `deck.html` for a
@@ -44,26 +48,64 @@ validation-plus-export gate:
    exported as exactly ten 1080×1350 PNGs named `slide-01.png` through
    `slide-10.png`. Structural validation and PNG export are the only hard gates.
 
-Each run is identified by a caller-supplied unique `run-id`; its artifacts live in
-a per-run folder `runs/<run-id>/` (its `deck.html` and `slide-01.png` …
-`slide-10.png`). `runs/` is local, gitignored generated output. The legacy flat
-`runs/deck.html` is preserved as pre-0002 evidence and is not overwritten by new
-runs.
+Each run is identified by a unique `run-id` the deck workflow generates itself;
+its artifacts live in a per-run folder `runs/<run-id>/` (its `deck.html` and
+`slide-01.png` … `slide-10.png`). `runs/` is local, gitignored generated output.
+The legacy flat `runs/deck.html` is preserved as pre-0002 evidence and is not
+overwritten by new runs.
 
-Each run is identified by a caller-supplied unique `run-id`; its artifacts live in
-a per-run folder `runs/<run-id>/` (its `deck.html` and `slide-01.png` …
-`slide-10.png`). `runs/` is local, gitignored generated output. The legacy flat
-`runs/deck.html` is preserved as pre-0002 evidence and is not overwritten by new
-runs.
+Each run is identified by a unique `run-id` the deck workflow generates itself;
+its artifacts live in a per-run folder `runs/<run-id>/` (its `deck.html` and
+`slide-01.png` … `slide-10.png`). `runs/` is local, gitignored generated output.
+The legacy flat `runs/deck.html` is preserved as pre-0002 evidence and is not
+overwritten by new runs.
 
 ## Approved Seams
 
 Boundaries the MVP deliberately establishes so post-MVP work can extend cleanly.
 These describe the contract the MVP code must respect, not pre-built abstractions.
 
+### Orchestration boundary (above Seam 1)
+
+Accepted in spec 0006; not yet implemented.
+
+- **What**: `$getcracked` main sits above Seam 1 as the sole user-facing entry
+  point. It takes a category and a topic count and owns inventory reads and
+  writes (`docs/getcracked-inventory.md`), topic selection via the
+  `web-researcher` agent, dispatch of one `$generate` workflow per selected
+  topic, `runs/<run-id>/metadata.md` writes on per-topic success, sequential
+  inventory updates, and per-topic failure reporting.
+- **Why**: separates "what to make and what has been made" from "how one deck
+  gets made", so a durable backlog and multi-topic runs can grow without
+  reaching into the deck pipeline.
+- **Current path**: `$generate` keeps its existing self-contained lifecycle
+  unchanged — it generates its own `run-id`, creates `runs/<run-id>/`, reads
+  templates, validates the manifest, delegates to `apollo-designer`, runs
+  structural validation and PNG export, and retries up to 3 attempts.
+  `$getcracked` does not precreate runs or generate run-ids. Workflows are
+  dispatched onto the runtime's own queue with no added cap, but inventory
+  writes are serialized: one write at a time, never concurrent. A failed topic
+  stays `planned`, gets no `metadata.md`, and does not block siblings.
+
+### Web-research agent boundary
+
+Accepted in spec 0006; not yet implemented.
+
+- **What**: a dedicated `web-researcher` agent, planned at
+  `.codex/agents/apollo/web-researcher.toml`, that supplies research findings
+  only — cited sources, current topics, relevant technical context — returned
+  in-session to its caller.
+- **Why**: keeps "what the world currently tests" as an input to orchestration
+  and authoring without letting a research agent own workflow control.
+- **Current path**: `$getcracked` consumes findings for topic selection and
+  `$generate` may consume them to ground current content. The agent edits no
+  files — not the inventory, decks, or templates — makes no workflow decisions
+  (no selection, dispatch, status transitions, or run-id generation), and its
+  sources are never written under `docs/` or `runs/`.
+
 ### Seam 1: Topic → deck HTML boundary
 
-- **What**: `$apollo` delegates deck-body composition of `deck.html` to the
+- **What**: `$generate` delegates deck-body composition of `deck.html` to the
   dedicated `.codex/agents/apollo/apollo-designer.toml` agent (not a generic
   worker/implementer). That design agent authors a self-contained `deck.html`
   from a single
@@ -126,7 +168,9 @@ which seam it builds on.
   instead of the Codex-native workflow.
 - **API / local-model integrations**: alternative authoring backends behind
   Seam 1.
-- **Batching**: multiple decks through Seam 2's export path.
+- **Batching**: multiple decks through Seam 2's export path. Spec 0006's
+  multi-topic dispatch is orchestration above Seam 1 — each topic still runs
+  its own unchanged `$generate` pipeline — not batched authoring or export.
 - **Publishing / accounts / cloud**: out of MVP scope; no runtime exists yet.
 - **Analytics**: out of MVP scope.
 - **Video / audio / PDF**: additional export formats reusing the validated HTML

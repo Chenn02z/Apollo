@@ -2,12 +2,17 @@
 
 > Turn one software-engineering topic into a self-contained, interview-ready slide deck — authored in Codex, delivered as one offline HTML file and ten PNGs.
 
-Apollo is a Codex-native workflow. You invoke it with a single
-software-engineering topic (for example, "database transactions" or "consistent
-hashing"). `$apollo` delegates deck-body composition to the dedicated
+Apollo is a Codex-native workflow. Spec 0006 (Accepted, not yet implemented)
+settles `$getcracked` as the sole user-facing entry point: you invoke it with a
+category and a topic count (for example, "give me 5 topics for Databases"), and
+it selects topics, records them in a checked-in inventory, and runs one
+`$generate` workflow per topic. `$generate` — the deck-authoring workflow,
+renamed from `$apollo` — owns one deck end to end: it generates its own
+`run-id`, creates `runs/<run-id>/`, authors, validates, exports, and retries.
+It delegates deck-body composition to the dedicated
 `.codex/agents/apollo/apollo-designer.toml` agent (not a generic
 worker/implementer); the design agent owns only `runs/<run-id>/deck.html` and
-does not alter templates, while the main workflow retains run setup, manifest
+does not alter templates, while the deck workflow retains run setup, manifest
 validation, structural validation, retry orchestration, and PNG export. There
 is no external
 model, no API integration, and no external runtime to run.
@@ -16,7 +21,12 @@ model, no API integration, and no external runtime to run.
 
 - **One topic in, one deck out.** Apollo produces exactly one standalone HTML
   file (`deck.html`) plus exactly ten PNG slides, written to a per-run folder
-  `runs/<run-id>/` for a caller-supplied unique `run-id`.
+  `runs/<run-id>/` for a unique `run-id` the deck workflow generates itself.
+- **A durable topic backlog.** Under spec 0006 (Accepted, not yet implemented),
+  `docs/getcracked-inventory.md` records topics under seven fixed categories
+  with a status (`planned`, `generated`, `reviewed`) and a run link, and each
+  successful run gets a `metadata.md` naming what it covers. `reviewed` is set
+  by hand only.
 - **Exactly ten coherent slides.** Every deck follows a fixed pedagogical order:
   hook, definition, mental model, mechanics, flow, applied example,
   code/pseudocode, trade-off, misconception/failure, interviewer follow-up.
@@ -43,7 +53,12 @@ model, no API integration, and no external runtime to run.
 
 ## How It Works
 
-1. You give Apollo a single software-engineering topic.
+1. You invoke `$getcracked` with a category and a topic count. It uses the
+   `web-researcher` agent to find what is currently tested in that category,
+   selects that exact count of topics not already in the inventory, records
+   them as `planned`, and dispatches one `$generate` workflow per topic. Each
+   topic succeeds or fails on its own: a failed topic stays `planned` and does
+   not block the others.
 2. Codex uses two checked-in standalone 1080×1350 source templates to build the
    deck: `templates/first-frame.html` for slide 1 (a fixed category/topic/
    commentary presentation with no body-safe area) and `templates/frame.html`
@@ -94,3 +109,6 @@ notes live in `docs/ARCHITECTURE.md`; canonical terminology is in
 The MVP does not include a web/editor UI, API or local-model integrations,
 batching, publishing, analytics, video/audio, PDF, accounts, cloud, or an
 automatic factual-review pipeline. Those are explicitly post-MVP.
+
+Spec 0006's multi-topic dispatch is orchestration, not batching: each topic
+still runs its own unchanged `$generate` pipeline end to end.

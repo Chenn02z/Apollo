@@ -37,11 +37,11 @@ write scopes. `doc-curator` may edit docs and skill or agent rules when
 
 ## Apollo Design-Agent Routing
 
-The `apollo-designer` agent-routing decision for the `$apollo` workflow. It delegates
+The `apollo-designer` agent-routing decision for the `$generate` workflow. It delegates
 deck-body composition to the dedicated design agent and does not change the
 generic roles above.
 
-- `$apollo` delegates deck-body composition of `runs/<run-id>/deck.html` to the
+- `$generate` delegates deck-body composition of `runs/<run-id>/deck.html` to the
   dedicated `.codex/agents/apollo/apollo-designer.toml` agent — not a generic
   worker/implementer. No generic worker runs Apollo composition.
 - The design agent authors only `runs/<run-id>/deck.html` within the immutable
@@ -53,8 +53,40 @@ generic roles above.
 - The main workflow retains run setup, manifest validation, structural
   validation (`scripts/check-deck.py`), retry orchestration, and PNG export
   (`scripts/export-carousel.mjs`); the design agent does not run those gates.
-- This is the only Apollo delegation: one task to one design agent, not a
-  multi-agent runtime.
+- This is the only delegation inside `$generate`: one task to one design agent,
+  not a multi-agent runtime.
+
+## Apollo Web-Research Agent Routing
+
+Accepted in spec 0006; the agent is not yet created. The `web-researcher` agent
+is planned at `.codex/agents/apollo/web-researcher.toml` as a dedicated agent,
+not a generic worker/implementer.
+
+- `web-researcher` determines what is currently tested or interviewed for a
+  given category and provides current content grounding for a given topic.
+- It is called by `$getcracked` for topic selection and by `$generate` for
+  content grounding. Both consume its output as input; neither hands it
+  workflow control.
+- It supplies research findings only: cited sources, current topics, and
+  relevant technical context returned in-session. It prefers primary sources
+  (official documentation, papers, specifications, source code) over secondary
+  commentary.
+- It edits no files — not `docs/getcracked-inventory.md`, decks, or templates —
+  and its sources are never written under `docs/` or `runs/`.
+- It makes no workflow decisions: no topic selection, no dispatch, no status
+  transitions, no run-id generation.
+
+## Apollo Orchestration Ownership
+
+Accepted in spec 0006; not yet implemented. `$getcracked` main is the sole
+user-facing entry point and owns orchestration directly rather than delegating
+it to a generic worker.
+
+- `$getcracked` main owns inventory reads and writes, topic selection,
+  per-topic `$generate` dispatch, `metadata.md` writes on success, sequential
+  inventory updates, and per-topic failure reporting.
+- `$generate` keeps its existing self-contained lifecycle; `$getcracked` does
+  not precreate runs or generate run-ids.
 
 ## Routing Principles
 

@@ -232,6 +232,11 @@
       background: rgba(217, 164, 65, 0.18);
     }
 
+    .status-planned {
+      color: #4a4a8b;
+      background: rgba(90, 90, 160, 0.16);
+    }
+
     ul {
       margin: 0;
       padding-left: 18px;
@@ -293,10 +298,12 @@
           <span class="eyebrow">Apollo</span>
           <h1>One topic. Ten slides. A deck you can open anywhere.</h1>
           <p>
-            Apollo is a Codex-native workflow that turns a single
-            software-engineering topic into a self-contained, interview-ready
-            slide deck. No external model, no API, no runtime — just a topic in
-            Codex and a validated <code>deck.html</code> with ten PNGs out.
+            Apollo is a Codex-native workflow that turns software-engineering
+            topics into self-contained, interview-ready slide decks. No external
+            model, no API, no runtime — just a category in Codex and validated
+            <code>deck.html</code> files with ten PNGs each out. Spec 0006
+            (Accepted, not yet implemented) makes <code>$getcracked</code> the
+            single way in, over a checked-in topic inventory.
           </p>
           <div class="meta">
             <span class="chip">Codex authoring</span>
@@ -325,32 +332,49 @@
         <div class="journey-grid">
           <article class="journey">
             <div class="journey-head">
-              <h3>1. Start with one topic</h3>
-              <span class="status status-ready">Ready</span>
+              <h3>1. Ask for topics in a category</h3>
+              <span class="status status-planned">Planned (0006)</span>
             </div>
             <ul>
-              <li>Invoke Apollo (<code>$apollo</code>) with a single software-engineering topic.</li>
+              <li>Invoke <code>$getcracked</code> — the sole user-facing entry point — with a category and a topic count, e.g. "give me 5 topics for Databases".</li>
+              <li>The category must be one of seven fixed names: DSA, System Design, Software Design, Java &amp; Backend Development, Databases, AI Engineering, Deep Learning. Unknown categories are rejected, never created.</li>
+              <li>The <code>web-researcher</code> agent reports what is currently tested or interviewed in that category — cited, in-session, never written to a file.</li>
+              <li><code>$getcracked</code> picks exactly the requested count of topics that are not already in the inventory and records them as <code>planned</code> in <code>docs/getcracked-inventory.md</code>.</li>
               <li>Broad topics get an interview-relevant angle; narrow topics get deeper treatment.</li>
-              <li>No project runtime exists yet — this runs inside a Codex session.</li>
-              <li>Every run has a caller-supplied unique <code>run-id</code>; its <code>deck.html</code> and ten PNGs live in <code>runs/&lt;run-id&gt;/</code> (no shared or cwd output folder).</li>
             </ul>
           </article>
 
           <article class="journey">
             <div class="journey-head">
-              <h3>2. Author in Codex</h3>
+              <h3>2. Generate one deck per topic</h3>
+              <span class="status status-planned">Planned (0006)</span>
+            </div>
+            <ul>
+              <li><code>$getcracked</code> dispatches one <code>$generate</code> workflow per selected topic; users never invoke research or <code>$generate</code> directly.</li>
+              <li>Each <code>$generate</code> owns its deck end to end and generates its own unique <code>run-id</code>; its <code>deck.html</code> and ten PNGs live in <code>runs/&lt;run-id&gt;/</code> (no shared or cwd output folder).</li>
+              <li>On success, <code>$getcracked</code> writes <code>runs/&lt;run-id&gt;/metadata.md</code> and flips that inventory entry to <code>generated</code> with a run link — one write at a time, never concurrent.</li>
+              <li>On failure the topic stays <code>planned</code>, gets no <code>metadata.md</code>, is reported, and the other topics still finish.</li>
+              <li><code>reviewed</code> is reached only by editing the inventory by hand; nothing in the workflow sets it.</li>
+              <li>No project runtime exists yet — this runs inside a Codex session.</li>
+            </ul>
+          </article>
+
+          <article class="journey">
+            <div class="journey-head">
+              <h3>3. Author in Codex</h3>
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
-              <li>`$apollo` delegates deck-body composition to the dedicated `.codex/agents/apollo/apollo-designer.toml` agent (not a generic worker/implementer); the design agent owns only `runs/&lt;run-id&gt;/deck.html` and does not alter templates, while the main workflow retains run setup, manifest validation, structural validation, retry orchestration, and PNG export; `templates/first-frame.html` (slide 1) and `templates/frame.html` (slides 2–10) stay immutable.</li>
+              <li>`$generate` delegates deck-body composition to the dedicated `.codex/agents/apollo/apollo-designer.toml` agent (not a generic worker/implementer); the design agent owns only `runs/&lt;run-id&gt;/deck.html` and does not alter templates, while the deck workflow retains run setup, manifest validation, structural validation, retry orchestration, and PNG export; `templates/first-frame.html` (slide 1) and `templates/frame.html` (slides 2–10) stay immutable.</li>
               <li>Each slide follows the fixed pedagogical order as an internal content-planning constraint — no separate outline artifact exists.</li>
               <li>Two checked-in standalone templates lock the shared frame: `templates/first-frame.html` fixes slide 1's category/topic/commentary, and `templates/frame.html` declares a body-safe area for slides 2–10 where the author composes the body freely.</li>
+              <li>`$generate` may consult the `web-researcher` agent to ground current content; that agent supplies findings only and makes no workflow decisions.</li>
             </ul>
           </article>
 
           <article class="journey">
             <div class="journey-head">
-              <h3>3. Produce a self-contained deck</h3>
+              <h3>4. Produce a self-contained deck</h3>
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
@@ -362,7 +386,7 @@
 
           <article class="journey">
             <div class="journey-head">
-              <h3>4. Review and revise (advisory)</h3>
+              <h3>5. Review and revise (advisory)</h3>
               <span class="status status-growing">Growing</span>
             </div>
             <ul>
@@ -374,7 +398,7 @@
 
           <article class="journey">
             <div class="journey-head">
-              <h3>5. Validate the deck</h3>
+              <h3>6. Validate the deck</h3>
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
@@ -386,7 +410,7 @@
 
           <article class="journey">
             <div class="journey-head">
-              <h3>6. Export ten PNGs</h3>
+              <h3>7. Export ten PNGs</h3>
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
@@ -398,7 +422,7 @@
 
           <article class="journey">
             <div class="journey-head">
-              <h3>7. Keep docs and terminology aligned</h3>
+              <h3>8. Keep docs and terminology aligned</h3>
               <span class="status status-ready">Ready</span>
             </div>
             <ul>
@@ -413,6 +437,16 @@
       <section class="panel">
         <h2>What Apollo Does</h2>
         <div class="capability-grid">
+          <article class="capability">
+            <span class="stage">Orchestration</span>
+            <h3>Turn a category into a topic backlog</h3>
+            <p><code>$getcracked</code> selects topics, records them in a durable inventory, and runs one deck per topic. Planned in spec 0006.</p>
+          </article>
+          <article class="capability">
+            <span class="stage">Research</span>
+            <h3>Ground topics in what is currently tested</h3>
+            <p>The <code>web-researcher</code> agent supplies cited in-session findings only — no files, no workflow decisions. Planned in spec 0006.</p>
+          </article>
           <article class="capability">
             <span class="stage">Authoring</span>
             <h3>Author a ten-slide deck via a Codex design-worker</h3>
@@ -450,6 +484,9 @@
           and visual review that reports back to the author, then HTML →
           validation + Playwright PNG export. Structural validation and PNG export
           are the only hard gates; the reference HTML is guidance, not a dependency.
+          Spec 0006 adds an orchestration layer above this pipeline — inventory,
+          topic selection, and per-topic dispatch — without changing the pipeline
+          itself.
         </p>
       </section>
 
@@ -457,8 +494,16 @@
         <h2>Key Artifacts</h2>
         <div class="artifact-grid">
           <article class="artifact">
-            <h3>Topic input</h3>
-            <p>A single software-engineering topic supplied to the Apollo workflow in Codex.</p>
+            <h3>Category + count input</h3>
+            <p>A fixed category and a topic count supplied to <code>$getcracked</code>; each selected topic becomes one deck run. Planned in spec 0006.</p>
+          </article>
+          <article class="artifact">
+            <h3>Topic inventory</h3>
+            <p><code>docs/getcracked-inventory.md</code> — seven fixed categories; each entry is a topic, a status, and a run link. Planned in spec 0006.</p>
+          </article>
+          <article class="artifact">
+            <h3>Run metadata</h3>
+            <p><code>runs/&lt;run-id&gt;/metadata.md</code> — a title plus a 1–2 sentence description, written on per-topic success. Planned in spec 0006.</p>
           </article>
           <article class="artifact">
             <h3>Self-contained deck</h3>
