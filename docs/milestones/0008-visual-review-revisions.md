@@ -4,6 +4,13 @@
 
 Draft
 
+## Status Notes
+
+- **Renumbered:** was milestone 0007; shifted one slot to 0008 when the
+  Accepted milestone 0006 (`get cracked` inventory and orchestration) took the
+  0006 slot and content review moved to 0007. Scope is unchanged by the
+  renumber.
+
 ## Goal
 
 Add non-blocking visual review that reads the rendered PNGs and helps the author
@@ -49,7 +56,7 @@ revisions.
 
 ## Out Of Scope
 
-- Content review and content reports (milestone 0006).
+- Content review and content reports (milestone 0007).
 - The frame template and manifest contract themselves (milestone 0003).
 - Any change to the structural validation or PNG export contract (owned by
   0001/0002) beyond re-rendering after an author revision.

@@ -104,6 +104,19 @@ These describe the contract the MVP code must respect, not pre-built abstraction
   and validates exact count and 1080×1350 image dimensions. The exporter owns
   rendered-dimension/overflow checks, exact names/count/sizes, and atomic output.
 
+### Seam 3: `assets/` brand assets boundary
+
+- **What**: `assets/` may hold standalone `getcracked.dev` brand assets for
+  external/social use. These assets are not referenced by, embedded in, or
+  exported with Apollo decks, which remain self-contained with no external
+  assets. Apollo keeps its own name and brand; `assets/` is a separate
+  external-facing space, not part of any deck.
+- **Why**: lets standalone brand material live in the repo without coupling it
+  to the self-contained deck pipeline or implying any deck external-asset
+  dependency.
+- **Current path**: `assets/` is decoupled from the Seam 1/Seam 2 pipeline;
+  nothing in the deck authoring or export path loads or ships these assets.
+
 ## Deferred Architecture
 
 Features intentionally NOT built in the MVP. Each names what is deferred and

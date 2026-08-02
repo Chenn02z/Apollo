@@ -4,6 +4,12 @@
 
 Draft
 
+## Status Notes
+
+- **Renumbered:** was milestone 0006; shifted one slot to 0007 when the
+  Accepted milestone 0006 (`get cracked` inventory and orchestration) took the
+  0006 slot. Scope is unchanged by the renumber.
+
 ## Goal
 
 Add non-blocking content review that helps the author raise a deck's
@@ -47,7 +53,7 @@ Implementation loop for advisory content review feeding author revisions.
 
 ## Out Of Scope
 
-- Visual review of rendered PNGs and visual reports (milestone 0007).
+- Visual review of rendered PNGs and visual reports (milestone 0008).
 - The frame template and manifest contract themselves (milestone 0003).
 - Any change to structural validation or PNG export (owned by 0001/0002).
 - Making content review a blocking gate — it is advisory only.
@@ -62,5 +68,5 @@ Implementation loop for advisory content review feeding author revisions.
 
 ## Deferred
 
-- Visual (rendered-PNG) review and reports (0007).
+- Visual (rendered-PNG) review and reports (0008).
 - Any escalation of content review into a hard gate.
