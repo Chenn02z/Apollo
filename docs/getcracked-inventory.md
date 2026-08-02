@@ -10,6 +10,11 @@ Durable backlog of Apollo deck topics organized by category. Each entry has exac
 ## System Design
 
 | Topic | Status | Run |
+| Design a High-Demand Ticket-Booking System | generated | `runs/system-design/run-24db24ae-24fd-4b44-b381-61ef36a698b9/` |
+| Design a Real-Time Chat and Presence System | generated | runs/system-design/run-744115b9-1f4c-48b7-b62d-141373b257dd/ |
+| Design a Social-Media News Feed | generated | runs/system-design/run-5d9f9256-389e-44d3-9ee2-081433ed2255/ |
+| Design a Payment-Processing System | generated | runs/system-design/run-9fedf998-333a-4332-a370-f9bd0db39a5a/ |
+| Design a Scalable LLM Inference API | generated | runs/system-design/run-011545f2-5340-429b-8cd3-16196c299632/ |
 |---|---|---|
 
 ## Software Design
