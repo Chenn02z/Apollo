@@ -14,7 +14,7 @@ exports ten PNGs. The only durable artifacts today are the docs in this repo
 (`docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/CONTEXT.md`, milestones,
 specs) and the untracked visual reference at `docs/reference/index.html`.
 
-Spec 0006 (Accepted, not yet implemented) adds an orchestration layer above this
+Spec 0006 (Verified) adds an orchestration layer above this
 pipeline: `$getcracked` becomes the sole user-facing entry point, taking a
 category and a topic count, and drives the pipeline once per selected topic.
 
@@ -22,7 +22,7 @@ The MVP production path is a pipeline of authoring, advisory review, and a
 validation-plus-export gate:
 
 1. **Topic → self-contained deck HTML.** `$generate` delegates deck-body
-   composition of each run's `runs/<run-id>/deck.html` to the dedicated
+   composition of each run's `<run-dir>/deck.html` to the dedicated
    `.codex/agents/apollo/apollo-designer.toml` agent (not a generic
    worker/implementer). That design agent authors the complete `deck.html` for a
    single topic using two checked-in standalone 1080×1350 source slides:
@@ -42,23 +42,21 @@ validation-plus-export gate:
    `deck.html` against a checked-in manifest's independent content and visual
    revision limits (each 0–5) and report feedback to the author, who revises the
    deck HTML. On revision exhaustion the run still delivers, writing run-scoped
-   reports under `runs/<run-id>/reviews/content` and `runs/<run-id>/reviews/visual`.
+   reports under `<run-dir>/reviews/content` and `<run-dir>/reviews/visual`.
    Review is advisory; it is not a hard gate.
 3. **HTML → validation + PNG export.** The `deck.html` is validated, then
    exported as exactly ten 1080×1350 PNGs named `slide-01.png` through
    `slide-10.png`. Structural validation and PNG export are the only hard gates.
 
 Each run is identified by a unique `run-id` the deck workflow generates itself;
-its artifacts live in a per-run folder `runs/<run-id>/` (its `deck.html` and
-`slide-01.png` … `slide-10.png`). `runs/` is local, gitignored generated output.
-The legacy flat `runs/deck.html` is preserved as pre-0002 evidence and is not
-overwritten by new runs.
-
-Each run is identified by a unique `run-id` the deck workflow generates itself;
-its artifacts live in a per-run folder `runs/<run-id>/` (its `deck.html` and
-`slide-01.png` … `slide-10.png`). `runs/` is local, gitignored generated output.
-The legacy flat `runs/deck.html` is preserved as pre-0002 evidence and is not
-overwritten by new runs.
+its artifacts live in a per-run folder (its `deck.html`, `metadata.md`, and
+`slide-01.png` … `slide-10.png`). Every `$getcracked`-dispatched run is
+category-scoped at `runs/<category-slug>/<run-id>/`; only a standalone
+`$generate` invocation without a category still writes a flat `runs/<run-id>/`.
+`runs/` is local, gitignored generated output. Historical flat runs are
+preserved as-is: the four seeded `runs/run-*/` directories keep their flat
+inventory links, and the legacy flat `runs/deck.html` remains pre-0002 evidence.
+Neither is moved or overwritten by new runs.
 
 ## Approved Seams
 
@@ -67,21 +65,23 @@ These describe the contract the MVP code must respect, not pre-built abstraction
 
 ### Orchestration boundary (above Seam 1)
 
-Accepted in spec 0006; not yet implemented.
+Verified in spec 0006.
 
 - **What**: `$getcracked` main sits above Seam 1 as the sole user-facing entry
   point. It takes a category and a topic count and owns inventory reads and
   writes (`docs/getcracked-inventory.md`), topic selection via the
   `web-researcher` agent, dispatch of one `$generate` workflow per selected
-  topic, `runs/<run-id>/metadata.md` writes on per-topic success, sequential
+  topic, `<run-dir>/metadata.md` writes on per-topic success, sequential
   inventory updates, and per-topic failure reporting.
 - **Why**: separates "what to make and what has been made" from "how one deck
   gets made", so a durable backlog and multi-topic runs can grow without
   reaching into the deck pipeline.
 - **Current path**: `$generate` keeps its existing self-contained lifecycle
-  unchanged — it generates its own `run-id`, creates `runs/<run-id>/`, reads
-  templates, validates the manifest, delegates to `apollo-designer`, runs
-  structural validation and PNG export, and retries up to 3 attempts.
+  unchanged — it generates its own `run-id`, creates its run directory
+  (`runs/<category-slug>/<run-id>/` under `$getcracked`, `runs/<run-id>/`
+  standalone), reads templates, validates the manifest, delegates to
+  `apollo-designer`, runs structural validation and PNG export, and retries up
+  to 3 attempts.
   `$getcracked` does not precreate runs or generate run-ids. Workflows are
   dispatched onto the runtime's own queue with no added cap, but inventory
   writes are serialized: one write at a time, never concurrent. A failed topic
@@ -89,9 +89,9 @@ Accepted in spec 0006; not yet implemented.
 
 ### Web-research agent boundary
 
-Accepted in spec 0006; not yet implemented.
+Verified in spec 0006.
 
-- **What**: a dedicated `web-researcher` agent, planned at
+- **What**: a dedicated `web-researcher` agent, configured at
   `.codex/agents/apollo/web-researcher.toml`, that supplies research findings
   only — cited sources, current topics, relevant technical context — returned
   in-session to its caller.
@@ -139,9 +139,10 @@ Accepted in spec 0006; not yet implemented.
 - **Why**: isolates authoring from export so future formats (PDF, video/audio)
   or batching can reuse the same validated HTML input.
 - **Current path**: validation and PNG export run as the second stage of the
-  MVP pipeline. `scripts/check-deck.py` validates `runs/<run-id>/deck.html`
-  through the 0005 slide-1 routing gate, then `node scripts/export-carousel.mjs <run-id>` rasterizes slides
-  1–10 into `runs/<run-id>/slide-01.png` through `slide-10.png` under
+  MVP pipeline. `scripts/check-deck.py` validates `<run-dir>/deck.html`
+  through the 0005 slide-1 routing gate, then
+  `node scripts/export-carousel.mjs <run-id> [--category <slug>]` rasterizes slides
+  1–10 into `<run-dir>/slide-01.png` through `slide-10.png` under
   local/offline Playwright (network disabled, 1080×1350 viewport, device scale 1)
   and validates exact count and 1080×1350 image dimensions. The exporter owns
   rendered-dimension/overflow checks, exact names/count/sizes, and atomic output.

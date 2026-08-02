@@ -41,10 +41,10 @@ The `apollo-designer` agent-routing decision for the `$generate` workflow. It de
 deck-body composition to the dedicated design agent and does not change the
 generic roles above.
 
-- `$generate` delegates deck-body composition of `runs/<run-id>/deck.html` to the
+- `$generate` delegates deck-body composition of `<run-dir>/deck.html` to the
   dedicated `.codex/agents/apollo/apollo-designer.toml` agent — not a generic
   worker/implementer. No generic worker runs Apollo composition.
-- The design agent authors only `runs/<run-id>/deck.html` within the immutable
+- The design agent authors only `<run-dir>/deck.html` within the immutable
   `templates/first-frame.html` for slide 1 (fixed category/topic/commentary, no
   body-safe area) and `templates/frame.html` for slides 2–10 (fixed header,
   footer, rail, rotated `get cracked` label, visual feel, type, colors, and
@@ -58,7 +58,7 @@ generic roles above.
 
 ## Apollo Web-Research Agent Routing
 
-Accepted in spec 0006; the agent is not yet created. The `web-researcher` agent
+Accepted in spec 0006; the agent lives at `.codex/agents/apollo/web-researcher.toml`. The `web-researcher` agent
 is planned at `.codex/agents/apollo/web-researcher.toml` as a dedicated agent,
 not a generic worker/implementer.
 
@@ -71,6 +71,8 @@ not a generic worker/implementer.
   relevant technical context returned in-session. It prefers primary sources
   (official documentation, papers, specifications, source code) over secondary
   commentary.
+- It uses native web search to surface current topics and cited sources; no
+  separate search plugin or tool proxy is required.
 - It edits no files — not `docs/getcracked-inventory.md`, decks, or templates —
   and its sources are never written under `docs/` or `runs/`.
 - It makes no workflow decisions: no topic selection, no dispatch, no status
@@ -78,7 +80,7 @@ not a generic worker/implementer.
 
 ## Apollo Orchestration Ownership
 
-Accepted in spec 0006; not yet implemented. `$getcracked` main is the sole
+Accepted in spec 0006; implemented. `$getcracked` main is the sole
 user-facing entry point and owns orchestration directly rather than delegating
 it to a generic worker.
 

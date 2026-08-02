@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Goal
 
@@ -11,7 +11,12 @@ operation with a durable backlog. `$getcracked` becomes the sole
 user-facing entry point that orchestrates research and generation
 internally over a checked-in inventory of topics. The deck-producing
 workflow renames from `$apollo` to `$generate` with its existing behavior
-unchanged. Each generated run becomes self-describing via `metadata.md`.
+unchanged. All future runs are category-scoped: `$getcracked` passes the
+category name to `$generate`, and `$generate` derives a normalized category
+slug and creates runs under `runs/<category-slug>/<run-id>/`. Existing flat
+run artifacts under `runs/run-*` are never moved or modified, and the four
+seeded inventory entries keep their flat run links. Each generated run
+becomes self-describing via `metadata.md`.
 A dedicated web-research agent supplies research findings to both
 `$getcracked` (topic selection) and `$generate` (content grounding)
 without making workflow decisions.
@@ -24,9 +29,10 @@ without making workflow decisions.
    teachable topics that are normalized-unique against existing inventory
    entries, appends them as `planned` to `docs/getcracked-inventory.md`,
    then dispatches one `$generate` workflow per selected topic. Each
-   `$generate` generates its own run-id, creates `runs/<run-id>/`, authors,
-   validates, exports, and retries — its existing behavior, unchanged. On
-   per-topic success, `$getcracked` writes `runs/<run-id>/metadata.md` and
+   `$generate` generates its own run-id, creates
+   `runs/<category-slug>/<run-id>/`, authors, validates, exports,
+   and retries — its existing behavior, unchanged. On per-topic success,
+   `$getcracked` writes `runs/<category-slug>/<run-id>/metadata.md` and
    transitions that inventory entry to `generated` with a run link.
 2. A forced-failure topic stays `planned`, gets no `metadata.md`, is
    reported, and does not block the other topics.
@@ -43,8 +49,10 @@ agent, per-topic `$generate` workflow dispatch, `metadata.md` writes, and
 sequential inventory updates. Seam 1's delegation contract (main →
 `apollo-designer` via `$generate`) is preserved: the design agent still
 authors `deck.html` only and never edits templates. `$generate`'s existing
-behavior is unchanged: it generates its own run-id, creates
-`runs/<run-id>/`, reads templates, validates the manifest, delegates
+behavior is unchanged: it generates its own run-id, creates the run
+directory (under `runs/<category-slug>/<run-id>/` when dispatched with a
+category by `$getcracked`, otherwise `runs/<run-id>/`), reads templates,
+validates the manifest, delegates
 deck-body composition to `apollo-designer`, runs structural validation,
 runs PNG export, and retries up to 3 attempts. Seam 2 (HTML →
 validation/PNG export) is unchanged. A new web-research agent boundary is
@@ -56,17 +64,23 @@ and never edits inventory, decks, or makes workflow decisions.
 - Rename `.agents/skills/apollo/` to `.agents/skills/generate/` and update
   its `SKILL.md` front-matter `name` to `generate`; invocation name becomes
   `$generate` with no alias, shim, or deprecation path. `$generate`'s
-  existing behavior (run-id generation, `runs/<run-id>/` creation, authoring,
-  validation, export, retries) is unchanged.
+  existing behavior (run-id generation, run-directory creation, authoring,
+  validation, export, retries) is unchanged. `$generate` now accepts
+  an optional `category` argument. When supplied (by `$getcracked`), it
+  normalizes the category name to a slug and creates
+  `runs/<category-slug>/<run-id>/`. When no category is supplied
+  (standalone invocation), `$generate` creates `runs/<run-id>/` as before.
 - Add `.agents/skills/getcracked/SKILL.md` as the sole user-facing
   orchestration skill. `$getcracked` is the only entry point users invoke.
   It orchestrates research and generation internally; users do not invoke
-  `$research` or `$generate` separately.
+  `$research` or `$generate` separately. `$getcracked` passes the category
+  name to each `$generate` invocation so the run directory is
+  category-scoped.
 - Add a dedicated web-research agent contract (see Web-Research Agent
   Contract). `$getcracked` uses it for topic selection; `$generate` uses
   it to ground current content for the chosen topic. The agent supplies
   research findings only.
-- `$getcracked`-written `runs/<run-id>/metadata.md` (title + 1–2 sentence
+- `$getcracked`-written `runs/<category-slug>/<run-id>/metadata.md` (title + 1–2 sentence
   description) on per-topic success only.
 - Sequential inventory writes in `$getcracked` main: it updates
   `docs/getcracked-inventory.md` one entry at a time after each
@@ -76,6 +90,9 @@ and never edits inventory, decks, or makes workflow decisions.
   and three-field entries (topic name, status, run link), seeded with four
   `generated` AI Engineering runs by exact run ID, excluding
   `run-b0472ccc-825f-418b-9ee5-19df1dcb4653`.
+  Seed entries use flat run links (`runs/run-*`); future entries
+  generated by `$getcracked` use categorized links
+  (`runs/<category-slug>/<run-id>/`).
 - Per-topic failure reporting: failed topic stays `planned`, no
   `metadata.md`, failure reported to developer, siblings proceed.
 - Minimal documentation alignment for the rename and new orchestration
@@ -84,10 +101,10 @@ and never edits inventory, decks, or makes workflow decisions.
 ## Out Of Scope
 
 - Any change to `$generate`'s existing behavior (run-id generation,
-  `runs/<run-id>/` creation, authoring, validation, export, retries).
+  run-directory creation, authoring, validation, export, retries).
 - Any change to `templates/first-frame.html`,
   `templates/frame.html`, `scripts/check-deck.py`,
-  `scripts/export-carousel.mjs`, `templates/manifest.json`,
+  `templates/manifest.json`,
   `tests/test_frame_template.py`, `tests/test_manifest.py`, or
   `tests/test_check_deck.py`.
 - Removing or altering the slide-1 `[COMMENTARY]` slot. Slide 1 retains
@@ -99,8 +116,12 @@ and never edits inventory, decks, or makes workflow decisions.
 - Durable storage or citation archiving of research sources.
 - Automating the `reviewed` transition or tying it to content/visual review
   (0007 / 0008).
+- Moving or modifying existing flat `runs/run-*` artifacts.
 - Retroactive metadata for pre-existing runs beyond the four seeded entries.
 - Unrelated doc cleanup beyond the documentation alignment listed below.
+- The `scripts/export-carousel.mjs` file is modified only to accept the
+  new nested run-path pattern; its validation and export logic is
+  unchanged.
 
 ## Architecture Seams
 
@@ -119,20 +140,22 @@ and never edits inventory, decks, or makes workflow decisions.
 - Per-topic failure reporting.
 
 `$generate` owns (unchanged from the existing `$apollo` skill):
-- Run-id generation and `runs/<run-id>/` creation.
+- Run-id generation and run directory creation.
+  When a category is supplied, creates `runs/<category-slug>/<run-id>/`;
+  otherwise `runs/<run-id>/`.
 - Reading both frame templates.
 - Reading and validating the manifest.
 - Delegating deck-body composition directly to `apollo-designer` (no
   intermediate generic worker).
 - Running structural validation (`scripts/check-deck.py`).
-- Running PNG export (`node scripts/export-carousel.mjs <run-id>`).
+- Running PNG export (`node scripts/export-carousel.mjs <run-id> [--category <slug>]`).
 - Retrying up to 3 total attempts on validation or export failure.
 - Optionally invoking the web-research agent to ground current content
   for the chosen topic before or during authoring.
 
 ### Seam 1 (Topic → deck HTML)
 
-Preserved unchanged. `apollo-designer` still authors `runs/<run-id>/deck.html`
+Preserved unchanged. `apollo-designer` still authors `<run-dir>/deck.html`
 only and never edits templates. Slide 1 retains its three slots: category,
 topic, and commentary.
 
@@ -183,11 +206,11 @@ Databases`. `$getcracked` orchestrates internally; users do not invoke
      onto the runtime's own queue with no added cap below the runtime's
      concurrency limit.
   2. Each `$generate` workflow generates its own run-id, creates
-     `runs/<run-id>/`, authors the deck, validates, exports, and retries —
+     `runs/<category-slug>/<run-id>/`, authors the deck, validates, exports, and retries —
      its existing behavior, unchanged. `$getcracked` does not precreate
      runs or generate run-ids.
   3. On per-topic success: `$getcracked` writes
-     `runs/<run-id>/metadata.md` with the deck title and a 1–2 sentence
+     `runs/<category-slug>/<run-id>/metadata.md` with the deck title and a 1–2 sentence
      description, then updates that topic's inventory entry to `generated`
      with a link to the run.
   4. On per-topic failure: the topic stays `planned`, no `metadata.md` is
@@ -201,17 +224,34 @@ Databases`. `$getcracked` orchestrates internally; users do not invoke
   verifies no interleaving by inspecting the final
   `docs/getcracked-inventory.md` state after all workflows finish.
 
+### Category Slug Derivation
+
+The category name maps to a normalized slug: lowercase, single-hyphen
+separator, ampersands and ASCII punctuation stripped.
+
+| Category | Slug |
+|---|---|
+| DSA | `dsa` |
+| System Design | `system-design` |
+| Software Design | `software-design` |
+| Java & Backend Development | `java-backend-development` |
+| Databases | `databases` |
+| AI Engineering | `ai-engineering` |
+| Deep Learning | `deep-learning` |
+
 ### `$generate` (renamed from `$apollo`, behavior unchanged)
 
 `$generate` is the deck-authoring workflow. Its behavior is identical to
-the existing `$apollo` skill: it generates its own run-id, creates
-`runs/<run-id>/`, reads both frame templates, reads and validates the
-manifest, delegates deck-body composition to `apollo-designer`, runs
-`scripts/check-deck.py`, runs `node scripts/export-carousel.mjs <run-id>`,
+the existing `$apollo` skill: it generates its own run-id, creates its run
+directory (`runs/<category-slug>/<run-id>/` when a category is supplied,
+otherwise `runs/<run-id>/`), reads both frame templates, reads and validates
+the manifest, delegates deck-body composition to `apollo-designer`, runs
+`scripts/check-deck.py`, runs
+`node scripts/export-carousel.mjs <run-id> [--category <slug>]`,
 and retries up to 3 total attempts on validation or export failure.
 
-The only change is the rename: path moves from
-`.agents/skills/apollo/SKILL.md` to `.agents/skills/generate/SKILL.md`,
+The changes are the rename and the optional category argument: path moves
+from `.agents/skills/apollo/SKILL.md` to `.agents/skills/generate/SKILL.md`,
 front-matter `name` changes from `apollo` to `generate`, and the invocation
 name becomes `$generate`.
 
@@ -352,6 +392,9 @@ changes. They are triggered via `$context` after implementation settles.
   deprecation path. `.agents/skills/apollo/` does not exist as a path. The
   skill lives at `.agents/skills/generate/SKILL.md` and `$generate` is the
   only name for the deck-authoring workflow.
+- Future runs are category-scoped (`runs/<category-slug>/<run-id>/`);
+  existing flat artifacts are untouched and seeded inventory links stay
+  flat.
 - `$getcracked` is the sole user-facing entry point. Users do not invoke
   `$research` or `$generate` separately when calling `$getcracked`.
 - `$getcracked` orchestrates research and generation internally: it invokes
@@ -359,7 +402,7 @@ changes. They are triggered via `$context` after implementation settles.
   count of normalized-unique teachable topics, appends them as `planned`,
   and dispatches one `$generate` workflow per topic.
 - `$generate`'s existing behavior is unchanged: it generates its own
-  run-id, creates `runs/<run-id>/`, authors, validates, exports, and
+  run-id, creates its run directory, authors, validates, exports, and
   retries up to 3 attempts. `$getcracked` does not precreate runs or
   generate run-ids.
 - The web-research agent supplies research findings only. It does not edit
@@ -367,7 +410,7 @@ changes. They are triggered via `$context` after implementation settles.
   Sources are shown in-session and never written to any file.
 - Slide 1 retains `[CATEGORY]`, `[TOPIC]`, and `[COMMENTARY]`. No template,
   test, or validator changes are made for slide 1.
-- On per-topic success, `$getcracked` writes `runs/<run-id>/metadata.md`
+- On per-topic success, `$getcracked` writes `runs/<category-slug>/<run-id>/metadata.md`
   with the deck title and a 1–2 sentence description, and updates that
   topic's inventory entry to `generated` with a link to the run.
   `$getcracked` writes inventory updates sequentially, one at a time,
@@ -400,7 +443,7 @@ changes. They are triggered via `$context` after implementation settles.
   replacement against a pre-existing entry, an in-session cited shortlist
   from the web-research agent, and no stored sources.
 - Confirm `$generate` workflows are dispatched one per topic and each
-  generates its own run-id and `runs/<run-id>/` directory.
+  generates its own run-id and `runs/<category-slug>/<run-id>/` directory.
 - Confirm `metadata.md` contents on success and inventory transition to
   `generated` with run link.
 - One forced-failure topic alongside a healthy topic; confirm per-topic
@@ -410,9 +453,12 @@ changes. They are triggered via `$context` after implementation settles.
 - `tests/test_frame_template.py`, `tests/test_manifest.py`, and
   `tests/test_check_deck.py` pass unchanged (no test modifications in this
   spec).
-- Confirm no existing run artifacts under `runs/` were modified.
+- Confirm no existing flat run artifacts under `runs/run-*` were modified.
+- Confirm seed inventory links stay flat (`runs/run-*`).
 - Confirm `.agents/skills/apollo/` no longer exists and
   `.agents/skills/generate/SKILL.md` does.
+- Confirm new runs land under `runs/<category-slug>/<run-id>/` when
+  dispatched by `$getcracked`.
 
 ## Handoff
 
@@ -420,15 +466,16 @@ changes. They are triggered via `$context` after implementation settles.
 - **intended consumer skill**: `$dev-loop`
 - **artifact path**:
   `docs/specs/0006-getcracked-inventory-and-orchestration.md`
-- **status**: Accepted
+- **status**: Verified
 - **settled decisions**:
   - `$getcracked` is the sole user-facing entry point. It orchestrates
     research and generation internally; users do not invoke `$research` or
     `$generate` separately.
-  - `$apollo` renames to `$generate` in both skill path and invocation
-    name, with no alias. `$generate`'s existing behavior is unchanged:
-    it generates its own run-id, creates `runs/<run-id>/`, authors,
-    validates, exports, and retries.
+  - `$apollo` renames to `$generate`; the skill accepts an optional
+    `category` argument for run-path scoping. `$generate`'s existing
+    behavior is unchanged: it generates its own run-id, creates its run
+    directory (`runs/<category-slug>/<run-id>/` with a category, otherwise
+    `runs/<run-id>/`), authors, validates, exports, and retries.
   - A dedicated web-research agent supplies research findings only. It does
     not edit inventory/decks or make workflow decisions. `$getcracked` uses
     it for topic selection; `$generate` uses it to ground current content.
@@ -451,10 +498,10 @@ changes. They are triggered via `$context` after implementation settles.
 - **docs / specs / milestones the next skill must read**:
   - `docs/WORKFLOWS.md` (handoff + spec status contract)
   - `docs/ARCHITECTURE.md` (Seam 1, Seam 2, new orchestration boundary)
-  - `docs/CONTEXT.md` (canonical terminology — needs `$context` update
-    after implementation for the rename and `$getcracked` addition)
+  - `docs/CONTEXT.md` (canonical terminology — updated by `$context` after
+    verification for the rename and `$getcracked` addition)
   - `docs/milestones/0006-getcracked-inventory-and-orchestration.md`
-    (Accepted milestone)
+    (Verified milestone)
   - `docs/specs/0005-deck-template-enforcement-and-inline-graphics.md`
     (current deck pipeline contract, preserved unchanged)
 - **agent routing log**:

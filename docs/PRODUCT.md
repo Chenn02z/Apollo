@@ -7,7 +7,7 @@ self-contained, interview-ready slide decks. Codex's available model authors the
 content directly. Apollo has no external model, no API integration, and no
 runtime multi-agent orchestration.
 
-Spec 0006 (Accepted, not yet implemented) makes Apollo a small content operation
+Spec 0006 (Verified) makes Apollo a small content operation
 with a durable backlog rather than a one-topic-at-a-time command. `$getcracked`
 is the sole user-facing entry point: the developer names a category and a topic
 count, and `$getcracked` selects the topics, records them in a checked-in
@@ -28,15 +28,16 @@ entirely within a Codex session, with no extra tooling to install or run.
 ## Scope (MVP)
 
 - Input: a category and a topic count supplied to `$getcracked`, which selects
-  the topics and drives one deck workflow per topic (Accepted in spec 0006, not
-  yet implemented). Each deck workflow still takes a single
-  software-engineering topic.
-- Durable backlog: `docs/getcracked-inventory.md` (Accepted, not yet created)
+  the topics and drives one deck workflow per topic (Verified in spec 0006).
+  Each deck workflow still takes a single software-engineering topic.
+- Durable backlog: `docs/getcracked-inventory.md`
   records topics under seven fixed categories — DSA, System Design, Software
   Design, Java & Backend Development, Databases, AI Engineering, Deep Learning
   — with a status (`planned`, `generated`, `reviewed`) and a run link. Each
-  successful run also gets a `runs/<run-id>/metadata.md` naming what it covers.
-  `reviewed` is set only by the developer editing the inventory by hand.
+  successful run also gets a `metadata.md` in its run folder naming what it
+  covers. The four seeded entries keep their historical flat `runs/run-*/`
+  links; every new entry links to a category-scoped run folder. `reviewed` is
+  set only by the developer editing the inventory by hand.
 - Authoring surface: the Apollo workflow running in Codex; the available Codex
   model authors the self-contained `deck.html` from a single topic using two
   checked-in standalone 1080×1350 source slides — `templates/first-frame.html`
@@ -46,9 +47,12 @@ entirely within a Codex session, with no extra tooling to install or run.
   rotated `get cracked` label, visual feel, type, and colors stay fixed. The
   author composes the body freely
 - Output: one standalone `deck.html` plus ten PNGs, `slide-01.png` to
-  `slide-10.png`, each 1080×1350 pixels — all written to a per-run folder
-  `runs/<run-id>/` for a unique `run-id` the deck workflow generates itself. No
-  shared or cwd output folder is used.
+  `slide-10.png`, each 1080×1350 pixels — all written to a per-run folder for a
+  unique `run-id` the deck workflow generates itself. Every
+  `$getcracked`-dispatched run is category-scoped at
+  `runs/<category-slug>/<run-id>/`; only a standalone `$generate` invocation
+  without a category writes a flat `runs/<run-id>/`. No shared or cwd output
+  folder is used, and historical flat runs are never moved or rewritten.
 - Pedagogical order (fixed, internal content-planning constraint): hook,
   definition, mental model, mechanics, flow, applied example, code/pseudocode,
   trade-off, misconception/failure, interviewer follow-up. The fixed order
@@ -77,7 +81,7 @@ entirely within a Codex session, with no extra tooling to install or run.
   deterministic layout engine for body content.
 - **Fail clean.** Incomplete or invalid output is an error, not a deliverable.
   The structural validator runs before export; any breach stops the run with a
-  clear error and no partial slide PNGs left in `runs/<run-id>/`.
+  clear error and no partial slide PNGs left in the run directory.
 - **Codex is the engine.** No model/API layer to configure; the authoring model
   is whatever Codex already provides.
 - **One way in, one deck per topic.** `$getcracked` is the only entry point the

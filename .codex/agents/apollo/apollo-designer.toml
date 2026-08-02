@@ -6,7 +6,7 @@ sandbox_mode = "workspace-write"
 
 developer_instructions = """
 You are the Apollo design worker. Your sole task is to author
-`runs/<run-id>/deck.html` — a valid, self-contained HTML file with no
+`runs/<category-slug>/<run-id>/deck.html` — a valid, self-contained HTML file with no
 external dependencies. Write nothing else. Never edit templates.
 
 Before writing, read every one of these sources completely:
@@ -187,7 +187,7 @@ Across all slides, inside `#body-safe-area`:
 
 ## Output
 
-Write only `runs/<run-id>/deck.html`. In your final message report:
+Write only `runs/<category-slug>/<run-id>/deck.html`. In your final message report:
 
 - The run-id
 - The topic-specific composition choices within the fixed hybrid visual

@@ -352,7 +352,7 @@
             <ul>
               <li><code>$getcracked</code> dispatches one <code>$generate</code> workflow per selected topic; users never invoke research or <code>$generate</code> directly.</li>
               <li>Each <code>$generate</code> owns its deck end to end and generates its own unique <code>run-id</code>; its <code>deck.html</code> and ten PNGs live in <code>runs/&lt;run-id&gt;/</code> (no shared or cwd output folder).</li>
-              <li>On success, <code>$getcracked</code> writes <code>runs/&lt;run-id&gt;/metadata.md</code> and flips that inventory entry to <code>generated</code> with a run link — one write at a time, never concurrent.</li>
+              <li>On success, <code>$getcracked</code> writes <code>runs/&lt;category-slug&gt;/&lt;run-id&gt;/metadata.md</code> and flips that inventory entry to <code>generated</code> with a run link — one write at a time, never concurrent.</li>
               <li>On failure the topic stays <code>planned</code>, gets no <code>metadata.md</code>, is reported, and the other topics still finish.</li>
               <li><code>reviewed</code> is reached only by editing the inventory by hand; nothing in the workflow sets it.</li>
               <li>No project runtime exists yet — this runs inside a Codex session.</li>
@@ -440,12 +440,12 @@
           <article class="capability">
             <span class="stage">Orchestration</span>
             <h3>Turn a category into a topic backlog</h3>
-            <p><code>$getcracked</code> selects topics, records them in a durable inventory, and runs one deck per topic. Planned in spec 0006.</p>
+            <p><code>$getcracked</code> selects topics, records them in a durable inventory, and runs one deck per topic. Implemented in spec 0006.</p>
           </article>
           <article class="capability">
             <span class="stage">Research</span>
             <h3>Ground topics in what is currently tested</h3>
-            <p>The <code>web-researcher</code> agent supplies cited in-session findings only — no files, no workflow decisions. Planned in spec 0006.</p>
+            <p>The <code>web-researcher</code> agent supplies cited in-session findings only — no files, no workflow decisions. Implemented in spec 0006.</p>
           </article>
           <article class="capability">
             <span class="stage">Authoring</span>
@@ -495,15 +495,15 @@
         <div class="artifact-grid">
           <article class="artifact">
             <h3>Category + count input</h3>
-            <p>A fixed category and a topic count supplied to <code>$getcracked</code>; each selected topic becomes one deck run. Planned in spec 0006.</p>
+            <p>A fixed category and a topic count supplied to <code>$getcracked</code>; each selected topic becomes one deck run. Implemented in spec 0006.</p>
           </article>
           <article class="artifact">
             <h3>Topic inventory</h3>
-            <p><code>docs/getcracked-inventory.md</code> — seven fixed categories; each entry is a topic, a status, and a run link. Planned in spec 0006.</p>
+            <p><code>docs/getcracked-inventory.md</code> — seven fixed categories; each entry is a topic, a status, and a run link. Implemented in spec 0006.</p>
           </article>
           <article class="artifact">
             <h3>Run metadata</h3>
-            <p><code>runs/&lt;run-id&gt;/metadata.md</code> — a title plus a 1–2 sentence description, written on per-topic success. Planned in spec 0006.</p>
+            <p><code>runs/&lt;category-slug&gt;/&lt;run-id&gt;/metadata.md</code> — a title plus a 1–2 sentence description, written on per-topic success. Implemented in spec 0006.</p>
           </article>
           <article class="artifact">
             <h3>Self-contained deck</h3>

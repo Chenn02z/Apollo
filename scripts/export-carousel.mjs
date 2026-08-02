@@ -7,14 +7,21 @@ const W = 1080, H = 1350, N = 10;
 
 const die = (c, m) => { console.error(m); process.exit(c); };
 
-const runId = process.argv[2];
+const args = process.argv.slice(2);
+let runId = null, category = null;
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--category' && i + 1 < args.length) category = args[++i];
+  else if (!runId) runId = args[i];
+}
 if (!runId || !RE.test(runId))
-  die(2, 'usage: node scripts/export-carousel.mjs <run-id>');
+  die(2, 'usage: node scripts/export-carousel.mjs <run-id> [--category <slug>]');
 
-const dir = join(process.cwd(), 'runs', runId);
+const dir = category
+  ? join(process.cwd(), 'runs', category, runId)
+  : join(process.cwd(), 'runs', runId);
 const deck = join(dir, 'deck.html');
 if (!existsSync(deck))
-  die(2, `EXPORT_ERROR: missing runs/${runId}/deck.html`);
+  die(2, `EXPORT_ERROR: missing ${category ? `runs/${category}/${runId}/deck.html` : `runs/${runId}/deck.html`}`);
 
 const s = i => `slide-${String(i).padStart(2, '0')}.png`;
 
@@ -88,5 +95,5 @@ try {
   await browser?.close();
 }
 
-if (!exit.c) console.log(`exported ${N} slides to runs/${runId}/`);
+if (!exit.c) console.log(`exported ${N} slides to ${category ? `runs/${category}/${runId}/` : `runs/${runId}/`}`);
 else die(exit.c, exit.m);

@@ -2,12 +2,20 @@
 
 ## Status
 
-Accepted
+Verified
 
 ## Status Notes
 
 - **Accepted by user:** the developer settled the decisions below directly in
-  requirements. Spec authoring may start; implementation is not yet authorized.
+  requirements.
+- **Verified:** spec 0006 was implemented and its targeted tests and final
+  review passed. Both the spec and this milestone are `Verified`.
+- **Amended after acceptance — run paths are category-scoped:** the settled
+  direction is that every `$getcracked`-dispatched run lands under
+  `runs/<category-slug>/<run-id>/`, and `$generate` still creates a flat
+  `runs/<run-id>/` only for a standalone invocation with no category. The four
+  seeded inventory entries keep their historical flat `runs/run-*/` links, and
+  no existing flat run artifact is moved or modified.
 - **Renames the deck workflow:** `$apollo` becomes `$generate`. Prior review
   milestones shift one slot: content review is now 0007, visual review is now
   0008.
@@ -18,8 +26,9 @@ Accepted
   unchanged; `$getcracked` is the sole user-facing invocation
   (`$getcracked give me N topics for <category>`) and orchestrates research,
   selection, inventory writes, and per-topic dispatch internally; `$generate` is
-  a pure rename of the existing `$apollo` behavior and still owns its own run-id
-  and `runs/<run-id>/` creation. A dedicated `web-researcher` agent supplies
+  a pure rename of the existing `$apollo` behavior, plus an optional category
+  argument for run-path scoping, and still owns its own run-id and run-directory
+  creation. A dedicated `web-researcher` agent supplies
   findings-only, in-session research to both topic selection and content
   grounding.
 - **Amended after acceptance — settled review findings:** `$generate` delegates
@@ -35,8 +44,8 @@ Accepted
 Turn Apollo from a one-topic-at-a-time deck command into a small content
 operation with a durable backlog. Today every deck is produced by invoking
 `$apollo` on one topic, and nothing in the repo records what has been made,
-what is worth making next, or which topic a given `runs/<run-id>/` folder
-belongs to. Run folders are UUID-named and opaque.
+what is worth making next, or which topic a given run folder belongs to. Run
+folders are UUID-named and opaque.
 
 This milestone introduces `$getcracked` as the sole user-facing entry point over
 a checked-in inventory of topics, renames the deck-producing workflow to
@@ -51,7 +60,7 @@ The developer can run `$getcracked give me N topics for <category>` and get N
 researched, normalized-unique topics recorded as `planned` in
 `docs/getcracked-inventory.md`, one deck generated per topic, and each
 successful topic flipped to `generated` with a run link and a
-`runs/<run-id>/metadata.md`.
+`runs/<category-slug>/<run-id>/metadata.md`.
 
 Verifiable success criteria:
 
@@ -78,10 +87,12 @@ Verifiable success criteria:
 - `$getcracked` dispatches exactly one `$generate` workflow per selected topic
   onto the runtime's own queue, with no cap below whatever concurrency the
   runtime already allows. Dispatch never uses `codex exec`.
-- `$generate` is a rename of the current Apollo deck behavior with no behavioral
-  change: it generates its own run-id, creates `runs/<run-id>/`, reads both
-  frame templates, reads and validates the manifest, delegates deck-body
-  composition directly to `apollo-designer` with no intermediate generic worker,
+- `$generate` is a rename of the current Apollo deck behavior, with an optional
+  category argument as the only addition: it generates its own run-id, creates
+  `runs/<category-slug>/<run-id>/` when dispatched with a category and
+  `runs/<run-id>/` when invoked standalone, reads both frame templates, reads
+  and validates the manifest, delegates deck-body composition directly to
+  `apollo-designer` with no intermediate generic worker,
   runs structural validation, runs PNG export, and retries up to 3 total
   attempts on validation or export failure. `$getcracked` never precreates runs
   or generates run-ids.
@@ -92,9 +103,10 @@ Verifiable success criteria:
   `[COMMENTARY]` — unchanged. No change is made to
   `templates/first-frame.html`, the `apollo-designer` slide-1 authoring
   contract, structural validation, or slide-1 tests.
-- On a per-topic success only, `$getcracked` writes `runs/<run-id>/metadata.md`
-  with the deck title and a 1–2 sentence description, and updates that topic's
-  inventory entry to `generated` with a link to the run. `$getcracked`
+- On a per-topic success only, `$getcracked` writes
+  `runs/<category-slug>/<run-id>/metadata.md` with the deck title and a 1–2
+  sentence description, and updates that topic's inventory entry to `generated`
+  with a link to the run. `$getcracked`
   serializes every inventory write, so concurrent workflow completions never
   interleave edits to `docs/getcracked-inventory.md`.
 - On a per-topic failure, the topic stays `planned`, no `metadata.md` is written
@@ -147,7 +159,9 @@ contract, then implementation through `$spec` and `$dev-loop`.
 - Research findings and their citations are shown in-session only. Sources are
   never stored.
 - The run lifecycle stays inside `$generate`: it generates its own run-id and
-  creates `runs/<run-id>/`. `$getcracked` never precreates runs.
+  creates its own run directory — `runs/<category-slug>/<run-id>/` under
+  `$getcracked`, `runs/<run-id>/` standalone. `$getcracked` never precreates
+  runs.
 - `$getcracked` dispatches one `$generate` workflow per selected topic onto the
   runtime's queue. The workflow adds no cap below the runtime's own concurrency
   limit, and dispatch never uses `codex exec`.
@@ -181,8 +195,8 @@ contract, then implementation through `$spec` and `$dev-loop`.
   topic selection and by `$generate` for content grounding.
 - Per-topic dispatch from `$getcracked` to one `$generate` workflow, queued by
   the runtime, not capped lower by the workflow, and never via `codex exec`.
-- `$getcracked`-written `runs/<run-id>/metadata.md` (title + 1–2 sentence
-  description) on per-topic success.
+- `$getcracked`-written `runs/<category-slug>/<run-id>/metadata.md` (title +
+  1–2 sentence description) on per-topic success.
 - Serialized inventory writes in `$getcracked`.
 - Create `docs/getcracked-inventory.md` with the seven fixed categories and the
   three-field entry shape.
@@ -207,11 +221,13 @@ contract, then implementation through `$spec` and `$dev-loop`.
   categories.
 - Persisting research sources to disk in any form.
 - Any change to `$generate`'s existing behavior, including run-id generation,
-  `runs/<run-id>/` creation, authoring, validation, export, and the 3-attempt
-  retry behavior. The rename is the only change to that workflow.
+  run-directory creation, authoring, validation, export, and the 3-attempt
+  retry behavior. The rename and the optional category argument for run-path
+  scoping are the only changes to that workflow.
 - Any change to `templates/first-frame.html`, `templates/frame.html`,
-  `templates/manifest.json`, `scripts/check-deck.py`,
-  `scripts/export-carousel.mjs`, or the slide-1 tests.
+  `templates/manifest.json`, `scripts/check-deck.py`, or the slide-1 tests.
+  `scripts/export-carousel.mjs` changes only to accept the category-scoped run
+  path; its validation and export logic is unchanged.
 - Any change to slide 1, including removing or altering `[COMMENTARY]`, adding
   slots, re-layout, or restyling.
 - Any user-facing subcommand, additional invocation, or direct developer
@@ -219,6 +235,8 @@ contract, then implementation through `$spec` and `$dev-loop`.
 - Any automatic use of `reviewed`; review remains manual inventory editing.
 - Backfilling metadata or inventory entries for the excluded Apollo
   slide-template test run.
+- Moving or modifying existing flat `runs/run-*/` artifacts, or re-linking the
+  four seeded inventory entries to category-scoped paths.
 - Content-review revisions and reports (0007) and visual-review revisions and
   reports (0008).
 
@@ -236,8 +254,8 @@ contract, then implementation through `$spec` and `$dev-loop`.
   decision, so neither caller hands control to it.
 - **Seam 1 (topic → deck HTML)** stays owned by `$generate` and
   `apollo-designer`, unchanged. `$generate` still generates its own run-id,
-  creates `runs/<run-id>/`, and delegates deck-body composition directly to
-  `apollo-designer`. The authoring contract is untouched: slide 1 keeps
+  creates its own run directory, and delegates deck-body composition directly
+  to `apollo-designer`. The authoring contract is untouched: slide 1 keeps
   category, topic, and commentary.
 - **Seam 2 (HTML → validation/PNG export)** is unchanged. Structural validation
   and PNG export remain the only hard gates and stay inside the per-topic
@@ -248,14 +266,15 @@ contract, then implementation through `$spec` and `$dev-loop`.
 
 ## Specs
 
-- Proposed: `docs/specs/0006-getcracked-inventory-and-orchestration.md`
+- Verified: `docs/specs/0006-getcracked-inventory-and-orchestration.md`
 
 ## Acceptance Criteria
 
 - `$generate` produces a validated, exported deck with its existing behavior
-  intact, including its own run-id and `runs/<run-id>/` creation; `$apollo` is
-  gone from the skill surface and the skill lives at
-  `.agents/skills/generate/SKILL.md`.
+  intact, including its own run-id and run-directory creation; new
+  `$getcracked`-dispatched runs land under `runs/<category-slug>/<run-id>/`
+  while existing flat run artifacts stay untouched; `$apollo` is gone from the
+  skill surface and the skill lives at `.agents/skills/generate/SKILL.md`.
 - A freshly generated deck's slide 1 still renders category, topic, and
   commentary, and `templates/first-frame.html`, the `apollo-designer` contract,
   `scripts/check-deck.py`, and the slide-1 tests are unmodified.
@@ -268,8 +287,8 @@ contract, then implementation through `$spec` and `$dev-loop`.
   only by an article are treated as distinct.
 - The same invocation dispatches one `$generate` workflow per selected topic
   with no `codex exec`, and on success flips each topic to `generated` with a
-  run link and a `runs/<run-id>/metadata.md` containing a title and a 1–2
-  sentence description. Concurrent completions produce a well-formed inventory
+  run link and a `runs/<category-slug>/<run-id>/metadata.md` containing a title
+  and a 1–2 sentence description. Concurrent completions produce a well-formed inventory
   with every entry updated exactly once.
 - A deliberately failing topic in a multi-topic run is reported, stays
   `planned`, has no `metadata.md`, and does not prevent sibling topics from
@@ -284,8 +303,9 @@ contract, then implementation through `$spec` and `$dev-loop`.
   of at least two; confirm the in-session cited findings, no stored sources,
   exactly N new planned entries, normalized-name de-duplication with
   replacement against a pre-existing entry, one `$generate` workflow per topic,
-  each workflow creating its own run directory, `metadata.md` contents, and
-  inventory transitions to `generated`.
+  each workflow creating its own category-scoped run directory under
+  `runs/<category-slug>/<run-id>/`, `metadata.md` contents, and inventory
+  transitions to `generated`.
 - Confirm no separate research or generate subcommand is required or exposed,
   and that no dispatch path shells out to `codex exec`.
 - One forced-failure topic alongside a healthy topic; confirm per-topic isolation
@@ -296,7 +316,8 @@ contract, then implementation through `$spec` and `$dev-loop`.
   `tests/test_manifest.py` pass unchanged, with no slide-1 test modifications.
 - Grep confirms `[COMMENTARY]` still exists in `templates/first-frame.html` and
   the `apollo-designer` contract.
-- Confirm no existing run artifacts under `runs/` were modified.
+- Confirm no existing flat run artifacts under `runs/run-*/` were modified and
+  that the four seeded inventory links stay flat.
 
 ## Deferred
 
@@ -323,11 +344,12 @@ mechanism for inventory writes.
 - producer skill: `$requirements`
 - intended consumer skill: `$spec`
 - artifact path: `docs/milestones/0006-getcracked-inventory-and-orchestration.md`
-- status: `Accepted`
+- status: `Verified`
 - settled decisions: see **Decisions** above — `$apollo` renames to `$generate`
   in both skill path and invocation name, with no alias, and `$generate`'s
-  existing behavior is otherwise unchanged, including its own run-id and
-  `runs/<run-id>/` creation, deck authoring, validation, export, retries, and
+  existing behavior is otherwise unchanged apart from an optional category
+  argument for run-path scoping, including its own run-id and run-directory
+  creation, deck authoring, validation, export, retries, and
   direct delegation of deck-body composition to `apollo-designer`;
   `$getcracked give me N topics for <category>` is the sole user-facing
   invocation and has no subcommands, orchestrating research, selection,

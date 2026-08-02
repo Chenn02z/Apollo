@@ -2,16 +2,16 @@
 
 > Turn one software-engineering topic into a self-contained, interview-ready slide deck — authored in Codex, delivered as one offline HTML file and ten PNGs.
 
-Apollo is a Codex-native workflow. Spec 0006 (Accepted, not yet implemented)
+Apollo is a Codex-native workflow. Spec 0006 (Implemented)
 settles `$getcracked` as the sole user-facing entry point: you invoke it with a
 category and a topic count (for example, "give me 5 topics for Databases"), and
 it selects topics, records them in a checked-in inventory, and runs one
 `$generate` workflow per topic. `$generate` — the deck-authoring workflow,
 renamed from `$apollo` — owns one deck end to end: it generates its own
-`run-id`, creates `runs/<run-id>/`, authors, validates, exports, and retries.
+`run-id`, creates the run directory (`runs/<category-slug>/<run-id>/` when dispatched with a category, otherwise `runs/<run-id>/`), authors, validates, exports, and retries.
 It delegates deck-body composition to the dedicated
 `.codex/agents/apollo/apollo-designer.toml` agent (not a generic
-worker/implementer); the design agent owns only `runs/<run-id>/deck.html` and
+worker/implementer); the design agent owns only `<run-dir>/deck.html` and
 does not alter templates, while the deck workflow retains run setup, manifest
 validation, structural validation, retry orchestration, and PNG export. There
 is no external
@@ -21,18 +21,18 @@ model, no API integration, and no external runtime to run.
 
 - **One topic in, one deck out.** Apollo produces exactly one standalone HTML
   file (`deck.html`) plus exactly ten PNG slides, written to a per-run folder
-  `runs/<run-id>/` for a unique `run-id` the deck workflow generates itself.
-- **A durable topic backlog.** Under spec 0006 (Accepted, not yet implemented),
-  `docs/getcracked-inventory.md` records topics under seven fixed categories
+  (`runs/<category-slug>/<run-id>/` when dispatched with a category,
+  otherwise `runs/<run-id>/`) for a unique `run-id` the deck workflow generates itself.
+- **A durable topic backlog.** `docs/getcracked-inventory.md` records topics under seven fixed categories
   with a status (`planned`, `generated`, `reviewed`) and a run link, and each
-  successful run gets a `metadata.md` naming what it covers. `reviewed` is set
+  successful run gets a `runs/<category-slug>/<run-id>/metadata.md` naming what it covers. `reviewed` is set
   by hand only.
 - **Exactly ten coherent slides.** Every deck follows a fixed pedagogical order:
   hook, definition, mental model, mechanics, flow, applied example,
   code/pseudocode, trade-off, misconception/failure, interviewer follow-up.
 - **Self-contained output.** No external assets, no network calls, no
   interactivity or animation. Each slide is 1080×1350 CSS pixels and exports as
-  `runs/<run-id>/slide-01.png` through `runs/<run-id>/slide-10.png`.
+  `<run-dir>/slide-01.png` through `<run-dir>/slide-10.png`.
 - **Locked frame, free body.** Two checked-in standalone 1080×1350 source
   templates (not full decks) build the ten-slide deck: `templates/first-frame.html`
   is used only for slide 1, carrying a fixed category/topic/commentary
@@ -68,14 +68,14 @@ model, no API integration, and no external runtime to run.
 3. Content and visual reviewers check the deck against the manifest's
    independent revision limits and report feedback to the author, who revises the
    deck HTML. Review is advisory: when the revision budget is exhausted the run
-   still delivers, writing run-scoped reports under `runs/<run-id>/reviews/`.
+   still delivers, writing run-scoped reports under `<run-dir>/reviews/`.
 4. Apollo validates the deck first (`scripts/check-deck.py`, reused unchanged):
    exactly ten top-level slides, correct dimensions, no overflow, no external
    dependencies.
 5. Apollo exports exactly ten 1080×1350 PNGs via a deterministic local
-   Node Playwright script (`scripts/export-carousel.mjs <run-id>`) that
-   rasterizes slides 1–10 into `runs/<run-id>/slide-01.png` through
-   `runs/<run-id>/slide-10.png` (network disabled, 1080×1350 viewport, device
+   Node Playwright script (`scripts/export-carousel.mjs <run-id> [--category <slug>]`) that
+   rasterizes slides 1–10 into `<run-dir>/slide-01.png` through
+   `<run-dir>/slide-10.png` (network disabled, 1080×1350 viewport, device
    scale 1) and validates count and dimensions. On any failure it emits a clear
    error and leaves no partial slide PNGs for the run.
 

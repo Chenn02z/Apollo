@@ -1,14 +1,31 @@
 ---
-name: apollo
-description: Authors a ten-slide deck.html from a topic for carousel export.
+name: generate
+description: Authors a ten-slide deck.html from a topic for carousel export. Accepts an optional category for run-path scoping.
 ---
 
-# Apollo Deck Authoring
+# Deck Generation
 
-When the user invokes `$apollo "<topic>"` with an optional angle or context,
-set up the per-run scaffolding, delegate full deck-body composition to the
-`apollo-designer` agent, validate, export, and re-delegate on failure up to
-3 attempts.
+When the user invokes `$generate "<topic>"` with an optional angle, context,
+or category, set up the per-run scaffolding, delegate full deck-body
+composition to the `apollo-designer` agent, validate, export, and
+re-delegate on failure up to 3 attempts.
+
+## 0. Category (optional)
+
+If `$getcracked` (or the user) supplies a `--category` or `category`
+argument, normalize the category name to a slug:
+
+- Lowercase, single-hyphen separator, ampersands and ASCII punctuation
+  stripped.
+- The seven exact category names map to: DSA → `dsa`, System Design →
+  `system-design`, Software Design → `software-design`, Java & Backend
+  Development → `java-backend-development`, Databases → `databases`,
+  AI Engineering → `ai-engineering`, Deep Learning → `deep-learning`.
+
+When a category is supplied, the run directory is
+`runs/<category-slug>/<run-id>/`. When no category is supplied (standalone
+invocation), the run directory is `runs/<run-id>/` as before. In the steps
+below, `<run-dir>` refers to the chosen run directory.
 
 ## 1. Generate run-id
 
@@ -21,7 +38,7 @@ Capture the output; this is `<run-id>`.
 ## 2. Create run directory
 
 ```sh
-mkdir -p runs/<run-id>
+mkdir -p <run-dir>
 ```
 
 ## 3. Read both frame templates
@@ -62,7 +79,7 @@ Read `templates/manifest.json`. Validate as follows:
   to both defaults `1`/`1`.
 - If the file is missing, halt with "Missing templates/manifest.json".
 
-`$apollo` reads and validates the manifest but does **not** run review loops.
+`$generate` reads and validates the manifest but does **not** run review loops.
 The manifest values are consumed by downstream review milestones.
 
 ## 5. Delegate deck-body composition to apollo-designer
@@ -76,37 +93,44 @@ pedagogical order, constraints).
 
 Provide the agent with:
 
-- The `<run-id>`
+- The `<run-id>` and `<run-dir>`
 - The `<topic>` exactly as given by the user
 - Any user-provided angle or context, passed through verbatim
+- The `<category>` if one was supplied
 
-The apollo-designer agent writes `runs/<run-id>/deck.html` and reports its
+The apollo-designer agent writes `<run-dir>/deck.html` and reports its
 chosen anchor, motif, and path.
 
 ## 6. Validate deck structure
 
 ```sh
-python scripts/check-deck.py runs/<run-id>/deck.html
+python scripts/check-deck.py <run-dir>/deck.html
 ```
 
 ## 7. Export carousel
 
+When no category was supplied:
 ```sh
 node scripts/export-carousel.mjs <run-id>
+```
+
+When a category was supplied:
+```sh
+node scripts/export-carousel.mjs <run-id> --category <category-slug>
 ```
 
 ## 8. Re-delegate on failure
 
 If structural validation (step 6) or export (step 7) fails, re-delegate to
 the `apollo-designer` agent with the failure output. Instruct it to fix
-`runs/<run-id>/deck.html` only — never edit templates. Repeat up to 3
-total delegation attempts (the initial plus up to 2 re-delegations).
+`<run-dir>/deck.html` only — never edit templates. Repeat up to 3 total
+delegation attempts (the initial plus up to 2 re-delegations).
 
 On success (step 7 exit 0), clearly report:
 
 - The run-id
-- `runs/<run-id>/deck.html`
-- `runs/<run-id>/slide-01.png` through `runs/<run-id>/slide-10.png`
+- `<run-dir>/deck.html`
+- `<run-dir>/slide-01.png` through `<run-dir>/slide-10.png`
 
 On persistent failure after 3 attempts, surface the final error verbatim.
 Never claim PNG success when the export command fails.
